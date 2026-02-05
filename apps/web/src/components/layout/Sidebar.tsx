@@ -1,7 +1,6 @@
 import React from 'react';
 import { Home, Swords, Store, Mail, Settings, User } from 'lucide-react';
 import { NavLink } from 'react-router-dom';
-import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
 const NavItem = ({ to, icon: Icon, label }: { to: string; icon: any; label: string }) => (

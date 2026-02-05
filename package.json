@@ -1,6 +1,7 @@
 {
   "name": "aojiru-senki",
   "version": "1.0.0",
+  "packageManager": "npm@10.2.4",
   "description": "",
   "main": "index.js",
   "scripts": {
