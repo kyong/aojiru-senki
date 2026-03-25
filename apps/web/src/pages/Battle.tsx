@@ -19,7 +19,7 @@ type EnemyData = {
 const ENEMIES: Record<number, EnemyData> = {
   1: { name: 'カリカリベーコン将軍', hp: 600,  maxHp: 600,  minAtk: 15, maxAtk: 25, image: '/images/bacon_general.png',          intro: '「朝から脂ギッシュにしてやるぜぇ……！」', bgImage: '/images/bacon_general_bg.png' },
   2: { name: '炭水化物・ザ・グレート', hp: 1500, maxHp: 1500, minAtk: 40, maxAtk: 55, image: '/images/carb_the_great.png', intro: '「血糖値を上げてやる……眠くなれぇ……」', bgImage: '/images/carb_the_great_bg.png' },
-  3: { name: '魔王コレステロール・キング', hp: 3000, maxHp: 3000, minAtk: 70, maxAtk: 90, image: '/images/cholesterol_king.png', intro: '「我こそは成人病の王なり……健康など不要！」' },
+  3: { name: '魔王コレステロール・キング', hp: 3000, maxHp: 3000, minAtk: 70, maxAtk: 90, image: '/images/cholesterol_king.png', intro: '「我こそは成人病の王なり……健康など不要！」', bgImage: '/images/cholesterol_king_bg.png' },
 };
 
 const STORY_TEXT: Record<number, string[]> = {
