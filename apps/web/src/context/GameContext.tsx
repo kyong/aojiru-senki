@@ -4,6 +4,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useRef,
   type PropsWithChildren,
 } from 'react';
 import type {
@@ -15,6 +16,9 @@ import type {
 import * as storage from '../store/storage';
 import { getCharacterById } from '../store/characters';
 
+// 1AP回復にかかる秒数（5分）
+const AP_RECOVERY_INTERVAL_SEC = 5 * 60;
+
 // ============================================================
 // Context 型定義
 // ============================================================
@@ -25,6 +29,8 @@ type GameContextValue = {
   party: PartyState;
   inventory: InventoryState;
   receivedPresentIds: ReceivedPresentState;
+  /** 次のAP回復まで残り何秒か（AP満タン時は null） */
+  nextApRecoveryIn: number | null;
 
   // Player actions
   addGold: (amount: number) => void;
@@ -64,12 +70,52 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [receivedPresentIds, setReceivedPresentIds] = useState<ReceivedPresentState>(
     () => storage.getReceivedPresentIds()
   );
+  const [nextApRecoveryIn, setNextApRecoveryIn] = useState<number | null>(null);
+  const apRecoveryTimeRef = useRef<number>(storage.getApRecoveryTime());
 
   // State が変わったら自動保存
   useEffect(() => { storage.savePlayer(player); }, [player]);
   useEffect(() => { storage.saveParty(party); }, [party]);
   useEffect(() => { storage.saveInventory(inventory); }, [inventory]);
   useEffect(() => { storage.saveReceivedPresentIds(receivedPresentIds); }, [receivedPresentIds]);
+
+  // ---- AP 自動回復 ----
+  // 起動時: アプリを閉じていた間に回復すべきAPを遡って加算
+  // 起動中: 毎秒チェックして回復タイミングになったらAPを加算
+  useEffect(() => {
+    const tick = () => {
+      setPlayer(p => {
+        if (p.ap >= p.maxAp) {
+          setNextApRecoveryIn(null);
+          return p;
+        }
+        const now = Date.now();
+        const elapsed = (now - apRecoveryTimeRef.current) / 1000; // 秒
+        const recoveredAp = Math.floor(elapsed / AP_RECOVERY_INTERVAL_SEC);
+
+        if (recoveredAp > 0) {
+          const newAp = Math.min(p.maxAp, p.ap + recoveredAp);
+          const remainder = elapsed % AP_RECOVERY_INTERVAL_SEC;
+          apRecoveryTimeRef.current = now - remainder * 1000;
+          storage.saveApRecoveryTime(apRecoveryTimeRef.current);
+          const remaining = Math.ceil(AP_RECOVERY_INTERVAL_SEC - remainder);
+          setNextApRecoveryIn(newAp >= p.maxAp ? null : remaining);
+          return { ...p, ap: newAp };
+        }
+
+        const remaining = Math.ceil(
+          AP_RECOVERY_INTERVAL_SEC - (now - apRecoveryTimeRef.current) / 1000
+        );
+        setNextApRecoveryIn(remaining);
+        return p;
+      });
+    };
+
+    // 起動時に即実行（オフライン中の回復を反映）
+    tick();
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- Player actions ----
 
@@ -181,6 +227,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const value: GameContextValue = {
     player, party, inventory, receivedPresentIds,
+    nextApRecoveryIn,
     addGold, addGems, spendGems, consumeAp, addExp,
     addToInventory, setPartySlot,
     receivePresent, receiveAllPresents,

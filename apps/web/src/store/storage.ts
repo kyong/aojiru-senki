@@ -25,6 +25,7 @@ const KEYS = {
   PARTY: 'aojiru_party',
   INVENTORY: 'aojiru_inventory',
   RECEIVED_PRESENTS: 'aojiru_received_presents',
+  AP_RECOVERY_TIME: 'aojiru_ap_recovery_time',
 } as const;
 
 function read<T>(key: string, fallback: T): T {
@@ -82,6 +83,16 @@ export function getReceivedPresentIds(): ReceivedPresentState {
 
 export function saveReceivedPresentIds(ids: ReceivedPresentState): void {
   write(KEYS.RECEIVED_PRESENTS, ids);
+}
+
+// ---- AP Recovery Timestamp ----
+
+export function getApRecoveryTime(): number {
+  return read<number>(KEYS.AP_RECOVERY_TIME, Date.now());
+}
+
+export function saveApRecoveryTime(timestamp: number): void {
+  write(KEYS.AP_RECOVERY_TIME, timestamp);
 }
 
 // ---- Reset (デバッグ用) ----

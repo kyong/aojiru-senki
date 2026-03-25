@@ -3,7 +3,7 @@ import { Coins, Gem, Zap } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
 
 export const Header: React.FC = () => {
-  const { player } = useGame();
+  const { player, nextApRecoveryIn } = useGame();
 
   return (
     <div className="h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-6 fixed w-full top-0 z-50">
@@ -20,7 +20,16 @@ export const Header: React.FC = () => {
             <Zap size={14} className="text-green-400" />
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] text-gray-400 leading-none">AP</span>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[10px] text-gray-400 leading-none">AP</span>
+              {nextApRecoveryIn === null ? (
+                <span className="text-[10px] text-green-400 font-bold leading-none">MAX</span>
+              ) : (
+                <span className="text-[10px] text-yellow-400 font-mono leading-none">
+                  +1 in {String(Math.floor(nextApRecoveryIn / 60)).padStart(2, '0')}:{String(nextApRecoveryIn % 60).padStart(2, '0')}
+                </span>
+              )}
+            </div>
             <span className="text-sm font-bold text-gray-100 font-mono">{player.ap} / {player.maxAp}</span>
           </div>
         </div>
