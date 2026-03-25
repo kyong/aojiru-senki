@@ -1,17 +1,25 @@
+import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
-import { Swords, Play, Star, AlertCircle } from 'lucide-react';
+import { Swords, Play, Star, AlertCircle, ArrowRight } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
 import { ALL_QUESTS } from '../store/quests';
+import type { Quest } from '../store/types';
 
 export const QuestSelect = () => {
   const navigate = useNavigate();
   const { player } = useGame();
+  const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
 
-  const handleQuestStart = (questId: number, stamina: number) => {
-    if (player.ap < stamina) return; // AP不足は出撃させない
-    navigate('/battle', { state: { questId } });
+  const handleQuestClick = (quest: Quest) => {
+    if (player.ap < quest.stamina) return;
+    setSelectedQuest(quest);
+  };
+
+  const handleConfirmStart = () => {
+    if (!selectedQuest) return;
+    navigate('/battle', { state: { questId: selectedQuest.id } });
   };
 
   return (
@@ -48,7 +56,7 @@ export const QuestSelect = () => {
                     ? 'border-gray-700 opacity-70 cursor-not-allowed'
                     : 'border-gray-700 hover:bg-gray-750 cursor-pointer'
                 )}
-                onClick={() => !insufficient && handleQuestStart(quest.id, quest.stamina)}
+                onClick={() => !insufficient && handleQuestClick(quest)}
               >
                 {/* Thumbnail */}
                 <div className={clsx(
@@ -108,6 +116,49 @@ export const QuestSelect = () => {
           })}
         </div>
       </div>
+
+      {/* Confirm Modal */}
+      {selectedQuest && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-md w-full shadow-2xl">
+            <h3 className="text-2xl font-bold text-center text-white mb-2">
+              出撃確認
+            </h3>
+            <p className="text-center text-gray-300 mb-6">
+              <span className="font-bold text-green-400">「{selectedQuest.title}」</span><br/>に出撃しますか？
+            </p>
+            
+            <div className="flex items-center justify-center gap-4 bg-gray-800 rounded-xl p-4 mb-8">
+              <div className="text-center">
+                <p className="text-gray-400 text-xs mb-1">現在のAP</p>
+                <p className="text-white font-mono font-bold">{player.ap}</p>
+              </div>
+              <ArrowRight className="text-gray-600" />
+              <div className="text-center">
+                <p className="text-gray-400 text-xs mb-1">消費後AP</p>
+                <p className="text-orange-400 font-mono font-bold">
+                  {player.ap - selectedQuest.stamina}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => setSelectedQuest(null)}
+                className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-colors"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleConfirmStart}
+                className="flex-1 flex justify-center items-center gap-2 py-3 bg-red-700 hover:bg-red-600 text-white font-bold rounded-xl transition-colors shadow-lg shadow-red-900/50"
+              >
+                <Swords size={18} /> 出撃する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Layout>
   );
 };
