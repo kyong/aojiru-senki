@@ -1,6 +1,11 @@
 import { Layout } from '../components/layout/Layout';
+import { useGame } from '../context/GameContext';
 
 const Home = () => {
+  const { player } = useGame();
+
+  const expPct = Math.floor((player.exp / player.nextExp) * 100);
+
   return (
     <Layout>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -17,38 +22,54 @@ const Home = () => {
               青汁マイスター
             </h2>
             <div className="flex gap-4 mt-2">
-              <span className="text-sm bg-gray-900/80 px-2 py-1 rounded text-green-400 border border-green-500/30">Lv. 50</span>
-              <span className="text-sm bg-gray-900/80 px-2 py-1 rounded text-blue-400 border border-blue-500/30">Next: 1200 EXP</span>
+              <span className="text-sm bg-gray-900/80 px-2 py-1 rounded text-green-400 border border-green-500/30">
+                Lv. {player.level}
+              </span>
+              <span className="text-sm bg-gray-900/80 px-2 py-1 rounded text-blue-400 border border-blue-500/30">
+                Next: {(player.nextExp - player.exp).toLocaleString()} EXP
+              </span>
+            </div>
+            {/* EXP bar */}
+            <div className="mt-3">
+              <div className="h-1.5 bg-gray-700 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-500 transition-all duration-500"
+                  style={{ width: `${expPct}%` }}
+                />
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Right Panel: News & Status */}
+        {/* Right Panel: Status & News */}
         <div className="flex flex-col gap-6">
           {/* Stamina & LP */}
           <div className="bg-gray-800 rounded-xl p-6 border border-gray-700 shadow-lg relative overflow-hidden">
             <div className="absolute top-0 right-0 w-32 h-32 bg-green-500/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none" />
-
             <h3 className="text-sm font-bold text-gray-400 mb-4 tracking-wider">プレイヤー情報</h3>
-
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="font-bold text-green-400">AP (Action Point)</span>
-                  <span className="font-mono">120 / 120</span>
+                  <span className="font-mono">{player.ap} / {player.maxAp}</span>
                 </div>
                 <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-green-500 to-green-300 w-full shadow-[0_0_10px_rgba(34,197,94,0.5)]" />
+                  <div
+                    className="h-full bg-gradient-to-r from-green-500 to-green-300 transition-all duration-300 shadow-[0_0_10px_rgba(34,197,94,0.5)]"
+                    style={{ width: `${(player.ap / player.maxAp) * 100}%` }}
+                  />
                 </div>
               </div>
-
               <div>
                 <div className="flex justify-between text-sm mb-1">
-                  <span className="font-bold text-yellow-400">BP (Battle Point)</span>
-                  <span className="font-mono">5 / 5</span>
+                  <span className="font-bold text-yellow-400">GOLD</span>
+                  <span className="font-mono">{player.gold.toLocaleString()}</span>
                 </div>
-                <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-yellow-500 to-yellow-300 w-full shadow-[0_0_10px_rgba(234,179,8,0.5)]" />
+              </div>
+              <div>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="font-bold text-purple-400">GEMS</span>
+                  <span className="font-mono">{player.gems.toLocaleString()}</span>
                 </div>
               </div>
             </div>

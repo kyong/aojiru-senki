@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { GameProvider } from './context/GameContext';
 import Home from './pages/Home';
 import Battle from './pages/Battle';
 import QuestSelect from './pages/QuestSelect';
@@ -9,17 +10,19 @@ import Menu from './pages/Menu';
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/"       element={<Home />} />
-        <Route path="/quest"   element={<QuestSelect />} />
-        <Route path="/battle"  element={<Battle />} />
-        <Route path="/gacha"   element={<Gacha />} />
-        <Route path="/party"   element={<Party />} />
-        <Route path="/present" element={<PresentPage />} />
-        <Route path="/menu"    element={<Menu />} />
-      </Routes>
-    </BrowserRouter>
+    <GameProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/"        element={<Home />} />
+          <Route path="/quest"   element={<QuestSelect />} />
+          <Route path="/battle"  element={<Battle />} />
+          <Route path="/gacha"   element={<Gacha />} />
+          <Route path="/party"   element={<Party />} />
+          <Route path="/present" element={<PresentPage />} />
+          <Route path="/menu"    element={<Menu />} />
+        </Routes>
+      </BrowserRouter>
+    </GameProvider>
   );
 }
 

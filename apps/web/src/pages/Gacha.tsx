@@ -1,82 +1,44 @@
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
-import { Gem, Sparkles, Star, Zap, RotateCcw } from 'lucide-react';
+import { Gem, Sparkles, Star, RotateCcw } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useGame } from '../context/GameContext';
+import {
+  drawRandomCharacter,
+  drawTenCharacters,
+} from '../store/characters';
+import type { Character, Rarity } from '../store/types';
 
-type Rarity = 'SSR' | 'SR' | 'R';
-
-type GachaCharacter = {
-  id: number;
-  name: string;
-  title: string;
-  rarity: Rarity;
-  color: string;
-  emoji: string;
-};
-
-const CHARACTERS: GachaCharacter[] = [
-  { id: 1, name: '青汁マイスター', title: '翠風の剣士', rarity: 'SSR', color: 'from-yellow-500 to-orange-500', emoji: '⚔️' },
-  { id: 2, name: 'ケナ氏', title: '映えの女神', rarity: 'SSR', color: 'from-pink-500 to-rose-600', emoji: '📸' },
-  { id: 3, name: '野菜騎士ブロッコリ', title: '緑の護衛隊長', rarity: 'SR', color: 'from-green-500 to-emerald-600', emoji: '🥦' },
-  { id: 4, name: '大麦戦士バーライ', title: '穀物の番人', rarity: 'SR', color: 'from-amber-500 to-yellow-600', emoji: '🌾' },
-  { id: 5, name: '小松菜の子', title: '新芽の見習い', rarity: 'R', color: 'from-gray-500 to-gray-600', emoji: '🌿' },
-  { id: 6, name: 'ほうれん草ナイト', title: '鉄分の守護者', rarity: 'R', color: 'from-green-700 to-gray-600', emoji: '🍃' },
-  { id: 7, name: 'ゴーヤ坊や', title: '苦味初級者', rarity: 'R', color: 'from-lime-600 to-gray-600', emoji: '🌱' },
-];
-
-const RARITY_WEIGHTS: Record<Rarity, number> = { SSR: 3, SR: 15, R: 82 };
+const SINGLE_COST = 100;
+const TEN_COST    = 900;
 
 const rarityStyle: Record<Rarity, string> = {
   SSR: 'border-yellow-400 bg-gradient-to-b from-yellow-900/60 to-gray-900 shadow-[0_0_20px_rgba(234,179,8,0.4)]',
   SR:  'border-purple-400 bg-gradient-to-b from-purple-900/60 to-gray-900 shadow-[0_0_12px_rgba(168,85,247,0.3)]',
   R:   'border-gray-500 bg-gradient-to-b from-gray-800 to-gray-900',
 };
-
 const rarityBadge: Record<Rarity, string> = {
   SSR: 'bg-yellow-500 text-black',
   SR:  'bg-purple-500 text-white',
   R:   'bg-gray-500 text-white',
 };
 
-function drawGacha(): GachaCharacter {
-  const roll = Math.random() * 100;
-  let rarity: Rarity;
-  if (roll < RARITY_WEIGHTS.SSR) rarity = 'SSR';
-  else if (roll < RARITY_WEIGHTS.SSR + RARITY_WEIGHTS.SR) rarity = 'SR';
-  else rarity = 'R';
-  const pool = CHARACTERS.filter(c => c.rarity === rarity);
-  return pool[Math.floor(Math.random() * pool.length)];
-}
-
-function drawTen(): GachaCharacter[] {
-  const results: GachaCharacter[] = Array.from({ length: 10 }, () => drawGacha());
-  // 10連は最低1枚SR以上を保証
-  const hasSROrAbove = results.some(c => c.rarity === 'SSR' || c.rarity === 'SR');
-  if (!hasSROrAbove) {
-    const srPool = CHARACTERS.filter(c => c.rarity === 'SR');
-    results[9] = srPool[Math.floor(Math.random() * srPool.length)];
-  }
-  return results;
-}
-
-type ModalResult = { cards: GachaCharacter[]; visible: boolean };
-
-const SINGLE_COST = 100;
-const TEN_COST = 900;
-
 export const Gacha = () => {
-  const [gems] = useState(5000);
-  const [modal, setModal] = useState<ModalResult>({ cards: [], visible: false });
+  const { player, spendGems, addToInventory } = useGame();
+  const [modal, setModal] = useState<{ cards: Character[]; visible: boolean }>({ cards: [], visible: false });
   const [isAnimating, setIsAnimating] = useState(false);
   const [totalPulls, setTotalPulls] = useState(0);
 
   const runGacha = (ten: boolean) => {
-    if (isAnimating) return;
+    const cost = ten ? TEN_COST : SINGLE_COST;
+    if (!spendGems(cost)) return; // GEMS不足でキャンセル
     setIsAnimating(true);
     setTimeout(() => {
-      const cards = ten ? drawTen() : [drawGacha()];
+      const cards = ten ? drawTenCharacters() : [drawRandomCharacter()];
+      // インベントリに追加
+      cards.forEach(c => addToInventory(c.id));
       setModal({ cards, visible: true });
-      setTotalPulls(prev => prev + cards.length);
+      setTotalPulls(p => p + cards.length);
       setIsAnimating(false);
     }, 600);
   };
@@ -84,18 +46,17 @@ export const Gacha = () => {
   return (
     <Layout>
       <div className="flex flex-col gap-6">
-        {/* Header */}
         <div className="flex items-center justify-between border-b border-gray-700 pb-4">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <Sparkles className="text-yellow-400" /> 青汁スカウト (Gacha)
           </h2>
           <div className="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
             <Gem size={16} className="text-purple-400" />
-            <span className="text-white font-bold font-mono">{gems.toLocaleString()}</span>
+            <span className="text-white font-bold font-mono">{player.gems.toLocaleString()}</span>
           </div>
         </div>
 
-        {/* Banner Art */}
+        {/* Banner */}
         <div className="relative rounded-2xl overflow-hidden h-56 flex items-center justify-center border border-yellow-500/30 bg-gradient-to-br from-gray-900 via-yellow-900/20 to-gray-900">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(234,179,8,0.15)_0%,transparent_70%)]" />
           <div className="z-10 text-center">
@@ -108,13 +69,9 @@ export const Gacha = () => {
           </div>
         </div>
 
-        {/* Banner Info */}
+        {/* Probabilities */}
         <div className="grid grid-cols-3 gap-4 text-sm text-center">
-          {[
-            { label: 'SSR確率', value: '3%', color: 'text-yellow-400' },
-            { label: 'SR確率', value: '15%', color: 'text-purple-400' },
-            { label: 'R確率',  value: '82%', color: 'text-gray-400' },
-          ].map(item => (
+          {[{ label: 'SSR確率', value: '3%', color: 'text-yellow-400' }, { label: 'SR確率', value: '15%', color: 'text-purple-400' }, { label: 'R確率', value: '82%', color: 'text-gray-400' }].map(item => (
             <div key={item.label} className="bg-gray-800/60 rounded-lg p-3 border border-gray-700">
               <p className="text-gray-400">{item.label}</p>
               <p className={clsx('text-2xl font-bold', item.color)}>{item.value}</p>
@@ -122,42 +79,32 @@ export const Gacha = () => {
           ))}
         </div>
 
-        {/* Gacha Buttons */}
+        {/* Buttons */}
         <div className="grid grid-cols-2 gap-4">
           <button
             onClick={() => runGacha(false)}
-            disabled={isAnimating || gems < SINGLE_COST}
+            disabled={isAnimating || player.gems < SINGLE_COST}
             className="relative group bg-gradient-to-br from-gray-700 to-gray-800 hover:from-purple-900/60 hover:to-purple-800/60 border border-gray-600 hover:border-purple-500 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
-            <Zap size={32} className="text-purple-400" />
+            <Gem size={32} className="text-purple-400" />
             <span className="font-black text-xl text-white">単発ガチャ</span>
-            <div className="flex items-center gap-1 text-purple-300">
-              <Gem size={14} />
-              <span className="font-mono font-bold">{SINGLE_COST}</span>
-            </div>
+            <div className="flex items-center gap-1 text-purple-300"><Gem size={14} /><span className="font-mono font-bold">{SINGLE_COST}</span></div>
           </button>
-
           <button
             onClick={() => runGacha(true)}
-            disabled={isAnimating || gems < TEN_COST}
+            disabled={isAnimating || player.gems < TEN_COST}
             className="relative group bg-gradient-to-br from-yellow-900/40 to-gray-800 hover:from-yellow-800/60 hover:to-yellow-900/60 border border-yellow-700/50 hover:border-yellow-400 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden"
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 pointer-events-none" />
             <Sparkles size={32} className="text-yellow-400" />
             <span className="font-black text-xl text-white">10連ガチャ</span>
-            <div className="flex items-center gap-1 text-yellow-300">
-              <Gem size={14} />
-              <span className="font-mono font-bold">{TEN_COST}</span>
-            </div>
+            <div className="flex items-center gap-1 text-yellow-300"><Gem size={14} /><span className="font-mono font-bold">{TEN_COST}</span></div>
             <span className="text-xs text-yellow-500 font-bold">SR以上確定！</span>
           </button>
         </div>
 
-        {/* Stats */}
         <p className="text-center text-gray-500 text-sm">累計スカウト回数: <span className="text-gray-300 font-mono font-bold">{totalPulls}</span> 回</p>
 
-        {/* Gacha Animating Overlay */}
+        {/* Loading overlay */}
         {isAnimating && (
           <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
             <div className="text-white text-center">
@@ -174,32 +121,17 @@ export const Gacha = () => {
               <h3 className="text-2xl font-bold text-center text-white mb-6">
                 {modal.cards.length > 1 ? '10連結果！' : 'スカウト結果！'}
               </h3>
-              <div className={clsx(
-                'grid gap-3',
-                modal.cards.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-5'
-              )}>
+              <div className={clsx('grid gap-3', modal.cards.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-5')}>
                 {modal.cards.map((card, i) => (
-                  <div
-                    key={i}
-                    className={clsx(
-                      'rounded-xl border-2 p-3 flex flex-col items-center gap-1 animate-[fadeIn_0.3s_ease-out] text-center',
-                      rarityStyle[card.rarity]
-                    )}
-                    style={{ animationDelay: `${i * 60}ms` }}
-                  >
-                    <span className={clsx('text-xs font-black px-2 py-0.5 rounded-full', rarityBadge[card.rarity])}>
-                      {card.rarity}
-                    </span>
+                  <div key={i} className={clsx('rounded-xl border-2 p-3 flex flex-col items-center gap-1 text-center', rarityStyle[card.rarity])} style={{ animationDelay: `${i * 60}ms` }}>
+                    <span className={clsx('text-xs font-black px-2 py-0.5 rounded-full', rarityBadge[card.rarity])}>{card.rarity}</span>
                     <span className="text-3xl mt-1">{card.emoji}</span>
                     <p className="text-white font-bold text-xs leading-tight">{card.name}</p>
                     <p className="text-gray-400 text-[10px]">{card.title}</p>
                   </div>
                 ))}
               </div>
-              <button
-                onClick={() => setModal({ cards: [], visible: false })}
-                className="mt-6 w-full py-3 bg-green-700 hover:bg-green-600 text-white font-bold rounded-xl transition-colors"
-              >
+              <button onClick={() => setModal({ cards: [], visible: false })} className="mt-6 w-full py-3 bg-green-700 hover:bg-green-600 text-white font-bold rounded-xl transition-colors">
                 閉じる
               </button>
             </div>
