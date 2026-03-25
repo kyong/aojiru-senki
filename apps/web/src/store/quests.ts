@@ -13,7 +13,7 @@ export const ALL_QUESTS: Quest[] = [
     stamina: 10,
     goldReward: 1000,
     description: 'ギトギトの朝を浄化せよ！',
-    thumbnail: '/images/enemy.png',
+    thumbnail: '/images/bacon_general.png',
   },
   {
     id: 2,
@@ -23,7 +23,7 @@ export const ALL_QUESTS: Quest[] = [
     stamina: 20,
     goldReward: 5000,
     description: '午後の眠気に打ち勝て！',
-    thumbnail: '/images/potato_sniper.png',
+    thumbnail: '/images/carb_the_great.png',
   },
   {
     id: 3,
@@ -33,7 +33,7 @@ export const ALL_QUESTS: Quest[] = [
     stamina: 50,
     goldReward: 50000,
     description: '世界に健康を取り戻す時だ！',
-    thumbnail: '/images/cola_slime.png',
+    thumbnail: '/images/cholesterol_king.png',
   },
 ];
 
