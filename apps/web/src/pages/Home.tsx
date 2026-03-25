@@ -6,11 +6,12 @@ const Home = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Main Character Display Area */}
         <div className="bg-gray-800/50 rounded-xl border border-gray-700 h-[600px] flex items-center justify-center relative overflow-hidden group">
-          {/* Placeholder for Character Image */}
-          <div className="text-gray-500 flex flex-col items-center">
-            <span className="text-6xl mb-4">🛡️</span>
-            <p>MAIN CHARACTER</p>
-          </div>
+          {/* Main Character Image */}
+          <img
+            src="/images/player.png"
+            alt="青汁マイスター"
+            className="h-full w-full object-contain object-bottom drop-shadow-[0_0_30px_rgba(34,197,94,0.4)] transition-transform duration-300 group-hover:scale-105"
+          />
           <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
             <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-green-400 to-emerald-500">
               青汁マイスター

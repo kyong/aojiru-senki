@@ -9,5 +9,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs"
+  "type": "commonjs",
+  "dependencies": {
+    "@hono/node-server": "^1.19.9",
+    "hono": "^4.11.9"
+  }
 }
