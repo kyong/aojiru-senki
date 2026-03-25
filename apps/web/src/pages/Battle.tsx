@@ -13,10 +13,11 @@ import { QUEST_MAP } from '../store/quests';
 type EnemyData = {
   name: string; hp: number; maxHp: number;
   minAtk: number; maxAtk: number; image: string; intro: string;
+  bgImage?: string;
 };
 
 const ENEMIES: Record<number, EnemyData> = {
-  1: { name: 'カリカリベーコン将軍', hp: 600,  maxHp: 600,  minAtk: 15, maxAtk: 25, image: '/images/bacon_general.png',          intro: '「朝から脂ギッシュにしてやるぜぇ……！」' },
+  1: { name: 'カリカリベーコン将軍', hp: 600,  maxHp: 600,  minAtk: 15, maxAtk: 25, image: '/images/bacon_general.png',          intro: '「朝から脂ギッシュにしてやるぜぇ……！」', bgImage: '/images/bacon_general_bg.png' },
   2: { name: '炭水化物・ザ・グレート', hp: 1500, maxHp: 1500, minAtk: 40, maxAtk: 55, image: '/images/carb_the_great.png', intro: '「血糖値を上げてやる……眠くなれぇ……」' },
   3: { name: '魔王コレステロール・キング', hp: 3000, maxHp: 3000, minAtk: 70, maxAtk: 90, image: '/images/cholesterol_king.png', intro: '「我こそは成人病の王なり……健康など不要！」' },
 };
@@ -195,7 +196,7 @@ export const Battle = () => {
       <div className="flex flex-col h-[calc(100vh-8rem)] gap-4">
 
         {/* Battle Area */}
-        <div className="flex-1 bg-gray-900 rounded-xl relative overflow-hidden border border-gray-700 flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: "url('https://placehold.co/1200x800/222/333?text=Battle+Background')" }}>
+        <div className="flex-1 bg-gray-900 rounded-xl relative overflow-hidden border border-gray-700 flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: enemyData.bgImage ? `url('${enemyData.bgImage}')` : "url('https://placehold.co/1200x800/222/333?text=Battle+Background')" }}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="z-10 flex flex-col items-center animate-[float_3s_ease-in-out_infinite]">
             <div className="filter drop-shadow-[0_0_20px_rgba(255,0,0,0.5)] transform hover:scale-110 transition-transform cursor-pointer">
