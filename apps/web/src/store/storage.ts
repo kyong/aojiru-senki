@@ -28,10 +28,48 @@ const KEYS = {
   AP_RECOVERY_TIME: 'aojiru_ap_recovery_time',
 } as const;
 
+const ENCRYPTION_KEY = 'ao_ji_ru_secret_key_2026';
+
+function xorEncryptDecrypt(input: string): string {
+  let output = '';
+  for (let i = 0; i < input.length; i++) {
+    output += String.fromCharCode(input.charCodeAt(i) ^ ENCRYPTION_KEY.charCodeAt(i % ENCRYPTION_KEY.length));
+  }
+  return output;
+}
+
+function encrypt(data: string): string {
+  // encodeURIComponent to ensure all characters are ASCII before XOR
+  return btoa(xorEncryptDecrypt(encodeURIComponent(data)));
+}
+
+function decrypt(data: string): string {
+  try {
+    return decodeURIComponent(xorEncryptDecrypt(atob(data)));
+  } catch {
+    // Fallback to returning original data if standard JSON or tampering prevents decoding
+    return data; 
+  }
+}
+
 function read<T>(key: string, fallback: T): T {
   try {
     const raw = localStorage.getItem(key);
-    return raw !== null ? (JSON.parse(raw) as T) : fallback;
+    if (raw === null) return fallback;
+    
+    let parsedRaw = raw;
+    try {
+      parsedRaw = decrypt(raw);
+    } catch {
+      // Ignored, handled by decrypt fallback
+    }
+
+    try {
+      return JSON.parse(parsedRaw) as T;
+    } catch {
+      // If decryption yielded invalid JSON (e.g. wrong key, tampered file), fallback to trying parsing raw
+      return JSON.parse(raw) as T;
+    }
   } catch {
     return fallback;
   }
@@ -39,7 +77,9 @@ function read<T>(key: string, fallback: T): T {
 
 function write<T>(key: string, value: T): void {
   try {
-    localStorage.setItem(key, JSON.stringify(value));
+    const jsonStr = JSON.stringify(value);
+    const encrypted = encrypt(jsonStr);
+    localStorage.setItem(key, encrypted);
   } catch {
     // storage full などは握り潰す
   }

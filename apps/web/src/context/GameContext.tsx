@@ -128,24 +128,16 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   }, []);
 
   const spendGems = useCallback((amount: number): boolean => {
-    let success = false;
-    setPlayer(p => {
-      if (p.gems < amount) return p;
-      success = true;
-      return { ...p, gems: p.gems - amount };
-    });
-    return success;
-  }, []);
+    if (player.gems < amount) return false;
+    setPlayer(p => ({ ...p, gems: p.gems - amount }));
+    return true;
+  }, [player.gems]);
 
   const consumeAp = useCallback((amount: number): boolean => {
-    let success = false;
-    setPlayer(p => {
-      if (p.ap < amount) return p;
-      success = true;
-      return { ...p, ap: p.ap - amount };
-    });
-    return success;
-  }, []);
+    if (player.ap < amount) return false;
+    setPlayer(p => ({ ...p, ap: p.ap - amount }));
+    return true;
+  }, [player.ap]);
 
   const addExp = useCallback((amount: number) => {
     setPlayer(p => {
