@@ -3,8 +3,10 @@ import { X, Play, Gem, Volume2, VolumeX } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 import adVideo1 from '../assets/ad/132fd59fadd43415.mp4';
+import adVideo2 from '../assets/ad/e644b9242716b3d2.mp4';
+import adVideo3 from '../assets/ad/19700121_2157_69c68e07db088191817f15e66bda3b25.mp4';
 
-const adVideos = [adVideo1];
+const adVideos = [adVideo1, adVideo2, adVideo3];
 
 type Phase = 'confirm' | 'playing' | 'close-challenge' | 'rewarded';
 
