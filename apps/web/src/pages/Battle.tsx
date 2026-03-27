@@ -61,7 +61,7 @@ export const Battle = () => {
   const [isGuarding, setIsGuarding] = useState(false);
 
   // 戦闘中・ストーリー中の画面遷移をブロック
-  const { guardedNavigate, setBlocked, pendingPath, confirmNavigation, cancelNavigation } = useNavigationGuard();
+  const { guardedNavigate, setBlocked } = useNavigationGuard();
   const shouldBlock = gameState === 'BATTLE' || gameState === 'STORY';
 
   useEffect(() => {
