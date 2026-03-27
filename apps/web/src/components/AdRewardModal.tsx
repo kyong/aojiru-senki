@@ -1,5 +1,5 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
-import { X, Play, Gem } from 'lucide-react';
+import { X, Play, Gem, Volume2, VolumeX } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 
 import adVideo1 from '../assets/ad/132fd59fadd43415.mp4';
@@ -19,6 +19,8 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
   const [videoSrc, setVideoSrc] = useState('');
   const videoRef = useRef<HTMLVideoElement>(null);
 
+  const [muted, setMuted] = useState(false);
+
   // Close button dodge state
   const [btnPos, setBtnPos] = useState({ x: 50, y: 50 });
   const [dodgeCount, setDodgeCount] = useState(0);
@@ -28,6 +30,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
   const reset = useCallback(() => {
     setPhase('confirm');
     setVideoSrc('');
+    setMuted(false);
     setBtnPos({ x: 50, y: 50 });
     setDodgeCount(0);
   }, []);
@@ -64,7 +67,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
   }, []);
 
   const handleCloseClick = useCallback(() => {
-    addGems(100);
+    addGems(50);
     setPhase('rewarded');
   }, [addGems]);
 
@@ -86,9 +89,13 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
             <Gem size={32} className="text-purple-400" />
           </div>
           <h3 className="text-xl font-bold text-white mb-2">広告を視聴してジェムを獲得</h3>
-          <p className="text-gray-400 text-sm mb-6">
+          <p className="text-gray-400 text-sm mb-2">
             動画広告を最後まで視聴すると<br />
-            <span className="text-purple-400 font-bold">100 GEMS</span> を獲得できます！
+            <span className="text-purple-400 font-bold">50 GEMS</span> を獲得できます！
+          </p>
+          <p className="text-yellow-400/80 text-xs mb-6 flex items-center justify-center gap-1">
+            <Volume2 size={14} />
+            音声が再生されます
           </p>
           <div className="flex gap-3">
             <button
@@ -113,11 +120,20 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
         <div className="bg-black rounded-2xl overflow-hidden max-w-2xl w-full shadow-2xl border border-gray-700">
           <div className="bg-gray-900 px-4 py-2 flex items-center justify-between">
             <span className="text-xs text-gray-400">広告再生中...</span>
-            <span className="text-xs text-purple-400 font-bold">最後まで視聴で 100 GEMS</span>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setMuted(m => !m)}
+                className="text-gray-400 hover:text-white transition-colors"
+              >
+                {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              </button>
+              <span className="text-xs text-purple-400 font-bold">最後まで視聴で 50 GEMS</span>
+            </div>
           </div>
           <video
             ref={videoRef}
             src={videoSrc}
+            muted={muted}
             className="w-full aspect-video bg-black"
             onEnded={handleVideoEnd}
             playsInline
@@ -162,7 +178,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
             <Gem size={40} className="text-purple-400" />
           </div>
           <h3 className="text-2xl font-bold text-white mb-2">獲得！</h3>
-          <p className="text-purple-400 text-3xl font-bold mb-6">+100 GEMS</p>
+          <p className="text-purple-400 text-3xl font-bold mb-6">+50 GEMS</p>
           <button
             onClick={handleClose}
             className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-colors"
