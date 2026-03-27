@@ -47,11 +47,14 @@ export const Battle = () => {
   const enemyData = ENEMIES[questId] || ENEMIES[1];
   const quest = QUEST_MAP[questId];
 
-  // 編成ステータスをバトル開始時に確定
-  const [battleStats] = useState(() => getBattleStats());
-  const { maxHp, baseAtk, atkRange } = battleStats;
+  const [gameState, setGameState] = useState<'STORY' | 'PREP' | 'BATTLE' | 'WIN' | 'GAMEOVER'>('STORY');
+  const [choHadoBuff, setChoHadoBuff] = useState(false);
 
-  const [gameState, setGameState] = useState<'STORY' | 'BATTLE' | 'WIN' | 'GAMEOVER'>('STORY');
+  // 編成ステータスをバトル開始時に確定（超波動青汁バフ適用）
+  const [rawBattleStats] = useState(() => getBattleStats());
+  const maxHp   = choHadoBuff ? Math.floor(rawBattleStats.maxHp * 1.2) : rawBattleStats.maxHp;
+  const baseAtk = choHadoBuff ? Math.floor(rawBattleStats.baseAtk * 1.3) : rawBattleStats.baseAtk;
+  const atkRange = rawBattleStats.atkRange;
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
   const [battleLog, setBattleLog] = useState<string[]>([`${enemyData.name}が現れた！`, enemyData.intro]);
   const [enemyHp, setEnemyHp] = useState(enemyData.hp);
@@ -62,7 +65,7 @@ export const Battle = () => {
 
   // 戦闘中・ストーリー中の画面遷移をブロック
   const { guardedNavigate, setBlocked } = useNavigationGuard();
-  const shouldBlock = gameState === 'BATTLE' || gameState === 'STORY';
+  const shouldBlock = gameState === 'BATTLE' || gameState === 'STORY' || gameState === 'PREP';
 
   useEffect(() => {
     setBlocked(shouldBlock);
@@ -87,11 +90,19 @@ export const Battle = () => {
     if (currentStoryIndex < STORY_TEXT[questId].length - 1) {
       setCurrentStoryIndex(p => p + 1);
     } else {
-      // AP消費はバトル開始時
-      consumeAp(quest?.stamina ?? 10);
-      setGameState('BATTLE');
-      addLog('戦闘開始！');
+      setGameState('PREP');
     }
+  };
+
+  const handleStartBattle = () => {
+    consumeAp(quest?.stamina ?? 10);
+    setGameState('BATTLE');
+    addLog('戦闘開始！');
+  };
+
+  const handleUseChoHado = () => {
+    if (!useItem('choHadoAojiru')) return;
+    setChoHadoBuff(true);
   };
 
   const doEnemyTurn = (guarding: boolean) => {
@@ -182,6 +193,68 @@ export const Battle = () => {
           <p className="text-lg md:text-xl leading-relaxed mb-16 md:mb-12 min-h-[80px] md:min-h-[100px]">{STORY_TEXT[questId][currentStoryIndex]}</p>
           <button onClick={handleStoryNext} className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold transition-all animate-bounce text-sm md:text-base">
             Next <ArrowRight size={20} />
+          </button>
+        </div>
+      </div>
+    </Layout>
+  );
+
+  if (gameState === 'PREP') return (
+    <Layout>
+      <div className="flex items-center justify-center h-[calc(100dvh-8rem)]">
+        <div className="bg-gray-800 p-6 md:p-8 rounded-xl max-w-md w-full border border-gray-600 shadow-2xl">
+          <h2 className="text-xl md:text-2xl font-bold text-white mb-2">戦闘準備</h2>
+          <p className="text-sm text-gray-400 mb-6">アイテムを使用して戦闘に備えよう</p>
+
+          {/* 超波動青汁 */}
+          <div className={clsx(
+            'p-4 rounded-xl border mb-4 transition-all',
+            choHadoBuff
+              ? 'bg-cyan-900/40 border-cyan-500'
+              : 'bg-gray-900 border-gray-700'
+          )}>
+            <div className="flex items-center gap-3">
+              <span className="text-2xl">🌀</span>
+              <div className="flex-1">
+                <p className="font-bold text-white">超波動青汁</p>
+                <p className="text-xs text-gray-400">ATK +30% / HP +20%</p>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <span className="text-xs font-mono text-gray-400">所持: {items.choHadoAojiru + (choHadoBuff ? 1 : 0)}個</span>
+                {choHadoBuff ? (
+                  <span className="px-3 py-1.5 text-sm font-bold text-cyan-300 bg-cyan-900/50 border border-cyan-600 rounded-lg">
+                    使用済み
+                  </span>
+                ) : (
+                  <button
+                    onClick={handleUseChoHado}
+                    disabled={items.choHadoAojiru <= 0}
+                    className={clsx(
+                      'px-3 py-1.5 text-sm font-bold rounded-lg transition-colors',
+                      items.choHadoAojiru > 0
+                        ? 'bg-cyan-600 hover:bg-cyan-500 text-white'
+                        : 'bg-gray-700 text-gray-500 cursor-not-allowed'
+                    )}
+                  >
+                    使用する
+                  </button>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {choHadoBuff && (
+            <div className="bg-cyan-900/20 border border-cyan-800 rounded-lg px-3 py-2 mb-4 text-center">
+              <p className="text-cyan-300 text-sm font-bold">超波動青汁の効果が発動中！</p>
+              <p className="text-cyan-400/70 text-xs">ATK {rawBattleStats.baseAtk} → {Math.floor(rawBattleStats.baseAtk * 1.3)} / HP {rawBattleStats.maxHp} → {Math.floor(rawBattleStats.maxHp * 1.2)}</p>
+            </div>
+          )}
+
+          <button
+            onClick={handleStartBattle}
+            className="w-full py-3 bg-green-600 hover:bg-green-500 text-white font-bold rounded-lg transition-colors text-lg flex items-center justify-center gap-2"
+          >
+            <Sword size={20} /> 戦闘開始
           </button>
         </div>
       </div>

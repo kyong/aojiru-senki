@@ -144,7 +144,8 @@ export function saveClearedQuests(cleared: ClearedQuestsState): void {
 // ---- Items ----
 
 export function getItems(): ItemsState {
-  return read<ItemsState>(KEYS.ITEMS, DEFAULT_ITEMS);
+  const saved = read<Partial<ItemsState>>(KEYS.ITEMS, DEFAULT_ITEMS);
+  return { ...DEFAULT_ITEMS, ...saved };
 }
 
 export function saveItems(items: ItemsState): void {

@@ -25,4 +25,4 @@ export const DEFAULT_RECEIVED_PRESENTS: ReceivedPresentState = [];
 export const DEFAULT_CLEARED_QUESTS: ClearedQuestsState = [];
 
 /** 初期アイテム: 青汁ポーション3個 */
-export const DEFAULT_ITEMS: ItemsState = { aojiruPotion: 3 };
+export const DEFAULT_ITEMS: ItemsState = { aojiruPotion: 3, choHadoAojiru: 0 };

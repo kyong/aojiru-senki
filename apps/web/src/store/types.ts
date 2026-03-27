@@ -59,4 +59,5 @@ export type ClearedQuestsState = number[];
 /** アイテム所持数 */
 export type ItemsState = {
   aojiruPotion: number;
+  choHadoAojiru: number;
 };

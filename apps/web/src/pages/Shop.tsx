@@ -10,16 +10,18 @@ type ShopItem = {
   description: string;
   emoji: string;
   price: number;
-  itemKey: 'aojiruPotion';
+  itemKey: keyof import('../store/types').ItemsState;
 };
 
 const SHOP_ITEMS: ShopItem[] = [
   { id: 'potion1',  name: '青汁ポーション×1',  description: 'HPを120回復する回復アイテム。',          emoji: '🧃', price: 500,   itemKey: 'aojiruPotion' },
   { id: 'potion5',  name: '青汁ポーション×5',  description: 'お得な5個セット！',                    emoji: '🧃', price: 2000,  itemKey: 'aojiruPotion' },
   { id: 'potion10', name: '青汁ポーション×10', description: 'まとめ買いでさらにお得！',              emoji: '🧃', price: 3500,  itemKey: 'aojiruPotion' },
+  { id: 'chohado1', name: '超波動青汁×1',      description: 'クエスト開始時に使用。ATK+30%・HP+20%。', emoji: '🌀', price: 5000,  itemKey: 'choHadoAojiru' },
+  { id: 'chohado3', name: '超波動青汁×3',      description: 'お得な3個セット！',                    emoji: '🌀', price: 12000, itemKey: 'choHadoAojiru' },
 ];
 
-const AMOUNTS: Record<string, number> = { potion1: 1, potion5: 5, potion10: 10 };
+const AMOUNTS: Record<string, number> = { potion1: 1, potion5: 5, potion10: 10, chohado1: 1, chohado3: 3 };
 
 export const Shop = () => {
   const { player, items, spendGold, addItems } = useGame();
@@ -54,10 +56,14 @@ export const Shop = () => {
         </div>
 
         {/* 所持アイテム表示 */}
-        <div className="bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 flex items-center gap-3">
+        <div className="bg-gray-800/50 border border-gray-700 rounded-lg px-4 py-3 flex items-center gap-3 flex-wrap">
           <span className="text-lg">🧃</span>
-          <span className="text-sm text-gray-300">青汁ポーション 所持数:</span>
+          <span className="text-sm text-gray-300">青汁ポーション:</span>
           <span className="font-mono font-bold text-green-400 text-lg">{items.aojiruPotion}</span>
+          <span className="text-gray-600 mx-1">|</span>
+          <span className="text-lg">🌀</span>
+          <span className="text-sm text-gray-300">超波動青汁:</span>
+          <span className="font-mono font-bold text-cyan-400 text-lg">{items.choHadoAojiru}</span>
         </div>
 
         {error && (
