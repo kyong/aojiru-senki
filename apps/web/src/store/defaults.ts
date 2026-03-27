@@ -1,4 +1,4 @@
-import type { PlayerState, PartyState, InventoryState, ReceivedPresentState, ClearedQuestsState } from './types';
+import type { PlayerState, PartyState, InventoryState, ReceivedPresentState, ClearedQuestsState, ItemsState } from './types';
 
 // ============================================================
 // ゲームの初期値
@@ -23,3 +23,6 @@ export const DEFAULT_INVENTORY: InventoryState = [1]; // 青汁マイスター�
 export const DEFAULT_RECEIVED_PRESENTS: ReceivedPresentState = [];
 
 export const DEFAULT_CLEARED_QUESTS: ClearedQuestsState = [];
+
+/** 初期アイテム: 青汁ポーション3個 */
+export const DEFAULT_ITEMS: ItemsState = { aojiruPotion: 3 };

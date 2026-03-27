@@ -8,6 +8,7 @@ import Gacha from './pages/Gacha';
 import Party from './pages/Party';
 import PresentPage from './pages/Present';
 import Menu from './pages/Menu';
+import Shop from './pages/Shop';
 import Splash from './pages/Splash';
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
           <Route path="/gacha"   element={<Gacha />} />
           <Route path="/party"   element={<Party />} />
           <Route path="/present" element={<PresentPage />} />
+          <Route path="/shop"    element={<Shop />} />
           <Route path="/menu"    element={<Menu />} />
         </Routes>
         </NavigationGuardProvider>

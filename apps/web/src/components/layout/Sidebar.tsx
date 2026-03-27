@@ -1,5 +1,5 @@
 import React from 'react';
-import { Home, Swords, Store, Mail, Settings, User } from 'lucide-react';
+import { Home, Swords, Store, Mail, Settings, User, ShoppingBag } from 'lucide-react';
 import { useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useNavigationGuard } from '../../context/NavigationGuardContext';
@@ -37,6 +37,7 @@ export const Sidebar: React.FC = () => {
         <NavItem to="/quest" icon={Swords} label="出撃" onGuardedClick={guardedNavigate} />
         <NavItem to="/gacha" icon={Store} label="ガチャ" onGuardedClick={guardedNavigate} />
         <NavItem to="/party" icon={User} label="編成" onGuardedClick={guardedNavigate} />
+        <NavItem to="/shop" icon={ShoppingBag} label="ショップ" onGuardedClick={guardedNavigate} />
         <div className="w-16 h-px bg-gray-800 my-2" />
         <NavItem to="/present" icon={Mail} label="プレゼント" onGuardedClick={guardedNavigate} />
         <div className="mt-auto">
@@ -50,6 +51,7 @@ export const Sidebar: React.FC = () => {
         <NavItem to="/quest" icon={Swords} label="出撃" onGuardedClick={guardedNavigate} />
         <NavItem to="/gacha" icon={Store} label="ガチャ" onGuardedClick={guardedNavigate} />
         <NavItem to="/party" icon={User} label="編成" onGuardedClick={guardedNavigate} />
+        <NavItem to="/shop" icon={ShoppingBag} label="商店" onGuardedClick={guardedNavigate} />
         <NavItem to="/present" icon={Mail} label="BOX" onGuardedClick={guardedNavigate} />
         <NavItem to="/menu" icon={Settings} label="設定" onGuardedClick={guardedNavigate} />
       </div>

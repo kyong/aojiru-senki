@@ -4,6 +4,7 @@ import type {
   InventoryState,
   ReceivedPresentState,
   ClearedQuestsState,
+  ItemsState,
 } from './types';
 import {
   DEFAULT_PLAYER,
@@ -11,6 +12,7 @@ import {
   DEFAULT_INVENTORY,
   DEFAULT_RECEIVED_PRESENTS,
   DEFAULT_CLEARED_QUESTS,
+  DEFAULT_ITEMS,
 } from './defaults';
 
 // ============================================================
@@ -28,6 +30,7 @@ const KEYS = {
   INVENTORY: 'aojiru_inventory',
   RECEIVED_PRESENTS: 'aojiru_received_presents',
   CLEARED_QUESTS: 'aojiru_cleared_quests',
+  ITEMS: 'aojiru_items',
   AP_RECOVERY_TIME: 'aojiru_ap_recovery_time',
 } as const;
 
@@ -136,6 +139,16 @@ export function getClearedQuests(): ClearedQuestsState {
 
 export function saveClearedQuests(cleared: ClearedQuestsState): void {
   write(KEYS.CLEARED_QUESTS, cleared);
+}
+
+// ---- Items ----
+
+export function getItems(): ItemsState {
+  return read<ItemsState>(KEYS.ITEMS, DEFAULT_ITEMS);
+}
+
+export function saveItems(items: ItemsState): void {
+  write(KEYS.ITEMS, items);
 }
 
 // ---- AP Recovery Timestamp ----

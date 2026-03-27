@@ -13,6 +13,7 @@ import type {
   InventoryState,
   ReceivedPresentState,
   ClearedQuestsState,
+  ItemsState,
 } from '../store/types';
 import * as storage from '../store/storage';
 import { getCharacterById } from '../store/characters';
@@ -31,12 +32,15 @@ type GameContextValue = {
   inventory: InventoryState;
   receivedPresentIds: ReceivedPresentState;
   clearedQuests: ClearedQuestsState;
+  items: ItemsState;
   /** 次のAP回復まで残り何秒か（AP満タン時は null） */
   nextApRecoveryIn: number | null;
 
   // Player actions
   addGold: (amount: number) => void;
   addGems: (amount: number) => void;
+  /** ゴールドを消費。不足時は false を返す */
+  spendGold: (amount: number) => boolean;
   /** ジェムを消費。不足時は false を返す */
   spendGems: (amount: number) => boolean;
   /** APを消費。不足時は false を返す */
@@ -44,6 +48,11 @@ type GameContextValue = {
   /** APを回復。上限突破を許容する */
   recoverAp: (amount: number) => void;
   addExp: (amount: number) => void;
+
+  // Item actions
+  addItems: (key: keyof ItemsState, amount: number) => void;
+  /** アイテムを1つ消費。不足時は false を返す */
+  useItem: (key: keyof ItemsState) => boolean;
 
   // Inventory & Party actions
   addToInventory: (charId: number) => void;
@@ -79,6 +88,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const [clearedQuests, setClearedQuests] = useState<ClearedQuestsState>(
     () => storage.getClearedQuests()
   );
+  const [items, setItems] = useState<ItemsState>(() => storage.getItems());
   const [nextApRecoveryIn, setNextApRecoveryIn] = useState<number | null>(null);
   const apRecoveryTimeRef = useRef<number>(storage.getApRecoveryTime());
 
@@ -88,6 +98,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => { storage.saveInventory(inventory); }, [inventory]);
   useEffect(() => { storage.saveReceivedPresentIds(receivedPresentIds); }, [receivedPresentIds]);
   useEffect(() => { storage.saveClearedQuests(clearedQuests); }, [clearedQuests]);
+  useEffect(() => { storage.saveItems(items); }, [items]);
 
   // ---- AP 自動回復 ----
   // 起動時: アプリを閉じていた間に回復すべきAPを遡って加算
@@ -137,6 +148,12 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setPlayer(p => ({ ...p, gems: p.gems + amount }));
   }, []);
 
+  const spendGold = useCallback((amount: number): boolean => {
+    if (player.gold < amount) return false;
+    setPlayer(p => ({ ...p, gold: p.gold - amount }));
+    return true;
+  }, [player.gold]);
+
   const spendGems = useCallback((amount: number): boolean => {
     if (player.gems < amount) return false;
     setPlayer(p => ({ ...p, gems: p.gems - amount }));
@@ -165,6 +182,18 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
       return { ...p, exp, level, nextExp };
     });
   }, []);
+
+  // ---- Items ----
+
+  const addItems = useCallback((key: keyof ItemsState, amount: number) => {
+    setItems(prev => ({ ...prev, [key]: prev[key] + amount }));
+  }, []);
+
+  const useItem = useCallback((key: keyof ItemsState): boolean => {
+    if (items[key] <= 0) return false;
+    setItems(prev => ({ ...prev, [key]: prev[key] - 1 }));
+    return true;
+  }, [items]);
 
   // ---- Inventory & Party ----
 
@@ -234,12 +263,14 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setInventory(storage.getInventory());
     setReceivedPresentIds(storage.getReceivedPresentIds());
     setClearedQuests(storage.getClearedQuests());
+    setItems(storage.getItems());
   }, []);
 
   const value: GameContextValue = {
-    player, party, inventory, receivedPresentIds, clearedQuests,
+    player, party, inventory, receivedPresentIds, clearedQuests, items,
     nextApRecoveryIn,
-    addGold, addGems, spendGems, consumeAp, recoverAp, addExp,
+    addGold, addGems, spendGold, spendGems, consumeAp, recoverAp, addExp,
+    addItems, useItem,
     addToInventory, setPartySlot,
     receivePresent, receiveAllPresents, markQuestCleared,
     getBattleStats,

@@ -31,12 +31,12 @@ const typeBadge: Record<PresentType, string> = {
 };
 
 export const Present = () => {
-  const { receivedPresentIds, receivePresent, receiveAllPresents, addGold, addGems } = useGame();
+  const { receivedPresentIds, receivePresent, receiveAllPresents, addGold, addGems, addItems } = useGame();
 
   const applyReward = (p: PresentDef) => {
     if (p.type === 'gold') addGold(p.amount);
     if (p.type === 'gem')  addGems(p.amount);
-    // item は今後のアイテムシステムに拡張
+    if (p.type === 'item') addItems('aojiruPotion', p.amount);
   };
 
   const handleReceive = (p: PresentDef) => {

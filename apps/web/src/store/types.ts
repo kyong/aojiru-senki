@@ -54,3 +54,8 @@ export type ReceivedPresentState = number[];
 
 /** クリア済みクエストのIDリスト */
 export type ClearedQuestsState = number[];
+
+/** アイテム所持数 */
+export type ItemsState = {
+  aojiruPotion: number;
+};
