@@ -46,8 +46,8 @@ export const Gacha = () => {
   return (
     <Layout>
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-gray-700 pb-4 gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
             <Sparkles className="text-yellow-400" /> 青汁スカウト (Gacha)
           </h2>
           <div className="flex items-center gap-2 bg-gray-800 px-4 py-2 rounded-full border border-gray-700">
@@ -57,11 +57,11 @@ export const Gacha = () => {
         </div>
 
         {/* Banner */}
-        <div className="relative rounded-2xl overflow-hidden h-56 flex items-center justify-center border border-yellow-500/30 bg-gradient-to-br from-gray-900 via-yellow-900/20 to-gray-900">
+        <div className="relative rounded-2xl overflow-hidden h-40 md:h-56 flex items-center justify-center border border-yellow-500/30 bg-gradient-to-br from-gray-900 via-yellow-900/20 to-gray-900">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(234,179,8,0.15)_0%,transparent_70%)]" />
           <div className="z-10 text-center">
             <p className="text-yellow-400 text-xs font-bold tracking-widest mb-2 uppercase">Limited</p>
-            <h3 className="text-3xl font-black text-white drop-shadow-lg">聖なる青汁ガチャ</h3>
+            <h3 className="text-2xl md:text-3xl font-black text-white drop-shadow-lg">聖なる青汁ガチャ</h3>
             <p className="text-gray-300 text-sm mt-2">SSR確率 3%！10連はSR以上確定！</p>
           </div>
           <div className="absolute top-4 right-4 flex gap-1">
@@ -121,7 +121,7 @@ export const Gacha = () => {
               <h3 className="text-2xl font-bold text-center text-white mb-6">
                 {modal.cards.length > 1 ? '10連結果！' : 'スカウト結果！'}
               </h3>
-              <div className={clsx('grid gap-3', modal.cards.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-5')}>
+              <div className={clsx('grid gap-2 md:gap-3', modal.cards.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-3 md:grid-cols-5')}>
                 {modal.cards.map((card, i) => (
                   <div key={i} className={clsx('rounded-xl border-2 p-3 flex flex-col items-center gap-1 text-center', rarityStyle[card.rarity])} style={{ animationDelay: `${i * 60}ms` }}>
                     <span className={clsx('text-xs font-black px-2 py-0.5 rounded-full', rarityBadge[card.rarity])}>{card.rarity}</span>

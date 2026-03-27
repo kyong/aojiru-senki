@@ -143,11 +143,11 @@ export const Battle = () => {
 
   if (gameState === 'STORY') return (
     <Layout>
-      <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-        <div className="bg-gray-800 p-8 rounded-xl max-w-2xl w-full border border-gray-600 shadow-2xl relative">
-          <h2 className="text-2xl font-bold mb-6 text-green-400">Episode {questId}</h2>
-          <p className="text-xl leading-relaxed mb-12 min-h-[100px]">{STORY_TEXT[questId][currentStoryIndex]}</p>
-          <button onClick={handleStoryNext} className="absolute bottom-8 right-8 flex items-center gap-2 px-6 py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold transition-all animate-bounce">
+      <div className="flex items-center justify-center h-[calc(100dvh-8rem)]">
+        <div className="bg-gray-800 p-6 md:p-8 rounded-xl max-w-2xl w-full border border-gray-600 shadow-2xl relative">
+          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-green-400">Episode {questId}</h2>
+          <p className="text-lg md:text-xl leading-relaxed mb-16 md:mb-12 min-h-[80px] md:min-h-[100px]">{STORY_TEXT[questId][currentStoryIndex]}</p>
+          <button onClick={handleStoryNext} className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold transition-all animate-bounce text-sm md:text-base">
             Next <ArrowRight size={20} />
           </button>
         </div>
@@ -157,15 +157,15 @@ export const Battle = () => {
 
   if (gameState === 'WIN') return (
     <Layout>
-      <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-        <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-900/40 p-12 rounded-xl text-center border border-yellow-500/50 backdrop-blur-md">
-          <h1 className="text-5xl font-bold text-yellow-400 mb-4 drop-shadow-lg">QUEST CLEAR!</h1>
-          <p className="text-xl text-white mb-2">「この一杯のために生きている！」</p>
-          <div className="flex justify-center gap-6 my-6 text-sm font-mono">
+      <div className="flex items-center justify-center h-[calc(100dvh-8rem)]">
+        <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-900/40 p-8 md:p-12 rounded-xl text-center border border-yellow-500/50 backdrop-blur-md mx-4">
+          <h1 className="text-3xl md:text-5xl font-bold text-yellow-400 mb-4 drop-shadow-lg">QUEST CLEAR!</h1>
+          <p className="text-lg md:text-xl text-white mb-2">「この一杯のために生きている！」</p>
+          <div className="flex justify-center gap-4 md:gap-6 my-6 text-sm font-mono">
             <span className="text-yellow-400">GOLD +{(quest?.goldReward ?? 1000).toLocaleString()}</span>
             <span className="text-blue-400">EXP +{Math.floor((quest?.goldReward ?? 1000) / 10).toLocaleString()}</span>
           </div>
-          <button onClick={() => navigate('/quest')} className="mt-2 px-8 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white font-bold">
+          <button onClick={() => navigate('/quest')} className="mt-2 px-6 md:px-8 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white font-bold">
             クエスト一覧へ戻る
           </button>
         </div>
@@ -175,14 +175,14 @@ export const Battle = () => {
 
   if (gameState === 'GAMEOVER') return (
     <Layout>
-      <div className="flex items-center justify-center h-[calc(100vh-8rem)]">
-        <div className="bg-gradient-to-br from-red-900/40 to-gray-900 p-12 rounded-xl text-center border border-red-700/50 backdrop-blur-md">
-          <h1 className="text-5xl font-bold text-red-500 mb-4 drop-shadow-lg animate-pulse">GAME OVER</h1>
-          <p className="text-xl text-gray-300 mb-2">「青汁が……足りなかった……」</p>
-          <p className="text-sm text-gray-500 mb-8">健康は一日にして成らず……</p>
-          <div className="flex gap-4 justify-center">
-            <button onClick={() => navigate('/quest')} className="px-8 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white font-bold">クエスト一覧へ戻る</button>
-            <button onClick={() => navigate('/battle', { state: { questId } })} className="px-8 py-3 bg-red-800 hover:bg-red-700 border border-red-600 rounded-lg text-white font-bold">リトライ</button>
+      <div className="flex items-center justify-center h-[calc(100dvh-8rem)]">
+        <div className="bg-gradient-to-br from-red-900/40 to-gray-900 p-8 md:p-12 rounded-xl text-center border border-red-700/50 backdrop-blur-md mx-4">
+          <h1 className="text-3xl md:text-5xl font-bold text-red-500 mb-4 drop-shadow-lg animate-pulse">GAME OVER</h1>
+          <p className="text-lg md:text-xl text-gray-300 mb-2">「青汁が……足りなかった……」</p>
+          <p className="text-sm text-gray-500 mb-6 md:mb-8">健康は一日にして成らず……</p>
+          <div className="flex flex-col md:flex-row gap-3 md:gap-4 justify-center">
+            <button onClick={() => navigate('/quest')} className="px-6 md:px-8 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white font-bold">クエスト一覧へ戻る</button>
+            <button onClick={() => navigate('/battle', { state: { questId } })} className="px-6 md:px-8 py-3 bg-red-800 hover:bg-red-700 border border-red-600 rounded-lg text-white font-bold">リトライ</button>
           </div>
         </div>
       </div>
@@ -193,37 +193,70 @@ export const Battle = () => {
 
   return (
     <Layout>
-      <div className="flex flex-col h-[calc(100vh-8rem)] gap-4">
+      <div className="flex flex-col h-[calc(100dvh-8rem)] gap-2 md:gap-4">
+
+        {/* Mobile: Player Status Bar (above battle area) */}
+        <div className="md:hidden flex gap-2">
+          <div className="flex-1 bg-gray-800/80 rounded-lg px-3 py-2 border border-gray-700">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Heart className={clsx('w-3.5 h-3.5 transition-colors', playerHp < maxHp * 0.3 ? 'text-red-400 animate-pulse' : 'text-red-500')} />
+              <span className="text-[10px] text-gray-400">HP</span>
+              <span className="text-[10px] font-mono text-gray-300 ml-auto">{playerHp}/{maxHp}</span>
+            </div>
+            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className={clsx('h-full transition-all duration-300', playerHp < maxHp * 0.3 ? 'bg-red-500' : 'bg-green-500')} style={{ width: `${(playerHp / maxHp) * 100}%` }} />
+            </div>
+          </div>
+          <div className="flex-1 bg-gray-800/80 rounded-lg px-3 py-2 border border-gray-700">
+            <div className="flex items-center gap-1.5 mb-1">
+              <Droplet className="w-3.5 h-3.5 text-green-500" />
+              <span className="text-[10px] text-gray-400">AOJIRU</span>
+              <span className="text-[10px] font-mono text-gray-300 ml-auto">{playerMp}%</span>
+            </div>
+            <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
+              <div className="h-full bg-green-600 transition-all duration-300" style={{ width: `${playerMp}%` }} />
+            </div>
+          </div>
+        </div>
 
         {/* Battle Area */}
         <div className="flex-1 bg-gray-900 rounded-xl relative overflow-hidden border border-gray-700 flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: enemyData.bgImage ? `url('${enemyData.bgImage}')` : "url('https://placehold.co/1200x800/222/333?text=Battle+Background')" }}>
           <div className="absolute inset-0 bg-black/40" />
           <div className="z-10 flex flex-col items-center animate-[float_3s_ease-in-out_infinite]">
             <div className="filter drop-shadow-[0_0_20px_rgba(255,0,0,0.5)] transform hover:scale-110 transition-transform cursor-pointer">
-              <img src={enemyData.image} alt={enemyData.name} className="w-64 h-64 object-contain" />
+              <img src={enemyData.image} alt={enemyData.name} className="w-40 h-40 md:w-64 md:h-64 object-contain" />
             </div>
-            <div className="mt-4 bg-gray-900/80 p-3 rounded-lg border border-red-900/50 backdrop-blur-sm w-64">
-              <h3 className="text-red-400 font-bold text-center mb-1">{enemyData.name}</h3>
+            <div className="mt-3 md:mt-4 bg-gray-900/80 p-2 md:p-3 rounded-lg border border-red-900/50 backdrop-blur-sm w-48 md:w-64">
+              <h3 className="text-red-400 font-bold text-center mb-1 text-sm md:text-base">{enemyData.name}</h3>
               <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
                 <div className="h-full bg-red-600 transition-all duration-500 origin-left" style={{ transform: `scaleX(${enemyHp / enemyData.maxHp})` }} />
               </div>
-              <p className="text-right text-xs text-gray-400 mt-1 font-mono">{enemyHp.toLocaleString()} / {enemyData.maxHp.toLocaleString()}</p>
+              <p className="text-right text-[10px] md:text-xs text-gray-400 mt-1 font-mono">{enemyHp.toLocaleString()} / {enemyData.maxHp.toLocaleString()}</p>
             </div>
           </div>
           {!isPlayerTurn && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-red-900/80 border border-red-600 text-red-300 text-sm px-4 py-1 rounded-full font-bold animate-pulse backdrop-blur">
+            <div className="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 bg-red-900/80 border border-red-600 text-red-300 text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-bold animate-pulse backdrop-blur">
               {enemyData.name}のターン……
             </div>
           )}
           {isGuarding && isPlayerTurn && (
-            <div className="absolute top-4 left-1/2 -translate-x-1/2 bg-blue-900/80 border border-blue-600 text-blue-300 text-sm px-4 py-1 rounded-full font-bold backdrop-blur">
+            <div className="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 bg-blue-900/80 border border-blue-600 text-blue-300 text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-bold backdrop-blur">
               🛡️ 防御態勢中
             </div>
           )}
+
+          {/* Mobile: Battle Log overlay */}
+          <div className="md:hidden absolute bottom-2 left-2 right-2 bg-black/70 rounded-lg p-2 backdrop-blur-sm border border-gray-700/50 max-h-16 overflow-hidden">
+            {battleLog.slice(-2).map((log, i) => (
+              <p key={i} className={clsx('text-[11px] font-mono leading-tight', i === battleLog.slice(-2).length - 1 ? 'text-white font-bold' : 'text-gray-500')}>
+                {i === battleLog.slice(-2).length - 1 ? '> ' : ''}{log}
+              </p>
+            ))}
+          </div>
         </div>
 
-        {/* HUD */}
-        <div className="h-48 grid grid-cols-12 gap-4">
+        {/* HUD - Desktop */}
+        <div className="hidden md:grid h-48 grid-cols-12 gap-4">
 
           {/* Player Status */}
           <div className="col-span-3 bg-gray-800 rounded-xl p-4 border border-gray-700 shadow-lg flex flex-col gap-2">
@@ -277,6 +310,23 @@ export const Battle = () => {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* HUD - Mobile */}
+        <div className="md:hidden grid grid-cols-2 gap-1.5">
+          {([
+            { label: '攻撃',    sub: null,           icon: <Sword size={18} />,   cls: 'from-red-900/70 to-gray-800 border-red-700/60 active:border-red-400', textCls: 'text-red-100',    iconCls: 'text-red-400',    fn: handleAttack },
+            { label: 'スキル',  sub: `-${SKILL_COST}`, icon: <Zap size={18} />,    cls: 'from-green-900/70 to-gray-800 border-green-700/60 active:border-green-400', textCls: 'text-green-100',  iconCls: 'text-green-400',  fn: handleSkill },
+            { label: '防御',    sub: '+10',          icon: <Shield size={18} />,  cls: 'from-blue-900/70 to-gray-800 border-blue-700/60 active:border-blue-400',  textCls: 'text-blue-100',   iconCls: 'text-blue-400',   fn: handleGuard },
+            { label: 'アイテム', sub: '+120HP',       icon: <Package size={18} />, cls: 'from-yellow-900/70 to-gray-800 border-yellow-700/60 active:border-yellow-400', textCls: 'text-yellow-100', iconCls: 'text-yellow-400', fn: handleItem },
+          ] as const).map(({ label, sub, icon, cls, textCls, iconCls, fn }) => (
+            <button key={label} onClick={() => fn()} disabled={disabled}
+              className={clsx('bg-gradient-to-br border rounded-lg flex items-center justify-center gap-1.5 py-3 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed', cls)}>
+              <span className={iconCls}>{icon}</span>
+              <span className={clsx('font-bold text-sm', textCls)}>{label}</span>
+              {sub && <span className={clsx('text-[10px] font-mono', textCls)}>{sub}</span>}
+            </button>
+          ))}
         </div>
       </div>
     </Layout>

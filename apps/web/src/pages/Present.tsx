@@ -56,7 +56,7 @@ export const Present = () => {
   return (
     <Layout>
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between border-b border-gray-700 pb-4">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-gray-700 pb-4 gap-3">
           <h2 className="text-2xl font-bold text-white flex items-center gap-2">
             <Mail className="text-blue-400" />
             プレゼント
@@ -86,10 +86,10 @@ export const Present = () => {
             const received = receivedPresentIds.includes(p.id);
             return (
               <div key={p.id} className={clsx(
-                'flex items-center gap-4 p-4 rounded-xl border transition-all',
+                'flex items-center gap-3 md:gap-4 p-3 md:p-4 rounded-xl border transition-all',
                 received ? 'bg-gray-800/30 border-gray-700/50 opacity-50' : 'bg-gray-800 border-gray-700 hover:border-gray-500'
               )}>
-                <div className="w-12 h-12 rounded-xl bg-gray-900 flex items-center justify-center text-2xl border border-gray-700 flex-shrink-0">{p.emoji}</div>
+                <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl bg-gray-900 flex items-center justify-center text-xl md:text-2xl border border-gray-700 flex-shrink-0">{p.emoji}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className={clsx('text-xs px-2 py-0.5 rounded border', typeBadge[p.type])}>{typeLabel[p.type]}</span>

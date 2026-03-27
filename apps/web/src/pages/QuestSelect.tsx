@@ -25,11 +25,11 @@ export const QuestSelect = () => {
   return (
     <Layout>
       <div className="flex flex-col gap-6">
-        <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-gray-700 pb-4 gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
             <Swords className="text-red-500" /> 出撃 (Quests)
           </h2>
-          <span className="text-gray-400 text-sm">開催期間: 2026/04/01 ~ 2026/04/02</span>
+          <span className="text-gray-400 text-xs md:text-sm">開催期間: 2026/04/01 ~ 2026/04/02</span>
         </div>
 
         {/* AP 表示 */}
@@ -51,7 +51,7 @@ export const QuestSelect = () => {
               <div
                 key={quest.id}
                 className={clsx(
-                  'bg-gray-800 rounded-xl p-4 border flex items-center gap-4 transition-colors group relative overflow-hidden',
+                  'bg-gray-800 rounded-xl p-3 md:p-4 border flex items-center gap-3 md:gap-4 transition-colors group relative overflow-hidden',
                   insufficient
                     ? 'border-gray-700 opacity-70 cursor-not-allowed'
                     : 'border-gray-700 hover:bg-gray-750 cursor-pointer'
@@ -60,7 +60,7 @@ export const QuestSelect = () => {
               >
                 {/* Thumbnail */}
                 <div className={clsx(
-                  'w-20 h-20 bg-gray-900 rounded-lg flex items-center justify-center border transition-colors z-10 overflow-hidden',
+                  'w-14 h-14 md:w-20 md:h-20 bg-gray-900 rounded-lg flex items-center justify-center border transition-colors z-10 overflow-hidden flex-shrink-0',
                   insufficient ? 'border-gray-700' : 'border-gray-600 group-hover:border-green-500'
                 )}>
                   <img src={quest.thumbnail} alt={quest.title} className="w-full h-full object-cover" />
@@ -79,7 +79,7 @@ export const QuestSelect = () => {
                     </div>
                   </div>
                   <h3 className={clsx(
-                    'text-lg font-bold transition-colors',
+                    'text-base md:text-lg font-bold transition-colors',
                     insufficient ? 'text-gray-400' : 'text-gray-100 group-hover:text-green-400'
                   )}>
                     {quest.title}

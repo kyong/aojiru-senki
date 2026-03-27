@@ -42,14 +42,14 @@ export const Party = () => {
       <div className="flex flex-col gap-6">
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-gray-700 pb-4">
-          <h2 className="text-2xl font-bold text-white flex items-center gap-2">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between border-b border-gray-700 pb-4 gap-2">
+          <h2 className="text-xl md:text-2xl font-bold text-white flex items-center gap-2">
             <Users className="text-blue-400" /> 編成 (Party)
           </h2>
-          <div className="flex gap-4 text-sm text-gray-400">
-            <span>ATKボーナス: <span className="text-red-400 font-bold font-mono">+{stats.baseAtk - 90}</span></span>
-            <span>HPボーナス: <span className="text-green-400 font-bold font-mono">+{stats.maxHp - 300}</span></span>
-            <span>バトルHP: <span className="text-white font-bold font-mono">{stats.maxHp}</span></span>
+          <div className="flex flex-wrap gap-2 md:gap-4 text-xs md:text-sm text-gray-400">
+            <span>ATK: <span className="text-red-400 font-bold font-mono">+{stats.baseAtk - 90}</span></span>
+            <span>HP: <span className="text-green-400 font-bold font-mono">+{stats.maxHp - 300}</span></span>
+            <span>Total: <span className="text-white font-bold font-mono">{stats.maxHp}</span></span>
           </div>
         </div>
 
@@ -105,7 +105,7 @@ export const Party = () => {
           {ownedChars.length === 0 ? (
             <p className="text-gray-500 text-sm">ガチャでキャラクターを入手しよう！</p>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               {ownedChars.map(char => {
                 if (!char) return null;
                 const inParty = assignedIds.has(char.id);

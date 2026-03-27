@@ -10,7 +10,7 @@ const Home = () => {
     <Layout>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Main Character Display Area */}
-        <div className="bg-gray-800/50 rounded-xl border border-gray-700 h-[600px] flex items-center justify-center relative overflow-hidden group">
+        <div className="bg-gray-800/50 rounded-xl border border-gray-700 h-[300px] md:h-[600px] flex items-center justify-center relative overflow-hidden group">
           {/* Main Character Image */}
           <img
             src="/images/player.png"
