@@ -5,8 +5,10 @@ import { useGame } from '../context/GameContext';
 import adVideo1 from '../assets/ad/132fd59fadd43415.mp4';
 import adVideo2 from '../assets/ad/e644b9242716b3d2.mp4';
 import adVideo3 from '../assets/ad/19700121_2157_69c68e07db088191817f15e66bda3b25.mp4';
+import adVideo4 from '../assets/ad/19700121_2157_69c699c33b388191a58e85be582a2d63.mp4';
+import adVideo5 from '../assets/ad/19700121_2157_69c69c32317c81918833d414de330808.mp4';
 
-const adVideos = [adVideo1, adVideo2, adVideo3];
+const adVideos = [adVideo1, adVideo2, adVideo3, adVideo4, adVideo5];
 
 type Phase = 'confirm' | 'playing' | 'close-challenge' | 'rewarded';
 
