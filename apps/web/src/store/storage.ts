@@ -3,12 +3,14 @@ import type {
   PartyState,
   InventoryState,
   ReceivedPresentState,
+  ClearedQuestsState,
 } from './types';
 import {
   DEFAULT_PLAYER,
   DEFAULT_PARTY,
   DEFAULT_INVENTORY,
   DEFAULT_RECEIVED_PRESENTS,
+  DEFAULT_CLEARED_QUESTS,
 } from './defaults';
 
 // ============================================================
@@ -25,6 +27,7 @@ const KEYS = {
   PARTY: 'aojiru_party',
   INVENTORY: 'aojiru_inventory',
   RECEIVED_PRESENTS: 'aojiru_received_presents',
+  CLEARED_QUESTS: 'aojiru_cleared_quests',
   AP_RECOVERY_TIME: 'aojiru_ap_recovery_time',
 } as const;
 
@@ -123,6 +126,16 @@ export function getReceivedPresentIds(): ReceivedPresentState {
 
 export function saveReceivedPresentIds(ids: ReceivedPresentState): void {
   write(KEYS.RECEIVED_PRESENTS, ids);
+}
+
+// ---- Cleared Quests ----
+
+export function getClearedQuests(): ClearedQuestsState {
+  return read<ClearedQuestsState>(KEYS.CLEARED_QUESTS, DEFAULT_CLEARED_QUESTS);
+}
+
+export function saveClearedQuests(cleared: ClearedQuestsState): void {
+  write(KEYS.CLEARED_QUESTS, cleared);
 }
 
 // ---- AP Recovery Timestamp ----

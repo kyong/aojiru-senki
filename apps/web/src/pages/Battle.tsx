@@ -20,12 +20,18 @@ const ENEMIES: Record<number, EnemyData> = {
   1: { name: 'カリカリベーコン将軍', hp: 600,  maxHp: 600,  minAtk: 15, maxAtk: 25, image: '/images/bacon_general.png',          intro: '「朝から脂ギッシュにしてやるぜぇ……！」', bgImage: '/images/bacon_general_bg.png' },
   2: { name: '炭水化物・ザ・グレート', hp: 1500, maxHp: 1500, minAtk: 40, maxAtk: 55, image: '/images/carb_the_great.png', intro: '「血糖値を上げてやる……眠くなれぇ……」', bgImage: '/images/carb_the_great_bg.png' },
   3: { name: '魔王コレステロール・キング', hp: 3000, maxHp: 3000, minAtk: 70, maxAtk: 90, image: '/images/cholesterol_king.png', intro: '「我こそは成人病の王なり……健康など不要！」', bgImage: '/images/cholesterol_king_bg.png' },
+  4: { name: 'スイーツ魔人ショートケーキ', hp: 2000, maxHp: 2000, minAtk: 50, maxAtk: 70, image: '/images/sweets_majin.png', intro: '「あま〜い罠から逃れられるかな？」', bgImage: '/images/sweets_majin_bg.png' },
+  5: { name: '深夜のラーメン怪人', hp: 4000, maxHp: 4000, minAtk: 80, maxAtk: 100, image: '/images/ramen_kaijin.png', intro: '「寝る前に…すすってけよ……」', bgImage: '/images/ramen_kaijin_bg.png' },
+  6: { name: '終わらない飲み会部長', hp: 2500, maxHp: 2500, minAtk: 60, maxAtk: 80, image: '/images/nomikai_bucho.png', intro: '「まだまだ帰さんぞ～！次行くぞ次！」', bgImage: '/images/nomikai_bucho_bg.png' },
 };
 
 const STORY_TEXT: Record<number, string[]> = {
   1: ['4月1日、朝。', '世界は突如として脂と糖質に覆われた。', '人々が胃もたれで苦しむ中、一人の戦士が立ち上がる。', '青汁マイスター「この苦味こそが、世界を救う力なんだ！」', 'まずは朝食の平和を取り戻すため、ベーコン将軍を倒せ！'],
   2: ['昼時、オフィス街。', '強烈な睡魔がサラリーマンたちを襲う。', 'これはただの昼寝ではない……炭水化物の呪いだ！', '社長「マイスター君！午後もバリバリ働くには青汁が必要だ！」', '炭水化物の化け物を倒し、生産性を取り戻せ！'],
   3: ['夕暮れ時。', '全ての元凶、魔王コレステロール・キングが姿を現した。', 'マイスター「これで終わりだ……みんなの健康は俺が守る！」', 'ケナ氏「映えより健康！みんな応援して！」', '最後の戦いが始まる……！'],
+  4: ['夕立の中、甘い匂いが漂う。', 'マイスター「この誘惑は……おやつだ！」', '最終決戦を前に、油断を誘う甘い罠。', 'ショートケーキ魔人が立ちふさがる！', '糖分を振り払い、魔王のもとへ急げ！'],
+  5: ['魔王を倒し、世界に平和が訪れた……ように見えた。', 'しかし、深夜0時。', '強烈な空腹感がマイスターを襲う。', 'マイスター「こ、これは……深夜ラーメンの誘惑！」', '真の恐ろしさは、寝る前の炭水化物だった！'],
+  6: ['時計の針が進むと、どこからともなく宴会の声が。', '「お疲れ様です！カンパーイ！」', '突発的に発生する飲み会……断れない雰囲気。', 'マイスター「肝臓への負担も青汁でカバーする！」', '終わらない飲み会から無事に帰還せよ！'],
 };
 
 const SKILL_COST = 30;
@@ -34,7 +40,7 @@ const MAX_MP = 100;
 export const Battle = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { consumeAp, addGold, addExp, getBattleStats } = useGame();
+  const { consumeAp, addGold, addExp, getBattleStats, markQuestCleared } = useGame();
 
   const questId = (location.state?.questId as number) || 1;
   const enemyData = ENEMIES[questId] || ENEMIES[1];
@@ -137,6 +143,7 @@ export const Battle = () => {
     addLog(`${enemyData.name}を倒した！`);
     addGold(gold);
     addExp(exp);
+    markQuestCleared(questId);
   };
 
   // ---- Screens ----

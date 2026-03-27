@@ -1,4 +1,4 @@
-import type { PlayerState, PartyState, InventoryState, ReceivedPresentState } from './types';
+import type { PlayerState, PartyState, InventoryState, ReceivedPresentState, ClearedQuestsState } from './types';
 
 // ============================================================
 // ゲームの初期値
@@ -21,3 +21,5 @@ export const DEFAULT_PARTY: PartyState = [1, null, null];
 export const DEFAULT_INVENTORY: InventoryState = [1]; // 青汁マイスターを初期配布
 
 export const DEFAULT_RECEIVED_PRESENTS: ReceivedPresentState = [];
+
+export const DEFAULT_CLEARED_QUESTS: ClearedQuestsState = [];

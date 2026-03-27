@@ -7,12 +7,14 @@ import Gacha from './pages/Gacha';
 import Party from './pages/Party';
 import PresentPage from './pages/Present';
 import Menu from './pages/Menu';
+import Splash from './pages/Splash';
 
 function App() {
   return (
     <GameProvider>
       <BrowserRouter>
         <Routes>
+          <Route path="/splash"  element={<Splash />} />
           <Route path="/"        element={<Home />} />
           <Route path="/quest"   element={<QuestSelect />} />
           <Route path="/battle"  element={<Battle />} />

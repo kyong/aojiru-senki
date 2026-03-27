@@ -24,6 +24,12 @@ export type Quest = {
   description: string;
   thumbnail: string;
   goldReward: number;
+  unlockCondition?: {
+    requireClearId?: number;
+  };
+  timeCondition?: {
+    activeRule: 'every_other_hour';
+  };
 };
 
 export type PlayerState = {
@@ -44,3 +50,6 @@ export type InventoryState = number[];
 
 /** 受け取り済みプレゼントのIDリスト */
 export type ReceivedPresentState = number[];
+
+/** クリア済みクエストのIDリスト */
+export type ClearedQuestsState = number[];

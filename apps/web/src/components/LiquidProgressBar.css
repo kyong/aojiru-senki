@@ -1,0 +1,91 @@
+/* LiquidProgressBar.css */
+.lp-outer {
+  position: relative;
+  width: 100%;
+  height: 54px;
+  border-radius: 100px;
+  background: #0a1a0a;
+  border: 2.5px solid #1a3a1a;
+  box-shadow: 0 0 18px 2px #00ff4488, inset 0 2px 8px #000a;
+  overflow: hidden;
+}
+
+.lp-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  background: linear-gradient(180deg, #5aff6a 0%, #18d43a 40%, #09a026 100%);
+  box-shadow: 2px 0 18px 4px #00ff4488;
+  overflow: hidden;
+}
+
+.lp-wave {
+  position: absolute;
+  left: -60%;
+  top: -18px;
+  width: 220%;
+  height: 36px;
+  border-radius: 40%;
+  background: radial-gradient(ellipse 60% 60% at 50% 50%, #ffffff55 0%, transparent 80%);
+  animation: wave 2.2s linear infinite;
+}
+
+.lp-wave--2 {
+  top: -12px;
+  height: 28px;
+  background: radial-gradient(ellipse 60% 40% at 50% 50%, #ffffffaa 0%, transparent 70%);
+  animation: wave 3.1s linear infinite reverse;
+  opacity: 0.5;
+}
+
+.lp-bubbles {
+  position: absolute;
+  inset: 0;
+}
+
+.lp-shine {
+  position: absolute;
+  left: 0;
+  top: 4px;
+  width: 100%;
+  height: 12px;
+  border-radius: 100px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.45) 0%, rgba(255, 255, 255, 0.05) 100%);
+}
+
+.lp-glow {
+  position: absolute;
+  inset: -4px;
+  border-radius: 100px;
+  box-shadow: 0 0 24px 6px #00ff4466, 0 0 60px 10px #00ff4422;
+  pointer-events: none;
+}
+
+@keyframes wave {
+  from {
+    transform: translateX(0) rotate(-2deg);
+  }
+
+  to {
+    transform: translateX(27%) rotate(2deg);
+  }
+}
+
+@keyframes bubbleRise {
+  0% {
+    transform: translateY(0) scale(1);
+    opacity: 0.7;
+  }
+
+  80% {
+    opacity: 0.5;
+  }
+
+  100% {
+    transform: translateY(-300%) scale(1.15);
+    opacity: 0;
+  }
+}

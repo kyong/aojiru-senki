@@ -9,17 +9,49 @@ import type { Quest } from '../store/types';
 
 export const QuestSelect = () => {
   const navigate = useNavigate();
-  const { player } = useGame();
+  const { player, clearedQuests, spendGems, recoverAp } = useGame();
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
+  const [apRecoveryQuest, setApRecoveryQuest] = useState<Quest | null>(null);
+  const AP_RECOVERY_COST = 50;
+  const AP_RECOVERY_AMOUNT = player.maxAp;
+
+  const currentHour = new Date().getHours();
+  const availableQuests = ALL_QUESTS.filter((quest) => {
+    if (quest.unlockCondition?.requireClearId) {
+      if (!clearedQuests.includes(quest.unlockCondition.requireClearId)) {
+        return false;
+      }
+    }
+    if (quest.timeCondition?.activeRule === 'every_other_hour') {
+      if (currentHour % 2 !== 0) {
+        return false;
+      }
+    }
+    return true;
+  });
 
   const handleQuestClick = (quest: Quest) => {
-    if (player.ap < quest.stamina) return;
+    if (player.ap < quest.stamina) {
+      setApRecoveryQuest(quest);
+      return;
+    }
     setSelectedQuest(quest);
   };
 
   const handleConfirmStart = () => {
     if (!selectedQuest) return;
     navigate('/battle', { state: { questId: selectedQuest.id } });
+  };
+
+  const handleRecoverAp = () => {
+    if (spendGems(AP_RECOVERY_COST)) {
+      recoverAp(AP_RECOVERY_AMOUNT);
+      // 回復後、元のクエストの確認モーダルへ移行するか、閉じるか
+      if (apRecoveryQuest) {
+        setSelectedQuest(apRecoveryQuest);
+        setApRecoveryQuest(null);
+      }
+    }
   };
 
   return (
@@ -45,7 +77,7 @@ export const QuestSelect = () => {
         </div>
 
         <div className="grid gap-4">
-          {ALL_QUESTS.map((quest) => {
+          {availableQuests.map((quest) => {
             const insufficient = player.ap < quest.stamina;
             return (
               <div
@@ -53,10 +85,10 @@ export const QuestSelect = () => {
                 className={clsx(
                   'bg-gray-800 rounded-xl p-3 md:p-4 border flex items-center gap-3 md:gap-4 transition-colors group relative overflow-hidden',
                   insufficient
-                    ? 'border-gray-700 opacity-70 cursor-not-allowed'
+                    ? 'border-gray-700 opacity-80 cursor-pointer'
                     : 'border-gray-700 hover:bg-gray-750 cursor-pointer'
                 )}
-                onClick={() => !insufficient && handleQuestClick(quest)}
+                onClick={() => handleQuestClick(quest)}
               >
                 {/* Thumbnail */}
                 <div className={clsx(
@@ -154,6 +186,54 @@ export const QuestSelect = () => {
                 className="flex-1 flex justify-center items-center gap-2 py-3 bg-red-700 hover:bg-red-600 text-white font-bold rounded-xl transition-colors shadow-lg shadow-red-900/50"
               >
                 <Swords size={18} /> 出撃する
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AP Recovery Modal */}
+      {apRecoveryQuest && (
+        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
+          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
+            <h3 className="text-xl font-bold text-center text-white mb-4">
+              AP回復
+            </h3>
+            <p className="text-center text-gray-300 text-sm mb-6 leading-relaxed">
+              APが不足しています。<br/>
+              ジェムを消費してAPを回復しますか？
+            </p>
+            
+            <div className="flex flex-col gap-2 bg-gray-800 rounded-xl p-4 mb-8">
+              <div className="flex justify-between items-center text-sm">
+                <span className="text-gray-400">消費ジェム</span>
+                <span className="font-mono text-pink-400 font-bold">-{AP_RECOVERY_COST}</span>
+              </div>
+              <div className="flex justify-between items-center text-sm border-t border-gray-700 pt-2">
+                <span className="text-gray-400">回復AP</span>
+                <span className="font-mono text-green-400 font-bold">+{AP_RECOVERY_AMOUNT}</span>
+              </div>
+              <div className="flex justify-between items-center text-xs mt-2 text-gray-500">
+                <span>所持ジェム</span>
+                <span className={clsx("font-mono", player.gems < AP_RECOVERY_COST ? 'text-red-400' : 'text-gray-300')}>
+                  {player.gems.toLocaleString()}
+                </span>
+              </div>
+            </div>
+
+            <div className="flex gap-4">
+              <button
+                onClick={() => setApRecoveryQuest(null)}
+                className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-colors text-sm"
+              >
+                キャンセル
+              </button>
+              <button
+                onClick={handleRecoverAp}
+                disabled={player.gems < AP_RECOVERY_COST}
+                className="flex-1 py-3 bg-green-700 hover:bg-green-600 disabled:bg-gray-800 disabled:text-gray-500 text-white font-bold rounded-xl transition-colors text-sm shadow-lg shadow-green-900/50"
+              >
+                回復する
               </button>
             </div>
           </div>
