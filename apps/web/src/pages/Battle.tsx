@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
-import { Heart, Droplet, Zap, Shield, Sword, ArrowRight, Package, LogOut } from 'lucide-react';
+import { Heart, Droplet, Zap, Shield, Sword, ArrowRight, Package, LogOut, Share2 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
@@ -61,7 +61,7 @@ export const Battle = () => {
   const [isGuarding, setIsGuarding] = useState(false);
 
   // 戦闘中・ストーリー中の画面遷移をブロック
-  const { guardedNavigate, setBlocked } = useNavigationGuard();
+  const { guardedNavigate, setBlocked, pendingPath, confirmNavigation, cancelNavigation } = useNavigationGuard();
   const shouldBlock = gameState === 'BATTLE' || gameState === 'STORY';
 
   useEffect(() => {
@@ -184,16 +184,95 @@ export const Battle = () => {
     </Layout>
   );
 
+  const isExtraStage = questId === 5;
+  const shareText = '【青汁戦記】エクストラステージをクリアして「超波動青汁割引券」をゲットした！深夜のラーメン怪人を倒したぞ！ #青汁戦記 #超波動青汁';
+  const shareUrl = window.location.origin;
+
+  const handleShareTwitter = () => {
+    window.open(`https://x.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`, '_blank');
+  };
+  const handleShareBluesky = () => {
+    window.open(`https://bsky.app/intent/compose?text=${encodeURIComponent(shareText + '\n' + shareUrl)}`, '_blank');
+  };
+  const handleShareFediverse = () => {
+    const text = encodeURIComponent(shareText + '\n' + shareUrl);
+    window.open(`https://donshare.net/share.html?text=${text}`, '_blank');
+  };
+
   if (gameState === 'WIN') return (
     <Layout>
       <div className="flex items-center justify-center h-[calc(100dvh-8rem)]">
-        <div className="bg-gradient-to-br from-yellow-600/20 to-yellow-900/40 p-8 md:p-12 rounded-xl text-center border border-yellow-500/50 backdrop-blur-md mx-4">
-          <h1 className="text-3xl md:text-5xl font-bold text-yellow-400 mb-4 drop-shadow-lg">QUEST CLEAR!</h1>
-          <p className="text-lg md:text-xl text-white mb-2">「この一杯のために生きている！」</p>
+        <div className={clsx(
+          'p-8 md:p-12 rounded-xl text-center border backdrop-blur-md mx-4 max-w-lg w-full',
+          isExtraStage
+            ? 'bg-gradient-to-br from-purple-600/30 to-green-900/40 border-green-400/50'
+            : 'bg-gradient-to-br from-yellow-600/20 to-yellow-900/40 border-yellow-500/50'
+        )}>
+          <h1 className={clsx(
+            'text-3xl md:text-5xl font-bold mb-4 drop-shadow-lg',
+            isExtraStage ? 'text-green-400' : 'text-yellow-400'
+          )}>
+            {isExtraStage ? 'EXTRA STAGE CLEAR!' : 'QUEST CLEAR!'}
+          </h1>
+          <p className="text-lg md:text-xl text-white mb-2">
+            {isExtraStage ? '「深夜の誘惑に打ち勝った……これぞ青汁の極み！」' : '「この一杯のために生きている！」'}
+          </p>
           <div className="flex justify-center gap-4 md:gap-6 my-6 text-sm font-mono">
             <span className="text-yellow-400">GOLD +{(quest?.goldReward ?? 1000).toLocaleString()}</span>
             <span className="text-blue-400">EXP +{Math.floor((quest?.goldReward ?? 1000) / 10).toLocaleString()}</span>
           </div>
+
+          {isExtraStage && (
+            <>
+              {/* 超波動青汁割引券 */}
+              <div className="my-6 relative">
+                <div className="bg-gradient-to-r from-green-800 via-green-600 to-green-800 border-2 border-dashed border-green-300 rounded-xl p-5 md:p-6 shadow-[0_0_30px_rgba(34,197,94,0.3)]">
+                  <div className="absolute -top-3 left-1/2 -translate-x-1/2 bg-green-500 text-black text-xs font-bold px-4 py-1 rounded-full">
+                    SPECIAL REWARD
+                  </div>
+                  <p className="text-green-200 text-xs mb-2 tracking-widest">COUPON</p>
+                  <h2 className="text-2xl md:text-3xl font-bold text-white mb-1 tracking-tight">超波動青汁割引券</h2>
+                  <p className="text-green-300 text-sm mb-3">全商品 30%OFF</p>
+                  <div className="border-t border-green-500/50 pt-3 mt-3">
+                    <p className="text-green-400/80 text-[10px] md:text-xs font-mono">
+                      ※ この割引券はフィクションです。実在の青汁とは関係ありません。
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* SNS投稿ボタン */}
+              <div className="my-6">
+                <p className="text-gray-400 text-xs mb-3 flex items-center justify-center gap-1.5">
+                  <Share2 size={14} /> クリアを共有する
+                </p>
+                <div className="flex justify-center gap-3">
+                  <button
+                    onClick={handleShareBluesky}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#0085ff] hover:bg-[#0070dd] text-white text-sm font-bold rounded-lg transition-colors"
+                  >
+                    <svg viewBox="0 0 600 530" className="w-4 h-4 fill-current"><path d="M135.72 44.03C202.216 93.951 273.74 195.17 300 249.49c26.262-54.316 97.782-155.54 164.28-205.46C512.26 8.009 590-19.862 590 68.825c0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.38-3.69-10.832-3.708-7.896-.017-2.935-1.193.516-3.707 7.896-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.256 82.697-152.22-67.108 11.421-142.549-7.449-163.25-81.433C20.15 217.613 9.997 86.535 9.997 68.825c0-88.687 77.742-60.816 125.723-24.795z"/></svg>
+                    Bluesky
+                  </button>
+                  <button
+                    onClick={handleShareTwitter}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-black hover:bg-gray-800 text-white text-sm font-bold rounded-lg border border-gray-600 transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    X (Twitter)
+                  </button>
+                  <button
+                    onClick={handleShareFediverse}
+                    className="flex items-center gap-1.5 px-4 py-2 bg-[#6364FF] hover:bg-[#5253dd] text-white text-sm font-bold rounded-lg transition-colors"
+                  >
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M21.327 8.566c0-4.339-2.843-5.61-2.843-5.61-1.433-.658-3.894-.935-6.451-.956h-.063c-2.557.021-5.016.298-6.45.956 0 0-2.843 1.272-2.843 5.61 0 .993-.019 2.181.012 3.441.103 4.243.778 8.425 4.701 9.463 1.809.479 3.362.579 4.612.51 2.268-.126 3.541-.809 3.541-.809l-.075-1.646s-1.621.511-3.441.449c-1.804-.062-3.707-.194-3.999-2.409a4.523 4.523 0 0 1-.04-.621s1.77.433 4.014.536c1.372.063 2.658-.08 3.965-.236 2.506-.299 4.688-1.843 4.962-3.254.433-2.22.397-5.424.397-5.424zm-3.353 5.59h-2.081V9.057c0-1.075-.452-1.62-1.357-1.62-1 0-1.501.647-1.501 1.927v2.791h-2.069V9.364c0-1.28-.501-1.927-1.502-1.927-.904 0-1.357.546-1.357 1.62v5.099H6.026V8.903c0-1.074.273-1.927.823-2.558.566-.631 1.307-.955 2.228-.955 1.065 0 1.872.41 2.405 1.228l.518.869.519-.869c.533-.818 1.34-1.228 2.405-1.228.92 0 1.662.324 2.228.955.549.631.822 1.484.822 2.558v5.253z"/></svg>
+                    Fediverse
+                  </button>
+                </div>
+              </div>
+            </>
+          )}
+
           <button onClick={() => navigate('/quest')} className="mt-2 px-6 md:px-8 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white font-bold">
             クエスト一覧へ戻る
           </button>
