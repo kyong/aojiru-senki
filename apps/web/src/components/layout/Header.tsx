@@ -1,9 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Coins, Gem, Zap } from 'lucide-react';
 import { useGame } from '../../context/GameContext';
+import { AdRewardModal } from '../AdRewardModal';
 
 export const Header: React.FC = () => {
   const { player, nextApRecoveryIn } = useGame();
+  const navigate = useNavigate();
+  const [adModalOpen, setAdModalOpen] = useState(false);
 
   return (
     <div className="h-14 md:h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-3 md:px-6 fixed w-full top-0 z-50">
@@ -36,7 +40,7 @@ export const Header: React.FC = () => {
         </div>
 
         {/* GOLD */}
-        <div className="flex items-center gap-1.5 md:gap-2 bg-gray-800 px-2 md:px-3 py-1 rounded-full border border-gray-700">
+        <div className="flex items-center gap-1.5 md:gap-2 bg-gray-800 px-2 md:px-3 py-1 rounded-full border border-gray-700 cursor-pointer hover:border-yellow-500/50 transition-colors" onClick={() => navigate('/shop')}>
           <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-yellow-500/20 flex items-center justify-center">
             <Coins size={12} className="text-yellow-500 md:w-3.5 md:h-3.5" />
           </div>
@@ -47,7 +51,7 @@ export const Header: React.FC = () => {
         </div>
 
         {/* GEMS */}
-        <div className="flex items-center gap-1.5 md:gap-2 bg-gray-800 px-2 md:px-3 py-1 rounded-full border border-gray-700">
+        <div className="flex items-center gap-1.5 md:gap-2 bg-gray-800 px-2 md:px-3 py-1 rounded-full border border-gray-700 cursor-pointer hover:border-purple-500/50 transition-colors" onClick={() => setAdModalOpen(true)}>
           <div className="w-6 h-6 md:w-7 md:h-7 rounded-full bg-purple-500/20 flex items-center justify-center">
             <Gem size={12} className="text-purple-500 md:w-3.5 md:h-3.5" />
           </div>
@@ -57,6 +61,8 @@ export const Header: React.FC = () => {
           </div>
         </div>
       </div>
+
+      <AdRewardModal open={adModalOpen} onClose={() => setAdModalOpen(false)} />
     </div>
   );
 };
