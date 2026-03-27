@@ -1,9 +1,10 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
-import { Heart, Droplet, Zap, Shield, Sword, ArrowRight, Package } from 'lucide-react';
+import { Heart, Droplet, Zap, Shield, Sword, ArrowRight, Package, LogOut } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
+import { useNavigationGuard } from '../context/NavigationGuardContext';
 import { QUEST_MAP } from '../store/quests';
 
 // ============================================================
@@ -58,6 +59,25 @@ export const Battle = () => {
   const [playerMp, setPlayerMp] = useState(MAX_MP);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [isGuarding, setIsGuarding] = useState(false);
+
+  // 戦闘中・ストーリー中の画面遷移をブロック
+  const { guardedNavigate, setBlocked } = useNavigationGuard();
+  const shouldBlock = gameState === 'BATTLE' || gameState === 'STORY';
+
+  useEffect(() => {
+    setBlocked(shouldBlock);
+    return () => setBlocked(false);
+  }, [shouldBlock, setBlocked]);
+
+  // ブラウザのリロード・タブ閉じ時にも確認
+  useEffect(() => {
+    if (!shouldBlock) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [shouldBlock]);
 
   const addLog = useCallback((msg: string) => {
     setBattleLog(prev => [...prev.slice(-4), msg]);
@@ -152,7 +172,9 @@ export const Battle = () => {
     <Layout>
       <div className="flex items-center justify-center h-[calc(100dvh-8rem)]">
         <div className="bg-gray-800 p-6 md:p-8 rounded-xl max-w-2xl w-full border border-gray-600 shadow-2xl relative">
-          <h2 className="text-xl md:text-2xl font-bold mb-4 md:mb-6 text-green-400">Episode {questId}</h2>
+          <h2 className={clsx("text-xl md:text-2xl font-bold mb-4 md:mb-6", quest?.guerrilla ? "text-orange-400" : "text-green-400")}>
+            {quest?.guerrilla ? 'GUERRILLA' : `Episode ${questId}`}
+          </h2>
           <p className="text-lg md:text-xl leading-relaxed mb-16 md:mb-12 min-h-[80px] md:min-h-[100px]">{STORY_TEXT[questId][currentStoryIndex]}</p>
           <button onClick={handleStoryNext} className="absolute bottom-6 right-6 md:bottom-8 md:right-8 flex items-center gap-2 px-5 py-2.5 md:px-6 md:py-3 bg-green-600 hover:bg-green-500 rounded-lg font-bold transition-all animate-bounce text-sm md:text-base">
             Next <ArrowRight size={20} />
@@ -231,7 +253,7 @@ export const Battle = () => {
           <div className="absolute inset-0 bg-black/40" />
           <div className="z-10 flex flex-col items-center animate-[float_3s_ease-in-out_infinite]">
             <div className="filter drop-shadow-[0_0_20px_rgba(255,0,0,0.5)] transform hover:scale-110 transition-transform cursor-pointer">
-              <img src={enemyData.image} alt={enemyData.name} className="w-40 h-40 md:w-64 md:h-64 object-contain" />
+              <img src={enemyData.image} alt={enemyData.name} className="w-56 h-56 md:w-96 md:h-96 object-contain" />
             </div>
             <div className="mt-3 md:mt-4 bg-gray-900/80 p-2 md:p-3 rounded-lg border border-red-900/50 backdrop-blur-sm w-48 md:w-64">
               <h3 className="text-red-400 font-bold text-center mb-1 text-sm md:text-base">{enemyData.name}</h3>
@@ -308,14 +330,17 @@ export const Battle = () => {
           </div>
 
           {/* Log */}
-          <div className="col-span-3 bg-black/60 rounded-xl p-3 border border-gray-700 overflow-hidden font-mono text-sm shadow-inner">
-            <div className="flex flex-col justify-end h-full">
+          <div className="col-span-3 bg-black/60 rounded-xl p-3 border border-gray-700 overflow-hidden font-mono text-sm shadow-inner flex flex-col">
+            <div className="flex flex-col justify-end flex-1">
               {battleLog.map((log, i) => (
                 <p key={i} className={clsx('mb-1', i === battleLog.length - 1 ? 'text-white font-bold' : 'text-gray-500')}>
                   {i === battleLog.length - 1 ? '> ' : ''}{log}
                 </p>
               ))}
             </div>
+            <button onClick={() => guardedNavigate('/quest')} className="mt-1 flex items-center justify-center gap-1.5 py-1.5 text-xs text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-700 rounded-lg transition-colors">
+              <LogOut size={14} /> 撤退
+            </button>
           </div>
         </div>
 
@@ -335,7 +360,12 @@ export const Battle = () => {
             </button>
           ))}
         </div>
+        {/* Mobile retreat button */}
+        <button onClick={() => guardedNavigate('/quest')} className="md:hidden flex items-center justify-center gap-1.5 py-2 text-xs text-gray-400 hover:text-red-400 border border-gray-700 hover:border-red-700 rounded-lg transition-colors">
+          <LogOut size={14} /> 撤退する
+        </button>
       </div>
+
     </Layout>
   );
 };

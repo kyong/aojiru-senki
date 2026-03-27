@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { GameProvider } from './context/GameContext';
+import { NavigationGuardProvider } from './context/NavigationGuardContext';
 import Home from './pages/Home';
 import Battle from './pages/Battle';
 import QuestSelect from './pages/QuestSelect';
@@ -13,6 +14,7 @@ function App() {
   return (
     <GameProvider>
       <BrowserRouter>
+        <NavigationGuardProvider>
         <Routes>
           <Route path="/splash"  element={<Splash />} />
           <Route path="/"        element={<Home />} />
@@ -23,6 +25,7 @@ function App() {
           <Route path="/present" element={<PresentPage />} />
           <Route path="/menu"    element={<Menu />} />
         </Routes>
+        </NavigationGuardProvider>
       </BrowserRouter>
     </GameProvider>
   );

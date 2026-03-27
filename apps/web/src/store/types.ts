@@ -30,6 +30,7 @@ export type Quest = {
   timeCondition?: {
     activeRule: 'every_other_hour';
   };
+  guerrilla?: boolean;
 };
 
 export type PlayerState = {

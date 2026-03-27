@@ -60,15 +60,15 @@ export const ALL_QUESTS: Quest[] = [
   },
   {
     id: 6,
-    title: 'イベント: 呑み会',
+    title: 'ゲリラ: 終わらない飲み会',
     enemy: '終わらない飲み会部長',
     difficulty: 5,
     stamina: 40,
     goldReward: 40000,
     description: '2時間に1時間だけ出現！肝臓を労われ！',
     thumbnail: '/images/nomikai_bucho.png',
-    unlockCondition: { requireClearId: 1 },
     timeCondition: { activeRule: 'every_other_hour' },
+    guerrilla: true,
   },
 ];
 

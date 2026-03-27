@@ -30,6 +30,11 @@ export const QuestSelect = () => {
     return true;
   });
 
+  // ゲリラクエストを一番上に表示
+  const guerrillaQuests = availableQuests.filter(q => q.guerrilla);
+  const normalQuests = availableQuests.filter(q => !q.guerrilla);
+  const sortedQuests = [...guerrillaQuests, ...normalQuests];
+
   const handleQuestClick = (quest: Quest) => {
     if (player.ap < quest.stamina) {
       setApRecoveryQuest(quest);
@@ -77,23 +82,28 @@ export const QuestSelect = () => {
         </div>
 
         <div className="grid gap-4">
-          {availableQuests.map((quest) => {
+          {sortedQuests.map((quest) => {
             const insufficient = player.ap < quest.stamina;
+            const isGuerrilla = quest.guerrilla;
             return (
               <div
                 key={quest.id}
                 className={clsx(
-                  'bg-gray-800 rounded-xl p-3 md:p-4 border flex items-center gap-3 md:gap-4 transition-colors group relative overflow-hidden',
+                  'rounded-xl p-3 md:p-4 border flex items-center gap-3 md:gap-4 transition-colors group relative overflow-hidden',
+                  isGuerrilla
+                    ? 'bg-gradient-to-r from-orange-900/40 to-gray-800 border-orange-500/60 animate-pulse-slow'
+                    : 'bg-gray-800',
                   insufficient
-                    ? 'border-gray-700 opacity-80 cursor-pointer'
-                    : 'border-gray-700 hover:bg-gray-750 cursor-pointer'
+                    ? 'opacity-80 cursor-pointer'
+                    : 'hover:bg-gray-750 cursor-pointer',
+                  !isGuerrilla && 'border-gray-700'
                 )}
                 onClick={() => handleQuestClick(quest)}
               >
                 {/* Thumbnail */}
                 <div className={clsx(
                   'w-14 h-14 md:w-20 md:h-20 bg-gray-900 rounded-lg flex items-center justify-center border transition-colors z-10 overflow-hidden flex-shrink-0',
-                  insufficient ? 'border-gray-700' : 'border-gray-600 group-hover:border-green-500'
+                  insufficient ? 'border-gray-700' : isGuerrilla ? 'border-orange-500 group-hover:border-orange-400' : 'border-gray-600 group-hover:border-green-500'
                 )}>
                   <img src={quest.thumbnail} alt={quest.title} className="w-full h-full object-cover" />
                 </div>
@@ -101,9 +111,15 @@ export const QuestSelect = () => {
                 {/* Info */}
                 <div className="flex-1 z-10">
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="bg-green-900/50 text-green-400 text-xs px-2 py-0.5 rounded border border-green-700/50">
-                      Chapter {quest.id}
-                    </span>
+                    {isGuerrilla ? (
+                      <span className="bg-orange-900/50 text-orange-400 text-xs px-2 py-0.5 rounded border border-orange-700/50 font-bold">
+                        GUERRILLA
+                      </span>
+                    ) : (
+                      <span className="bg-green-900/50 text-green-400 text-xs px-2 py-0.5 rounded border border-green-700/50">
+                        Chapter {quest.id}
+                      </span>
+                    )}
                     <div className="flex gap-0.5">
                       {[...Array(quest.difficulty)].map((_, i) => (
                         <Star key={i} size={12} className="text-yellow-500 fill-yellow-500" />
@@ -112,7 +128,7 @@ export const QuestSelect = () => {
                   </div>
                   <h3 className={clsx(
                     'text-base md:text-lg font-bold transition-colors',
-                    insufficient ? 'text-gray-400' : 'text-gray-100 group-hover:text-green-400'
+                    insufficient ? 'text-gray-400' : isGuerrilla ? 'text-orange-100 group-hover:text-orange-400' : 'text-gray-100 group-hover:text-green-400'
                   )}>
                     {quest.title}
                   </h3>
@@ -133,7 +149,10 @@ export const QuestSelect = () => {
                       <span className="text-xs font-bold">AP不足</span>
                     </div>
                   ) : (
-                    <div className="bg-green-600 p-3 rounded-full text-white shadow-lg group-hover:scale-110 transition-transform hover:bg-green-500">
+                    <div className={clsx(
+                      'p-3 rounded-full text-white shadow-lg group-hover:scale-110 transition-transform',
+                      isGuerrilla ? 'bg-orange-600 hover:bg-orange-500' : 'bg-green-600 hover:bg-green-500'
+                    )}>
                       <Play fill="currentColor" />
                     </div>
                   )}
