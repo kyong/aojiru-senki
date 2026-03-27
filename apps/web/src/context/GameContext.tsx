@@ -239,20 +239,23 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
       .map(id => getCharacterById(id!))
       .filter(Boolean);
 
+    // レベルボーナス（Lv1で0、以降レベルごとに緩やかに上昇）
+    const lvBonus = player.level - 1;
+
     if (partyChars.length === 0) {
-      // 編成なし: デフォルト値
-      return { maxHp: 500, baseAtk: 110, atkRange: 30 };
+      // 編成なし: デフォルト値 + レベルボーナス
+      return { maxHp: 500 + lvBonus * 5, baseAtk: 110 + lvBonus * 2, atkRange: 30 };
     }
 
     const totalAtk = partyChars.reduce((s, c) => s + (c?.atk ?? 0), 0);
     const totalHp  = partyChars.reduce((s, c) => s + (c?.hp ?? 0), 0);
 
-    const maxHp   = 300 + Math.floor(totalHp / 20);   // 300 + 各キャラHP/20
-    const baseAtk = 90  + Math.floor(totalAtk / 10);  // 90  + 各キャラATK/10
+    const maxHp   = 300 + Math.floor(totalHp / 20) + lvBonus * 5;   // 300 + 各キャラHP/20 + レベルボーナス
+    const baseAtk = 90  + Math.floor(totalAtk / 10) + lvBonus * 2;  // 90  + 各キャラATK/10 + レベルボーナス
     const atkRange = 30;
 
     return { maxHp, baseAtk, atkRange };
-  }, [party]);
+  }, [party, player.level]);
 
   // ---- Debug ----
 
