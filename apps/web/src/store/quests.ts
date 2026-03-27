@@ -69,6 +69,7 @@ export const ALL_QUESTS: Quest[] = [
     thumbnail: '/images/nomikai_bucho.png',
     timeCondition: { activeRule: 'every_other_hour' },
     guerrilla: true,
+    gemsReward: 10,
   },
 ];
 

@@ -8,8 +8,9 @@ export const Header: React.FC = () => {
   return (
     <div className="h-14 md:h-16 bg-gray-900 border-b border-gray-800 flex items-center justify-between px-3 md:px-6 fixed w-full top-0 z-50">
       <div className="flex items-center gap-2 flex-shrink-0">
-        <h1 className="text-sm md:text-xl font-bold whitespace-nowrap tracking-tighter md:tracking-normal bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent">
-          青汁戦記
+        <h1 className="font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent text-[10px] leading-tight md:text-[3.2em] md:leading-[1.1] md:whitespace-nowrap md:tracking-normal">
+          <span className="md:hidden">青汁<br />戦記</span>
+          <span className="hidden md:inline">青汁戦記</span>
         </h1>
       </div>
 

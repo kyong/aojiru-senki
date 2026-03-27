@@ -1,19 +1,35 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { useNavigate } from 'react-router-dom';
-import { Swords, Play, Star, AlertCircle, ArrowRight } from 'lucide-react';
+import { Swords, Play, Star, AlertCircle, ArrowRight, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
 import { ALL_QUESTS } from '../store/quests';
 import type { Quest } from '../store/types';
+
+/** every_other_hour ゲリラの残り時間（分）を返す。非アクティブ時は 0 */
+function getGuerrillaRemainingMin(): number {
+  const now = new Date();
+  if (now.getHours() % 2 !== 0) return 0; // 奇数時間＝非表示
+  const endOfSlot = new Date(now);
+  endOfSlot.setHours(now.getHours() + 1, 0, 0, 0);
+  return Math.max(0, Math.ceil((endOfSlot.getTime() - now.getTime()) / 60000));
+}
 
 export const QuestSelect = () => {
   const navigate = useNavigate();
   const { player, clearedQuests, spendGems, recoverAp } = useGame();
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [apRecoveryQuest, setApRecoveryQuest] = useState<Quest | null>(null);
+  const [guerrillaMin, setGuerrillaMin] = useState(getGuerrillaRemainingMin);
   const AP_RECOVERY_COST = 50;
   const AP_RECOVERY_AMOUNT = player.maxAp;
+
+  // 毎分ゲリラ残り時間を更新
+  useEffect(() => {
+    const id = setInterval(() => setGuerrillaMin(getGuerrillaRemainingMin()), 10000);
+    return () => clearInterval(id);
+  }, []);
 
   const currentHour = new Date().getHours();
   const availableQuests = ALL_QUESTS.filter((quest) => {
@@ -112,9 +128,14 @@ export const QuestSelect = () => {
                 <div className="flex-1 z-10">
                   <div className="flex items-center gap-2 mb-1">
                     {isGuerrilla ? (
-                      <span className="bg-orange-900/50 text-orange-400 text-xs px-2 py-0.5 rounded border border-orange-700/50 font-bold">
-                        GUERRILLA
-                      </span>
+                      <>
+                        <span className="bg-orange-900/50 text-orange-400 text-xs px-2 py-0.5 rounded border border-orange-700/50 font-bold">
+                          GUERRILLA
+                        </span>
+                        <span className="flex items-center gap-1 text-orange-300 text-xs font-mono">
+                          <Clock size={12} /> 残り{guerrillaMin}分
+                        </span>
+                      </>
                     ) : (
                       <span className="bg-green-900/50 text-green-400 text-xs px-2 py-0.5 rounded border border-green-700/50">
                         Chapter {quest.id}
@@ -138,6 +159,9 @@ export const QuestSelect = () => {
                       消費AP: {quest.stamina}
                     </span>
                     <span className="text-yellow-400">GOLD: +{quest.goldReward.toLocaleString()}</span>
+                    {(quest.gemsReward ?? 0) > 0 && (
+                      <span className="text-purple-400">GEMS: +{quest.gemsReward}</span>
+                    )}
                   </div>
                 </div>
 

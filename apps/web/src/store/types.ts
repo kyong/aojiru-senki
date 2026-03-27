@@ -31,6 +31,7 @@ export type Quest = {
     activeRule: 'every_other_hour';
   };
   guerrilla?: boolean;
+  gemsReward?: number;
 };
 
 export type PlayerState = {

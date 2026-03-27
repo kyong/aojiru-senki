@@ -41,7 +41,7 @@ const MAX_MP = 100;
 export const Battle = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { consumeAp, addGold, addExp, getBattleStats, markQuestCleared, items, useItem } = useGame();
+  const { consumeAp, addGold, addGems, addExp, getBattleStats, markQuestCleared, items, useItem } = useGame();
 
   const questId = (location.state?.questId as number) || 1;
   const enemyData = ENEMIES[questId] || ENEMIES[1];
@@ -160,10 +160,12 @@ export const Battle = () => {
 
   const handleWin = () => {
     const gold = quest?.goldReward ?? 1000;
+    const gems = quest?.gemsReward ?? 0;
     const exp  = gold / 10;
     setGameState('WIN');
     addLog(`${enemyData.name}を倒した！`);
     addGold(gold);
+    if (gems > 0) addGems(gems);
     addExp(exp);
     markQuestCleared(questId);
   };
@@ -222,6 +224,9 @@ export const Battle = () => {
           <div className="flex justify-center gap-4 md:gap-6 my-6 text-sm font-mono">
             <span className="text-yellow-400">GOLD +{(quest?.goldReward ?? 1000).toLocaleString()}</span>
             <span className="text-blue-400">EXP +{Math.floor((quest?.goldReward ?? 1000) / 10).toLocaleString()}</span>
+            {(quest?.gemsReward ?? 0) > 0 && (
+              <span className="text-purple-400">GEMS +{quest!.gemsReward}</span>
+            )}
           </div>
 
           {isExtraStage && (
