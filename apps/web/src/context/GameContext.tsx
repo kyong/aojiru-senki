@@ -138,10 +138,21 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
       });
     };
 
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        tick();
+      }
+    };
+
     // 起動時に即実行（オフライン中の回復を反映）
     tick();
     const id = setInterval(tick, 1000);
-    return () => clearInterval(id);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(id);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ---- Player actions ----
