@@ -124,10 +124,19 @@ export const Gacha = () => {
               <div className={clsx('grid gap-2 md:gap-3', modal.cards.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-3 md:grid-cols-5')}>
                 {modal.cards.map((card, i) => (
                   <div key={i} className={clsx('rounded-xl border-2 p-3 flex flex-col items-center gap-1 text-center', rarityStyle[card.rarity])} style={{ animationDelay: `${i * 60}ms` }}>
-                    <span className={clsx('text-xs font-black px-2 py-0.5 rounded-full', rarityBadge[card.rarity])}>{card.rarity}</span>
-                    <span className="text-3xl mt-1">{card.emoji}</span>
-                    <p className="text-white font-bold text-xs leading-tight">{card.name}</p>
-                    <p className="text-gray-400 text-[10px]">{card.title}</p>
+                    <div className="flex items-center justify-between w-full mb-1">
+                      <span className={clsx('text-[10px] font-black px-1.5 py-0.5 rounded', rarityBadge[card.rarity])}>{card.rarity}</span>
+                      <span className="text-base">{card.emoji}</span>
+                    </div>
+                    <div className="w-16 h-16 md:w-20 md:h-20 relative flex items-center justify-center mb-1">
+                      {card.image ? (
+                        <img src={card.image} alt={card.name} className="w-full h-full object-contain drop-shadow-md" />
+                      ) : (
+                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center text-2xl">{card.emoji}</div>
+                      )}
+                    </div>
+                    <p className="text-white font-bold text-[10px] md:text-xs leading-tight line-clamp-1 w-full">{card.name}</p>
+                    <p className="text-gray-400 text-[9px] md:text-[10px] line-clamp-1 w-full">{card.title}</p>
                   </div>
                 ))}
               </div>

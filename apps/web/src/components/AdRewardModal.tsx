@@ -138,7 +138,8 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
             ref={videoRef}
             src={videoSrc}
             muted={muted}
-            className="w-full aspect-video bg-black"
+            className="w-full bg-black"
+            style={{ maxHeight: '80vh', minHeight: '60vh' }}
             onEnded={handleVideoEnd}
             playsInline
           />

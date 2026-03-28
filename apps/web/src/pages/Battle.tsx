@@ -62,6 +62,11 @@ export const Battle = () => {
   const [playerMp, setPlayerMp] = useState(MAX_MP);
   const [isPlayerTurn, setIsPlayerTurn] = useState(true);
   const [isGuarding, setIsGuarding] = useState(false);
+  const [isShaking, setIsShaking] = useState(false);
+  const [enemyHit, setEnemyHit] = useState(false);
+  const [playerHit, setPlayerHit] = useState(false);
+  const [enemyAttacking, setEnemyAttacking] = useState(false);
+  const [floatingDamage, setFloatingDamage] = useState<{ id: number; value: string; type: 'player' | 'enemy' }[]>([]);
 
   // 戦闘中・ストーリー中の画面遷移をブロック
   const { guardedNavigate, setBlocked } = useNavigationGuard();
@@ -107,13 +112,28 @@ export const Battle = () => {
 
   const doEnemyTurn = (guarding: boolean) => {
     setIsPlayerTurn(false);
+    // 敵の攻撃前タメ（一瞬引く）
+    setTimeout(() => setEnemyAttacking(true), 100);
+
     setTimeout(() => {
       const base = enemyData.minAtk + Math.floor(Math.random() * (enemyData.maxAtk - enemyData.minAtk + 1));
       const dmg = guarding ? Math.floor(base * 0.5) : base;
       const guardText = guarding ? '（防御！ダメージ半減！）' : '';
       setIsGuarding(false);
+      setEnemyAttacking(false); // ランジ終了
+      
       setPlayerHp(prev => {
         const next = Math.max(0, prev - dmg);
+        
+        // 被ダメージ演出
+        setPlayerHit(true);
+        setIsShaking(true);
+        const damageId = Date.now();
+        setFloatingDamage(prev => [...prev, { id: damageId, value: `-${dmg}`, type: 'player' }]);
+        setTimeout(() => setPlayerHit(false), 200);
+        setTimeout(() => setIsShaking(false), 300);
+        setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1000);
+
         if (next === 0) {
           setGameState('GAMEOVER');
           addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージ${guardText}……倒れてしまった！`);
@@ -123,13 +143,23 @@ export const Battle = () => {
         }
         return next;
       });
-    }, 800);
+    }, 1000); // 演出に合わせて少し遅らせる
   };
 
   const handleAttack = () => {
     if (!isPlayerTurn) return;
     const dmg = baseAtk + Math.floor(Math.random() * atkRange);
     const newHp = Math.max(0, enemyHp - dmg);
+    
+    // 攻撃演出
+    setEnemyHit(true);
+    setIsShaking(true);
+    const damageId = Date.now();
+    setFloatingDamage(prev => [...prev, { id: damageId, value: `-${dmg}`, type: 'enemy' }]);
+    setTimeout(() => setEnemyHit(false), 200);
+    setTimeout(() => setIsShaking(false), 300);
+    setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1000);
+
     setEnemyHp(newHp);
     addLog(`青汁マイスターの攻撃！ ${enemyData.name}に${dmg}のダメージ！`);
     if (newHp === 0) { handleWin(); return; }
@@ -141,6 +171,16 @@ export const Battle = () => {
     if (playerMp < SKILL_COST) { addLog(`AOJIRUが足りない！（必要: ${SKILL_COST}）`); return; }
     const dmg = Math.floor((baseAtk + Math.floor(Math.random() * atkRange)) * 2.5);
     const newHp = Math.max(0, enemyHp - dmg);
+    
+    // スキル演出（より強いシェイク）
+    setEnemyHit(true);
+    setIsShaking(true);
+    const damageId = Date.now();
+    setFloatingDamage(prev => [...prev, { id: damageId, value: `CRITICAL!! -${dmg}`, type: 'enemy' }]);
+    setTimeout(() => setEnemyHit(false), 400); // 少し長めに光る
+    setTimeout(() => setIsShaking(false), 500);
+    setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1200);
+
     setEnemyHp(newHp);
     setPlayerMp(p => p - SKILL_COST);
     addLog(`💚 青汁ストーム！ ${enemyData.name}に${dmg}の大ダメージ！`);
@@ -408,12 +448,26 @@ export const Battle = () => {
         </div>
 
         {/* Battle Area */}
-        <div className="flex-1 bg-gray-900 rounded-xl relative overflow-hidden border border-gray-700 flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: enemyData.bgImage ? `url('${enemyData.bgImage}')` : "url('https://placehold.co/1200x800/222/333?text=Battle+Background')" }}>
+        <div className={clsx(
+          "flex-1 bg-gray-900 rounded-xl relative overflow-hidden border flex items-center justify-center bg-cover bg-center transition-all duration-300",
+          isShaking && "animate-[shake_0.3s_ease-in-out_infinite]",
+          playerHit ? "border-red-500 shadow-[inset_0_0_50px_rgba(239,68,68,0.5)]" : "border-gray-700"
+        )} style={{ backgroundImage: enemyData.bgImage ? `url('${enemyData.bgImage}')` : "url('https://placehold.co/1200x800/222/333?text=Battle+Background')" }}>
           <div className="absolute inset-0 bg-black/40" />
-          <div className="z-10 flex flex-col items-center animate-[float_3s_ease-in-out_infinite]">
-            <div className="filter drop-shadow-[0_0_20px_rgba(255,0,0,0.5)] transform hover:scale-110 transition-transform cursor-pointer">
+          
+          <div className={clsx(
+            "z-10 flex flex-col items-center transition-all duration-300",
+            !enemyAttacking && "animate-[float_3s_ease-in-out_infinite]",
+            enemyAttacking && "scale-110 -translate-y-8" // 攻撃ランジ
+          )}>
+            <div className={clsx(
+              "filter drop-shadow-[0_0_20px_rgba(255,0,0,0.5)] transform transition-all duration-200",
+              enemyHit ? "brightness-200 scale-95" : "hover:scale-105"
+            )}>
               <img src={enemyData.image} alt={enemyData.name} className="w-56 h-56 md:w-96 md:h-96 object-contain" />
             </div>
+            
+            {/* Enemy HP */}
             <div className="mt-3 md:mt-4 bg-gray-900/80 p-2 md:p-3 rounded-lg border border-red-900/50 backdrop-blur-sm w-48 md:w-64">
               <h3 className="text-red-400 font-bold text-center mb-1 text-sm md:text-base">{enemyData.name}</h3>
               <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
@@ -422,6 +476,17 @@ export const Battle = () => {
               <p className="text-right text-[10px] md:text-xs text-gray-400 mt-1 font-mono">{enemyHp.toLocaleString()} / {enemyData.maxHp.toLocaleString()}</p>
             </div>
           </div>
+
+          {/* Floating Damage Numbers */}
+          {floatingDamage.map(dmg => (
+            <div key={dmg.id} className={clsx(
+              "absolute z-30 font-black text-2xl md:text-4xl pointer-events-none animate-[damage-up_1s_ease-out_forwards] drop-shadow-lg",
+              dmg.type === 'player' ? "text-red-500 bottom-1/3" : "text-yellow-400 top-1/4"
+            )}>
+              {dmg.value}
+            </div>
+          ))}
+
           {!isPlayerTurn && (
             <div className="absolute top-3 md:top-4 left-1/2 -translate-x-1/2 bg-red-900/80 border border-red-600 text-red-300 text-xs md:text-sm px-3 md:px-4 py-1 rounded-full font-bold animate-pulse backdrop-blur">
               {enemyData.name}のターン……
@@ -528,5 +593,24 @@ export const Battle = () => {
     </Layout>
   );
 };
+
+// ============================================================
+// Styles for Animations
+// ============================================================
+const style = document.createElement('style');
+style.textContent = `
+  @keyframes shake {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(-4px, 4px); }
+    50% { transform: translate(4px, -4px); }
+    75% { transform: translate(-4px, -4px); }
+  }
+  @keyframes damage-up {
+    0% { transform: translateY(0); opacity: 0; scale: 0.5; }
+    20% { transform: translateY(-20px); opacity: 1; scale: 1.2; }
+    100% { transform: translateY(-60px); opacity: 0; scale: 1; }
+  }
+`;
+document.head.appendChild(style);
 
 export default Battle;

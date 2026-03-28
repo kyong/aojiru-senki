@@ -78,7 +78,13 @@ export const Party = () => {
                   {char ? (
                     <>
                       <button onClick={e => { e.stopPropagation(); removeFromSlot(i); }} className="absolute top-2 right-2 text-gray-500 hover:text-red-400 transition-colors"><X size={16} /></button>
-                      <span className="text-4xl">{char.emoji}</span>
+                      <div className="w-20 h-20 relative flex items-center justify-center mb-1">
+                        {char.image ? (
+                          <img src={char.image} alt={char.name} className="w-full h-full object-contain drop-shadow-lg" />
+                        ) : (
+                          <span className="text-4xl">{char.emoji}</span>
+                        )}
+                      </div>
                       <span className={clsx('text-xs font-black px-2 py-0.5 rounded-full', rarityBadge[char.rarity])}>{char.rarity}</span>
                       <p className="text-white font-bold text-center text-sm">{char.name}</p>
                       <p className="text-gray-400 text-xs">{char.title}</p>
@@ -120,7 +126,13 @@ export const Party = () => {
                         ? 'border-gray-600 bg-gray-800 hover:border-green-400 hover:bg-green-900/20 cursor-pointer'
                         : 'border-gray-700 bg-gray-800 cursor-default'
                     )}>
-                    <span className="text-3xl">{char.emoji}</span>
+                    <div className="w-12 h-12 flex-shrink-0 relative flex items-center justify-center bg-gray-900 rounded-lg overflow-hidden border border-gray-700">
+                      {char.image ? (
+                        <img src={char.image} alt={char.name} className="w-full h-full object-contain" />
+                      ) : (
+                        <span className="text-2xl">{char.emoji}</span>
+                      )}
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-0.5">
                         <span className={clsx('text-xs font-black px-1.5 py-0.5 rounded', rarityBadge[char.rarity])}>{char.rarity}</span>

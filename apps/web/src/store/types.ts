@@ -13,6 +13,7 @@ export type Character = {
   atk: number;
   def: number;
   hp: number;
+  image?: string;
 };
 
 export type Quest = {
