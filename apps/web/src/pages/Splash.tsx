@@ -68,8 +68,8 @@ export const Splash = ({ onComplete }: SplashProps) => {
       />
       
       {/* React UI Layer */}
-      <div className="absolute inset-x-0 bottom-12 md:bottom-24 z-10 flex justify-center pointer-events-none">
-        <div className="w-[80%] max-w-[600px]">
+      <div className="absolute inset-x-0 bottom-16 md:bottom-24 z-50 flex justify-center pointer-events-none">
+        <div className="w-[85%] max-w-[500px] pointer-events-auto">
           <LiquidProgressBar value={progress} />
         </div>
       </div>

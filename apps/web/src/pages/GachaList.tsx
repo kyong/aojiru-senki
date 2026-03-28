@@ -53,13 +53,13 @@ export const GachaList = () => {
         </div>
 
         {/* Probability Summary */}
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
           {rarities.map(r => (
-            <div key={r} className="bg-gray-800/40 border border-gray-700 rounded-xl p-4 text-center">
-              <p className={clsx('text-xs font-black px-2 py-0.5 rounded inline-block mb-2', rarityBadge[r])}>
-                {r}
+            <div key={r} className="bg-gray-800/40 border border-gray-700 rounded-2xl p-4 flex sm:flex-col items-center justify-between sm:justify-center gap-3 shadow-lg backdrop-blur-sm">
+              <p className={clsx('text-[10px] sm:text-xs font-black px-2 py-0.5 rounded shadow-sm', rarityBadge[r])}>
+                {r} 提供割合
               </p>
-              <p className={clsx('text-2xl font-black font-mono leading-none', rarityText[r])}>
+              <p className={clsx('text-xl sm:text-2xl font-black font-mono leading-none', rarityText[r])}>
                 {RARITY_WEIGHTS[r]}%
               </p>
             </div>

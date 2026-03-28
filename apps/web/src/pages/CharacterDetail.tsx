@@ -61,41 +61,44 @@ export const CharacterDetail = () => {
           <div className="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
           
           {/* Character Visual */}
-          <div className="w-full md:w-2/5 flex flex-col items-center justify-center bg-black/40 rounded-2xl p-8 border border-white/5 shadow-inner min-h-[300px]">
-            <div className="text-8xl md:text-9xl drop-shadow-[0_0_20px_rgba(255,255,255,0.2)] mb-4">
-              {character.image ? (
-                <img src={character.image} alt={character.name} className="w-48 h-48 object-contain" />
-              ) : (
-                character.emoji
-              )}
+          <div className="w-full md:w-2/5 flex flex-col items-center justify-center bg-black/40 rounded-3xl p-6 md:p-8 border border-white/5 shadow-inner min-h-[260px] md:min-h-[380px]">
+            <div className="relative group">
+              <div className="absolute inset-0 bg-white/10 blur-3xl rounded-full scale-150 group-hover:bg-white/20 transition-all duration-700" />
+              <div className="text-8xl md:text-9xl relative drop-shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                {character.image ? (
+                  <img src={character.image} alt={character.name} className="w-40 h-40 md:w-56 md:h-56 object-contain" />
+                ) : (
+                  character.emoji
+                )}
+              </div>
             </div>
-            <div className={clsx("px-4 py-1 rounded-full font-black text-sm mb-2 shadow-lg", rarityBadge[character.rarity])}>
+            <div className={clsx("mt-4 px-6 py-1.5 rounded-full font-black text-xs md:text-sm shadow-xl tracking-widest", rarityBadge[character.rarity])}>
               {character.rarity}
             </div>
           </div>
 
           {/* Character Profile & Stats */}
-          <div className="flex-1 space-y-6">
-            <div className="space-y-1">
-              <p className="text-gray-400 text-sm md:text-base font-medium tracking-wider">{character.title}</p>
-              <h1 className="text-3xl md:text-4xl font-black text-white tracking-tight">{character.name}</h1>
+          <div className="flex-1 space-y-4 md:space-y-6">
+            <div className="space-y-1 text-center md:text-left">
+              <p className="text-gray-400 text-xs md:text-base font-bold tracking-tight uppercase opacity-60 italic">{character.title}</p>
+              <h1 className="text-3xl md:text-5xl font-black text-white tracking-tighter leading-none">{character.name}</h1>
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="bg-black/60 rounded-xl p-3 border border-red-500/20 flex flex-col items-center">
-                <Sword className="text-red-400 mb-1" size={18} />
-                <span className="text-gray-500 text-[10px] uppercase font-bold">ATK</span>
-                <span className="text-white text-lg font-black font-mono">{character.atk}</span>
+            <div className="grid grid-cols-3 gap-2 md:gap-4">
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-red-500/10 flex flex-col items-center shadow-lg group hover:border-red-500/30 transition-all">
+                <Sword className="text-red-400 mb-1 sm:mb-2 group-hover:scale-110 transition-transform" size={16} />
+                <span className="text-[9px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest">ATK</span>
+                <span className="text-white text-base md:text-2xl font-black font-mono">{character.atk}</span>
               </div>
-              <div className="bg-black/60 rounded-xl p-3 border border-blue-500/20 flex flex-col items-center">
-                <Shield className="text-blue-400 mb-1" size={18} />
-                <span className="text-gray-500 text-[10px] uppercase font-bold">DEF</span>
-                <span className="text-white text-lg font-black font-mono">{character.def}</span>
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-blue-500/10 flex flex-col items-center shadow-lg group hover:border-blue-500/30 transition-all">
+                <Shield className="text-blue-400 mb-1 sm:mb-2 group-hover:scale-110 transition-transform" size={16} />
+                <span className="text-[9px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest">DEF</span>
+                <span className="text-white text-base md:text-2xl font-black font-mono">{character.def}</span>
               </div>
-              <div className="bg-black/60 rounded-xl p-3 border border-green-500/20 flex flex-col items-center">
-                <Heart className="text-green-400 mb-1" size={18} />
-                <span className="text-gray-500 text-[10px] uppercase font-bold">HP</span>
-                <span className="text-white text-lg font-black font-mono">{character.hp}</span>
+              <div className="bg-black/40 backdrop-blur-md rounded-2xl p-3 md:p-4 border border-green-500/10 flex flex-col items-center shadow-lg group hover:border-green-500/30 transition-all">
+                <Heart className="text-green-400 mb-1 sm:mb-2 group-hover:scale-110 transition-transform" size={16} />
+                <span className="text-[9px] md:text-[10px] text-gray-500 uppercase font-black tracking-widest">HP</span>
+                <span className="text-white text-base md:text-2xl font-black font-mono">{character.hp}</span>
               </div>
             </div>
 

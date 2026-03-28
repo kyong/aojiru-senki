@@ -146,32 +146,49 @@ export const Gacha = () => {
 
         {/* Result Modal */}
         {modal.visible && (
-          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-            <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-3xl w-full shadow-2xl">
-              <h3 className="text-2xl font-bold text-center text-white mb-6">
-                {modal.cards.length > 1 ? '10連結果！' : 'スカウト結果！'}
+          <div className="fixed inset-0 bg-black/90 z-[100] flex items-center justify-center p-2 md:p-4 backdrop-blur-md">
+            <div className="bg-gray-900 border border-gray-700 rounded-3xl p-4 md:p-8 max-w-3xl w-full max-h-[95vh] flex flex-col shadow-[0_0_50px_rgba(0,0,0,0.5)] overflow-hidden">
+              <h3 className="text-xl md:text-3xl font-black text-center text-white mb-4 md:mb-8 tracking-tight">
+                {modal.cards.length > 1 ? '10連スカウト結果！' : 'スカウト結果！'}
               </h3>
-              <div className={clsx('grid gap-2 md:gap-3', modal.cards.length === 1 ? 'grid-cols-1 max-w-xs mx-auto' : 'grid-cols-3 md:grid-cols-5')}>
-                {modal.cards.map((card, i) => (
-                  <div key={i} className={clsx('rounded-xl border-2 p-3 flex flex-col items-center gap-1 text-center', rarityStyle[card.rarity])} style={{ animationDelay: `${i * 60}ms` }}>
-                    <div className="flex items-center justify-between w-full mb-1">
-                      <span className={clsx('text-[10px] font-black px-1.5 py-0.5 rounded', rarityBadge[card.rarity])}>{card.rarity}</span>
-                      <span className="text-base">{card.emoji}</span>
+              
+              <div className="flex-1 overflow-y-auto pr-1 custom-scrollbar">
+                <div className={clsx(
+                  'grid gap-3 md:gap-4 pb-4',
+                  modal.cards.length === 1 ? 'grid-cols-1 max-w-[240px] mx-auto' : 'grid-cols-2 sm:grid-cols-3 md:grid-cols-5'
+                )}>
+                  {modal.cards.map((card, i) => (
+                    <div 
+                      key={i} 
+                      className={clsx(
+                        'rounded-2xl border-2 p-3 flex flex-col items-center gap-1 text-center transition-all duration-500 animate-in fade-in zoom-in',
+                        rarityStyle[card.rarity]
+                      )} 
+                      style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
+                    >
+                      <div className="flex items-center justify-between w-full mb-1">
+                        <span className={clsx('text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm', rarityBadge[card.rarity])}>{card.rarity}</span>
+                        <span className="text-sm md:text-base">{card.emoji}</span>
+                      </div>
+                      <div className="w-16 h-16 md:w-20 md:h-20 relative flex items-center justify-center mb-1">
+                        {card.image ? (
+                          <img src={card.image} alt={card.name} className="w-full h-full object-contain drop-shadow-xl" />
+                        ) : (
+                          <div className="w-full h-full bg-gray-800/50 rounded-xl flex items-center justify-center text-3xl">{card.emoji}</div>
+                        )}
+                      </div>
+                      <p className="text-white font-black text-[10px] md:text-xs leading-tight line-clamp-1 w-full">{card.name}</p>
+                      <p className="text-gray-400 text-[9px] md:text-[10px] font-medium line-clamp-1 w-full opacity-80">{card.title}</p>
                     </div>
-                    <div className="w-16 h-16 md:w-20 md:h-20 relative flex items-center justify-center mb-1">
-                      {card.image ? (
-                        <img src={card.image} alt={card.name} className="w-full h-full object-contain drop-shadow-md" />
-                      ) : (
-                        <div className="w-full h-full bg-gray-800 rounded flex items-center justify-center text-2xl">{card.emoji}</div>
-                      )}
-                    </div>
-                    <p className="text-white font-bold text-[10px] md:text-xs leading-tight line-clamp-1 w-full">{card.name}</p>
-                    <p className="text-gray-400 text-[9px] md:text-[10px] line-clamp-1 w-full">{card.title}</p>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-              <button onClick={() => setModal({ cards: [], visible: false })} className="mt-6 w-full py-3 bg-green-700 hover:bg-green-600 text-white font-bold rounded-xl transition-colors">
-                閉じる
+              
+              <button 
+                onClick={() => setModal({ cards: [], visible: false })} 
+                className="mt-4 md:mt-8 w-full py-4 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-white font-black rounded-2xl transition-all shadow-xl active:scale-[0.98] hover:shadow-green-500/20"
+              >
+                スカウト結果を閉じる
               </button>
             </div>
           </div>
