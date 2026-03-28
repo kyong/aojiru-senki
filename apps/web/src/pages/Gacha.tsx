@@ -78,15 +78,53 @@ export const Gacha = () => {
         </div>
 
         {/* Banner */}
-        <div className="relative rounded-2xl overflow-hidden h-40 md:h-56 flex items-center justify-center border border-yellow-500/30 bg-gradient-to-br from-gray-900 via-yellow-900/20 to-gray-900">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,rgba(234,179,8,0.15)_0%,transparent_70%)]" />
-          <div className="z-10 text-center">
-            <p className="text-yellow-400 text-xs font-bold tracking-widest mb-2 uppercase">Limited</p>
-            <h3 className="text-2xl md:text-3xl font-black text-white drop-shadow-lg">聖なる青汁ガチャ</h3>
-            <p className="text-gray-300 text-sm mt-2">SSR確率 3%！10連はSR以上確定！</p>
+        <div className="relative rounded-2xl overflow-hidden h-40 md:h-64 flex items-center justify-center border-2 border-yellow-500/50 bg-gradient-to-br from-indigo-900 via-purple-900 to-indigo-900 shadow-[0_0_30px_rgba(234,179,8,0.2)]">
+          {/* Holy Glow Effects */}
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.1)_0%,transparent_70%)]" />
+          <div className="absolute inset-0 animate-pulse bg-[radial-gradient(circle_at_center,rgba(234,179,8,0.1)_0%,transparent_80%)]" />
+          
+          {/* Featured Characters */}
+          <div className="absolute inset-0 flex items-end justify-between px-4 md:px-12 pointer-events-none overflow-hidden">
+            {/* Shacho (Full image) */}
+            <div className="relative w-32 md:w-48 h-full transform translate-y-4 md:translate-y-8 -translate-x-4 md:-translate-x-8 opacity-40 md:opacity-100 transition-all duration-700">
+               <img src="/images/characters/shacho.png" alt="Featured" className="w-full h-full object-contain object-bottom drop-shadow-[0_0_15px_rgba(234,179,8,0.4)]" />
+               <div className="absolute bottom-10 left-0 right-0 text-center">
+                 <span className="bg-yellow-500 text-black text-[10px] font-black px-2 py-0.5 rounded shadow-lg uppercase">Pick Up!</span>
+               </div>
+            </div>
+
+            {/* Kena-shi (Silhouette) */}
+            <div className="relative w-32 md:w-48 h-full transform translate-y-4 md:translate-y-8 translate-x-4 md:translate-x-8 opacity-30 md:opacity-80 transition-all duration-700">
+               <img 
+                 src="/images/characters/kenashi.png" 
+                 alt="Coming Soon" 
+                 className="w-full h-full object-contain object-bottom brightness-0" 
+               />
+               <div className="absolute bottom-10 left-0 right-0 text-center">
+                 <span className="bg-indigo-600 text-white text-[10px] font-black px-2 py-0.5 rounded shadow-lg uppercase">Coming Soon?</span>
+               </div>
+            </div>
           </div>
-          <div className="absolute top-4 right-4 flex gap-1">
-            {[...Array(3)].map((_, i) => <Star key={i} size={16} className="text-yellow-400 fill-yellow-400" />)}
+
+          {/* Banner Text */}
+          <div className="z-10 text-center px-4">
+            <div className="flex items-center justify-center gap-2 mb-2">
+              <Sparkles size={16} className="text-yellow-400 animate-spin-slow" />
+              <p className="text-yellow-400 text-[10px] md:text-sm font-black tracking-[0.2em] uppercase drop-shadow-md">聖なる光の導き</p>
+              <Sparkles size={16} className="text-yellow-400 animate-spin-slow" />
+            </div>
+            <h3 className="text-3xl md:text-5xl font-black text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)] tracking-tighter italic">
+              聖なる青汁ガチャ
+            </h3>
+            <div className="flex items-center justify-center gap-4 mt-3">
+              <div className="h-[1px] w-8 bg-gradient-to-r from-transparent to-yellow-500/50" />
+              <p className="text-gray-200 text-xs md:text-sm font-bold">SSR確率 <span className="text-yellow-400 text-lg">3%</span> 爆速中！</p>
+              <div className="h-[1px] w-8 bg-gradient-to-l from-transparent to-yellow-500/50" />
+            </div>
+          </div>
+
+          <div className="absolute top-4 left-4 flex gap-1">
+            {[...Array(3)].map((_, i) => <Star key={i} size={14} className="text-yellow-400 fill-yellow-400 animate-[pulse_1.5s_infinite] shadow-yellow-500" />)}
           </div>
         </div>
 
@@ -110,25 +148,66 @@ export const Gacha = () => {
         </div>
 
         {/* Buttons */}
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+          {/* Single Pull */}
           <button
             onClick={() => runGacha(false)}
             disabled={isAnimating || player.gems < SINGLE_COST}
-            className="relative group bg-gradient-to-br from-gray-700 to-gray-800 hover:from-purple-900/60 hover:to-purple-800/60 border border-gray-600 hover:border-purple-500 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden shadow-lg"
+            className="relative group h-32 md:h-48 rounded-3xl overflow-hidden transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:shadow-purple-500/30"
           >
-            <Gem size={32} className="text-purple-400 group-hover:scale-110 transition-transform" />
-            <span className="font-black text-xl text-white">単発ガチャ</span>
-            <div className="flex items-center gap-1 text-purple-300"><Gem size={14} /><span className="font-mono font-bold">{SINGLE_COST}</span></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-indigo-900 to-purple-900 group-hover:from-indigo-800 group-hover:to-purple-800 transition-colors" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1)_0%,transparent_60%)]" />
+            
+            {/* Background Icon */}
+            <Gem size={120} className="absolute -bottom-8 -right-8 text-white/5 rotate-12 group-hover:scale-110 transition-transform duration-500" />
+
+            <div className="relative h-full flex flex-col items-center justify-center gap-2">
+              <div className="bg-white/10 p-3 rounded-2xl group-hover:bg-white/20 transition-colors">
+                <Gem size={32} className="text-purple-300 group-hover:drop-shadow-[0_0_8px_rgba(216,180,254,0.6)] transition-all" />
+              </div>
+              <span className="font-black text-xl md:text-2xl text-white tracking-wider">単発スカウト</span>
+              <div className="flex items-center gap-1.5 bg-black/30 px-4 py-1.5 rounded-full border border-white/10 group-hover:border-purple-500/50 transition-colors">
+                <Gem size={14} className="text-purple-400" />
+                <span className="font-mono font-black text-lg text-purple-200">{SINGLE_COST}</span>
+              </div>
+            </div>
+
+            {/* Shine effect on hover */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700">
+               <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/10 to-transparent skew-x-[45deg] animate-[shine_2s_infinite]" />
+            </div>
           </button>
+
+          {/* 10-Pull Pulled */}
           <button
             onClick={() => runGacha(true)}
             disabled={isAnimating || player.gems < TEN_COST}
-            className="relative group bg-gradient-to-br from-yellow-900/40 to-gray-800 hover:from-yellow-800/60 hover:to-yellow-900/60 border border-yellow-700/50 hover:border-yellow-400 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden shadow-lg"
+            className="relative group h-32 md:h-48 rounded-3xl overflow-hidden transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_10px_30px_rgba(0,0,0,0.3)] hover:shadow-yellow-500/30"
           >
-            <Sparkles size={32} className="text-yellow-400 group-hover:scale-110 transition-transform" />
-            <span className="font-black text-xl text-white">10連ガチャ</span>
-            <div className="flex items-center gap-1 text-yellow-300"><Gem size={14} /><span className="font-mono font-bold">{TEN_COST}</span></div>
-            <span className="text-xs text-yellow-500 font-bold">SR以上確定！</span>
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-900 to-amber-900 group-hover:from-yellow-800 group-hover:to-amber-800 transition-colors" />
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.1)_0%,transparent_60%)]" />
+            
+            {/* Background Icon */}
+            <Sparkles size={140} className="absolute -bottom-10 -right-10 text-white/5 -rotate-12 group-hover:scale-110 transition-transform duration-500" />
+
+            <div className="relative h-full flex flex-col items-center justify-center gap-2">
+              <div className="absolute top-4 right-4">
+                 <span className="bg-red-600 text-white text-[10px] md:text-xs font-black px-2 py-1 rounded-lg shadow-lg animate-bounce">SR以上確定！</span>
+              </div>
+              <div className="bg-white/10 p-3 rounded-2xl group-hover:bg-white/20 transition-colors">
+                <Sparkles size={32} className="text-yellow-300 group-hover:drop-shadow-[0_0_8px_rgba(253,224,71,0.6)] transition-all" />
+              </div>
+              <span className="font-black text-xl md:text-2xl text-white tracking-wider">10連スカウト</span>
+              <div className="flex items-center gap-1.5 bg-black/30 px-4 py-1.5 rounded-full border border-white/10 group-hover:border-yellow-500/50 transition-colors">
+                <Gem size={14} className="text-yellow-400" />
+                <span className="font-mono font-black text-lg text-yellow-200">{TEN_COST}</span>
+              </div>
+            </div>
+
+            {/* Shine effect on hover */}
+            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-700">
+               <div className="absolute top-0 -left-full w-full h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[45deg] animate-[shine_1.5s_infinite]" />
+            </div>
           </button>
         </div>
 
