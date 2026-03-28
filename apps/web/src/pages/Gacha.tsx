@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
 import { Gem, Sparkles, Star, RotateCcw, Play } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -90,13 +91,22 @@ export const Gacha = () => {
         </div>
 
         {/* Probabilities */}
-        <div className="grid grid-cols-3 gap-4 text-sm text-center">
-          {[{ label: 'SSR確率', value: '3%', color: 'text-yellow-400' }, { label: 'SR確率', value: '15%', color: 'text-purple-400' }, { label: 'R確率', value: '82%', color: 'text-gray-400' }].map(item => (
-            <div key={item.label} className="bg-gray-800/60 rounded-lg p-3 border border-gray-700">
-              <p className="text-gray-400">{item.label}</p>
-              <p className={clsx('text-2xl font-bold', item.color)}>{item.value}</p>
-            </div>
-          ))}
+        <div className="flex flex-col gap-3">
+          <div className="grid grid-cols-3 gap-4 text-sm text-center">
+            {[{ label: 'SSR確率', value: '3%', color: 'text-yellow-400' }, { label: 'SR確率', value: '15%', color: 'text-purple-400' }, { label: 'R確率', value: '82%', color: 'text-gray-400' }].map(item => (
+              <div key={item.label} className="bg-gray-800/60 rounded-lg p-3 border border-gray-700">
+                <p className="text-gray-400 text-[10px] md:text-sm">{item.label}</p>
+                <p className={clsx('text-xl md:text-2xl font-bold', item.color)}>{item.value}</p>
+              </div>
+            ))}
+          </div>
+          <Link 
+            to="/gacha/list" 
+            className="flex items-center justify-center gap-2 text-xs text-gray-400 hover:text-white transition-colors bg-gray-800/30 py-2 rounded-lg border border-gray-700/50 hover:border-gray-600 group"
+          >
+            <Star size={14} className="group-hover:text-yellow-400 transition-colors" />
+            <span>ガチャ排出リスト・提供割合を確認する</span>
+          </Link>
         </div>
 
         {/* Buttons */}

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
-import { Users, PlusCircle, X, ChevronRight, Zap } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Users, PlusCircle, X, ChevronRight, Zap, Info } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
 import { getCharacterById, ALL_CHARACTERS } from '../store/characters';
@@ -88,9 +89,14 @@ export const Party = () => {
                       <span className={clsx('text-xs font-black px-2 py-0.5 rounded-full', rarityBadge[char.rarity])}>{char.rarity}</span>
                       <p className="text-white font-bold text-center text-sm">{char.name}</p>
                       <p className="text-gray-400 text-xs">{char.title}</p>
-                      <button onClick={e => { e.stopPropagation(); setSelectedSlot(i); }} className="text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1 mt-1">
-                        変更 <ChevronRight size={12} />
-                      </button>
+                      <div className="flex gap-2 mt-1">
+                        <button onClick={e => { e.stopPropagation(); setSelectedSlot(i); }} className="text-[10px] md:text-xs text-blue-400 hover:text-blue-300 flex items-center gap-1">
+                          変更 <ChevronRight size={10} />
+                        </button>
+                        <Link to={`/character/${char.id}`} onClick={e => e.stopPropagation()} className="text-[10px] md:text-xs text-gray-400 hover:text-white flex items-center gap-1">
+                          詳細 <Info size={10} />
+                        </Link>
+                      </div>
                     </>
                   ) : (
                     <>
@@ -150,7 +156,16 @@ export const Party = () => {
                         <p className="text-[9px] text-gray-500 leading-tight">{char.skill?.description}</p>
                       </div>
                     </div>
-                    {inParty && <span className="text-xs text-green-500 font-bold whitespace-nowrap">編成中</span>}
+                      <div className="flex flex-col gap-2">
+                        {inParty && <span className="text-[10px] text-green-500 font-bold bg-green-900/20 px-1.5 py-0.5 rounded border border-green-500/20 whitespace-nowrap">編成中</span>}
+                        <Link 
+                          to={`/character/${char.id}`} 
+                          onClick={e => e.stopPropagation()} 
+                          className="text-[10px] text-gray-400 hover:text-white bg-gray-900/50 hover:bg-gray-800 px-2 py-1 rounded border border-gray-700/50 flex items-center justify-center gap-1 transition-colors"
+                        >
+                          詳細 <Info size={10} />
+                        </Link>
+                      </div>
                   </div>
                 );
               })}
