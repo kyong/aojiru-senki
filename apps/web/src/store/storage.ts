@@ -32,6 +32,7 @@ const KEYS = {
   CLEARED_QUESTS: 'aojiru_cleared_quests',
   ITEMS: 'aojiru_items',
   AP_RECOVERY_TIME: 'aojiru_ap_recovery_time',
+  GACHA_PULLS: 'aojiru_gacha_pulls',
 } as const;
 
 const ENCRYPTION_KEY = 'ao_ji_ru_secret_key_2026';
@@ -160,6 +161,16 @@ export function getApRecoveryTime(): number {
 
 export function saveApRecoveryTime(timestamp: number): void {
   write(KEYS.AP_RECOVERY_TIME, timestamp);
+}
+
+// ---- Gacha Pulls ----
+
+export function getGachaPulls(): number {
+  return read<number>(KEYS.GACHA_PULLS, 0);
+}
+
+export function saveGachaPulls(count: number): void {
+  write(KEYS.GACHA_PULLS, count);
 }
 
 // ---- Reset (デバッグ用) ----

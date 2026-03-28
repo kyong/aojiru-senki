@@ -35,6 +35,8 @@ type GameContextValue = {
   items: ItemsState;
   /** 次のAP回復まで残り何秒か（AP満タン時は null） */
   nextApRecoveryIn: number | null;
+  /** ガチャの累計スカウト回数 */
+  totalGachaPulls: number;
 
   // Player actions
   addGold: (amount: number) => void;
@@ -64,6 +66,8 @@ type GameContextValue = {
 
   markQuestCleared: (id: number) => void;
 
+  incrementGachaPulls: (amount: number) => void;
+
   // Battle helpers
   /** 編成から計算したバトル用プレイヤーステータス */
   getBattleStats: () => { maxHp: number; baseAtk: number; atkRange: number };
@@ -89,6 +93,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     () => storage.getClearedQuests()
   );
   const [items, setItems] = useState<ItemsState>(() => storage.getItems());
+  const [totalGachaPulls, setTotalGachaPulls] = useState<number>(() => storage.getGachaPulls());
   const [nextApRecoveryIn, setNextApRecoveryIn] = useState<number | null>(null);
   const apRecoveryTimeRef = useRef<number>(storage.getApRecoveryTime());
 
@@ -99,6 +104,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => { storage.saveReceivedPresentIds(receivedPresentIds); }, [receivedPresentIds]);
   useEffect(() => { storage.saveClearedQuests(clearedQuests); }, [clearedQuests]);
   useEffect(() => { storage.saveItems(items); }, [items]);
+  useEffect(() => { storage.saveGachaPulls(totalGachaPulls); }, [totalGachaPulls]);
 
   // ---- AP 自動回復 ----
   // 起動時: アプリを閉じていた間に回復すべきAPを遡って加算
@@ -231,6 +237,10 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setClearedQuests(prev => prev.includes(id) ? prev : [...prev, id]);
   }, []);
 
+  const incrementGachaPulls = useCallback((amount: number) => {
+    setTotalGachaPulls(prev => prev + amount);
+  }, []);
+
   // ---- Battle helpers ----
 
   const getBattleStats = useCallback(() => {
@@ -272,10 +282,12 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   const value: GameContextValue = {
     player, party, inventory, receivedPresentIds, clearedQuests, items,
     nextApRecoveryIn,
+    totalGachaPulls,
     addGold, addGems, spendGold, spendGems, consumeAp, recoverAp, addExp,
     addItems, useItem,
     addToInventory, setPartySlot,
     receivePresent, receiveAllPresents, markQuestCleared,
+    incrementGachaPulls,
     getBattleStats,
     resetAll,
   };

@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
-import { Gem, Sparkles, Star, RotateCcw } from 'lucide-react';
+import { Gem, Sparkles, Star, RotateCcw, Play } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
+import { AdRewardModal } from '../components/AdRewardModal';
 import {
   drawRandomCharacter,
   drawTenCharacters,
@@ -24,10 +25,10 @@ const rarityBadge: Record<Rarity, string> = {
 };
 
 export const Gacha = () => {
-  const { player, spendGems, addToInventory } = useGame();
+  const { player, spendGems, addToInventory, totalGachaPulls, incrementGachaPulls } = useGame();
   const [modal, setModal] = useState<{ cards: Character[]; visible: boolean }>({ cards: [], visible: false });
   const [isAnimating, setIsAnimating] = useState(false);
-  const [totalPulls, setTotalPulls] = useState(0);
+  const [isAdModalOpen, setIsAdModalOpen] = useState(false);
 
   const runGacha = (ten: boolean) => {
     const cost = ten ? TEN_COST : SINGLE_COST;
@@ -38,7 +39,7 @@ export const Gacha = () => {
       // インベントリに追加
       cards.forEach(c => addToInventory(c.id));
       setModal({ cards, visible: true });
-      setTotalPulls(p => p + cards.length);
+      incrementGachaPulls(cards.length);
       setIsAnimating(false);
     }, 600);
   };
@@ -54,6 +55,25 @@ export const Gacha = () => {
             <Gem size={16} className="text-purple-400" />
             <span className="text-white font-bold font-mono">{player.gems.toLocaleString()}</span>
           </div>
+        </div>
+
+        {/* Ad Reward Banner - Moved to top */}
+        <div className="bg-gradient-to-r from-purple-900/40 to-indigo-900/40 border border-purple-500/30 rounded-2xl p-4 md:p-5 flex items-center justify-between gap-4 shadow-xl backdrop-blur-sm group hover:border-purple-500/60 transition-all duration-300">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-full bg-purple-500/20 flex items-center justify-center group-hover:bg-purple-500/30 transition-colors">
+              <Play size={24} className="text-purple-400 fill-purple-400" />
+            </div>
+            <div>
+              <p className="text-white font-bold text-sm md:text-base">ジェムが足りませんか？</p>
+              <p className="text-purple-300 text-xs md:text-sm">広告視聴で <span className="text-yellow-400 font-black">50 GEMS 〜</span> 獲得チャンス！</p>
+            </div>
+          </div>
+          <button 
+            onClick={() => setIsAdModalOpen(true)}
+            className="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all shadow-lg active:scale-95 hover:shadow-purple-500/20"
+          >
+            今すぐ視聴
+          </button>
         </div>
 
         {/* Banner */}
@@ -84,25 +104,25 @@ export const Gacha = () => {
           <button
             onClick={() => runGacha(false)}
             disabled={isAnimating || player.gems < SINGLE_COST}
-            className="relative group bg-gradient-to-br from-gray-700 to-gray-800 hover:from-purple-900/60 hover:to-purple-800/60 border border-gray-600 hover:border-purple-500 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden"
+            className="relative group bg-gradient-to-br from-gray-700 to-gray-800 hover:from-purple-900/60 hover:to-purple-800/60 border border-gray-600 hover:border-purple-500 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden shadow-lg"
           >
-            <Gem size={32} className="text-purple-400" />
+            <Gem size={32} className="text-purple-400 group-hover:scale-110 transition-transform" />
             <span className="font-black text-xl text-white">単発ガチャ</span>
             <div className="flex items-center gap-1 text-purple-300"><Gem size={14} /><span className="font-mono font-bold">{SINGLE_COST}</span></div>
           </button>
           <button
             onClick={() => runGacha(true)}
             disabled={isAnimating || player.gems < TEN_COST}
-            className="relative group bg-gradient-to-br from-yellow-900/40 to-gray-800 hover:from-yellow-800/60 hover:to-yellow-900/60 border border-yellow-700/50 hover:border-yellow-400 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden"
+            className="relative group bg-gradient-to-br from-yellow-900/40 to-gray-800 hover:from-yellow-800/60 hover:to-yellow-900/60 border border-yellow-700/50 hover:border-yellow-400 rounded-xl p-6 flex flex-col items-center gap-2 transition-all duration-300 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed overflow-hidden shadow-lg"
           >
-            <Sparkles size={32} className="text-yellow-400" />
+            <Sparkles size={32} className="text-yellow-400 group-hover:scale-110 transition-transform" />
             <span className="font-black text-xl text-white">10連ガチャ</span>
             <div className="flex items-center gap-1 text-yellow-300"><Gem size={14} /><span className="font-mono font-bold">{TEN_COST}</span></div>
             <span className="text-xs text-yellow-500 font-bold">SR以上確定！</span>
           </button>
         </div>
 
-        <p className="text-center text-gray-500 text-sm">累計スカウト回数: <span className="text-gray-300 font-mono font-bold">{totalPulls}</span> 回</p>
+        <p className="text-center text-gray-500 text-sm">累計スカウト回数: <span className="text-gray-300 font-mono font-bold">{totalGachaPulls}</span> 回</p>
 
         {/* Loading overlay */}
         {isAnimating && (
@@ -147,6 +167,7 @@ export const Gacha = () => {
           </div>
         )}
       </div>
+      <AdRewardModal open={isAdModalOpen} onClose={() => setIsAdModalOpen(false)} />
     </Layout>
   );
 };

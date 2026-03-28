@@ -1,5 +1,6 @@
 import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { X, Play, Gem, Volume2, VolumeX } from 'lucide-react';
+import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
 
 import adVideo1 from '../assets/ad/132fd59fadd43415.mp4';
@@ -11,6 +12,75 @@ import adVideo5 from '../assets/ad/19700121_2157_69c69c32317c81918833d414de33080
 const adVideos = [adVideo1, adVideo2, adVideo3, adVideo4, adVideo5];
 
 type Phase = 'confirm' | 'playing' | 'close-challenge' | 'rewarded';
+
+type AdRank = 'common' | 'uncommon' | 'rare' | 'epic' | 'multi' | 'legend';
+
+interface AdRankConfig {
+  name: string;
+  label: string;
+  reward: number;
+  maxDodges: number;
+  color: string;
+  bgColor: string;
+  borderColor: string;
+}
+
+const AD_RANKS: Record<AdRank, AdRankConfig> = {
+  common: {
+    name: 'Common',
+    label: '通常',
+    reward: 50,
+    maxDodges: 5,
+    color: 'text-gray-400',
+    bgColor: 'bg-gray-700',
+    borderColor: 'border-gray-600',
+  },
+  uncommon: {
+    name: 'Uncommon',
+    label: '俊敏',
+    reward: 100,
+    maxDodges: 7,
+    color: 'text-green-400',
+    bgColor: 'bg-green-600/20',
+    borderColor: 'border-green-500/50',
+  },
+  rare: {
+    name: 'Rare',
+    label: '幽霊',
+    reward: 150,
+    maxDodges: 8,
+    color: 'text-blue-400',
+    bgColor: 'bg-blue-600/20',
+    borderColor: 'border-blue-500/50',
+  },
+  epic: {
+    name: 'Epic',
+    label: '極小',
+    reward: 200,
+    maxDodges: 10,
+    color: 'text-purple-400',
+    bgColor: 'bg-purple-600/20',
+    borderColor: 'border-purple-500/50',
+  },
+  multi: {
+    name: 'Illusion',
+    label: '幻影',
+    reward: 250,
+    maxDodges: 5,
+    color: 'text-orange-400',
+    bgColor: 'bg-orange-600/20',
+    borderColor: 'border-orange-500/50',
+  },
+  legend: {
+    name: 'Legend',
+    label: '超次元',
+    reward: 300,
+    maxDodges: 12,
+    color: 'text-yellow-400',
+    bgColor: 'bg-yellow-500/20',
+    borderColor: 'border-yellow-500/50',
+  },
+};
 
 interface Props {
   open: boolean;
@@ -26,17 +96,25 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
   const [muted, setMuted] = useState(false);
 
   // Close button dodge state
-  const [btnPos, setBtnPos] = useState({ x: 50, y: 50 });
+  const [btnPos, setBtnPos] = useState({ x: 90, y: 10 });
   const [dodgeCount, setDodgeCount] = useState(0);
+  const [hasStarted, setHasStarted] = useState(false);
+  const [rank, setRank] = useState<AdRank>('common');
+  const [isGhostVisible, setIsGhostVisible] = useState(true);
+  const [fakes, setFakes] = useState<{ id: number; x: number; y: number }[]>([]);
+  const [misses, setMisses] = useState<{ id: number; x: number; y: number }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
-  const maxDodges = 5;
 
   const reset = useCallback(() => {
     setPhase('confirm');
     setVideoSrc('');
     setMuted(false);
-    setBtnPos({ x: 50, y: 50 });
+    setBtnPos({ x: 90, y: 10 });
     setDodgeCount(0);
+    setHasStarted(false);
+    setIsGhostVisible(true);
+    setFakes([]);
+    setMisses([]);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -51,29 +129,119 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
   }, []);
 
   const handleVideoEnd = useCallback(() => {
+    // Determine rank randomly
+    const rand = Math.random();
+    let selectedRank: AdRank = 'common';
+    if (rand < 0.05) selectedRank = 'legend';
+    else if (rand < 0.15) selectedRank = 'epic';
+    else if (rand < 0.35) selectedRank = 'rare';
+    else if (rand < 0.65) selectedRank = 'uncommon';
+
+    setRank(selectedRank);
     setDodgeCount(0);
-    setBtnPos({ x: 50, y: 50 });
+    setHasStarted(false);
+    setBtnPos({ x: 90, y: 10 });
     setPhase('close-challenge');
+    setIsGhostVisible(true);
+    setFakes([]);
   }, []);
 
-  // Dodge the close button on hover
+  const addMissEffect = useCallback((x: number, y: number) => {
+    const id = Date.now();
+    setMisses(prev => [...prev, { id, x, y }]);
+    setTimeout(() => {
+      setMisses(prev => prev.filter(m => m.id !== id));
+    }, 1000);
+  }, []);
+
+  // Dodge the close button logic
   const dodgeButton = useCallback(() => {
-    setDodgeCount(prev => {
-      const next = prev + 1;
-      if (next >= maxDodges) return prev;
-      // Random position within safe bounds (10%-90%)
+    const config = AD_RANKS[rank];
+    if (dodgeCount >= config.maxDodges) return;
+
+    if (!hasStarted) setHasStarted(true);
+
+    if (rank === 'rare') {
+      setIsGhostVisible(false);
+      setTimeout(() => {
+        setBtnPos({
+          x: 10 + Math.random() * 80,
+          y: 10 + Math.random() * 80,
+        });
+        setIsGhostVisible(true);
+      }, 300);
+    } else if (rank === 'multi' && dodgeCount === 0) {
+      // Split into fakes
+      const newFakes = Array.from({ length: 24 }).map((_, i) => ({
+        id: i,
+        x: 10 + Math.random() * 80,
+        y: 10 + Math.random() * 80,
+      }));
+      setFakes(newFakes);
       setBtnPos({
         x: 10 + Math.random() * 80,
         y: 10 + Math.random() * 80,
       });
-      return next;
-    });
+    } else {
+      setBtnPos({
+        x: 10 + Math.random() * 80,
+        y: 10 + Math.random() * 80,
+      });
+    }
+
+    setDodgeCount(prev => prev + 1);
+  }, [rank, dodgeCount, hasStarted]);
+
+  const handleFakeClick = useCallback((e: React.MouseEvent, id: number) => {
+    e.stopPropagation();
+    setFakes(prev => prev.filter(f => f.id !== id));
   }, []);
 
-  const handleCloseClick = useCallback(() => {
-    addGems(50);
+  const handleContainerClick = useCallback((e: React.MouseEvent) => {
+    if (phase !== 'close-challenge') return;
+    const rect = containerRef.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    addMissEffect(x, y);
+  }, [phase, addMissEffect]);
+
+  // Hyper logic: active repulsion
+  useEffect(() => {
+    if (phase !== 'close-challenge' || rank !== 'legend' || dodgeCount >= AD_RANKS.legend.maxDodges) return;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const rect = containerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      const mx = ((e.clientX - rect.left) / rect.width) * 100;
+      const my = ((e.clientY - rect.top) / rect.height) * 100;
+
+      const dx = btnPos.x - mx;
+      const dy = btnPos.y - my;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+
+      if (dist < 15) { // Threshold for repulsion
+        const angle = Math.atan2(dy, dx);
+        const moveX = Math.cos(angle) * 10;
+        const moveY = Math.sin(angle) * 10;
+
+        setBtnPos(prev => ({
+          x: Math.max(10, Math.min(90, prev.x + moveX)),
+          y: Math.max(10, Math.min(90, prev.y + moveY)),
+        }));
+      }
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, [phase, rank, btnPos, dodgeCount]);
+
+  const handleCloseClick = useCallback((e: React.MouseEvent) => {
+    e.stopPropagation();
+    addGems(AD_RANKS[rank].reward);
     setPhase('rewarded');
-  }, [addGems]);
+  }, [addGems, rank]);
 
   // Auto-play video when phase changes
   useEffect(() => {
@@ -93,9 +261,9 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
             <Gem size={32} className="text-purple-400" />
           </div>
           <h3 className="text-xl font-bold text-white mb-2">広告を視聴してジェムを獲得</h3>
-          <p className="text-gray-400 text-sm mb-2">
+          <p className="text-gray-400 text-sm mb-4">
             動画広告を最後まで視聴すると<br />
-            <span className="text-purple-400 font-bold">50 GEMS</span> を獲得できます！
+            <span className="text-purple-400 font-bold">50 GEMS 以上</span> を獲得できます！
           </p>
           <p className="text-yellow-400/80 text-xs mb-6 flex items-center justify-center gap-1">
             <Volume2 size={14} />
@@ -131,7 +299,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
               >
                 {muted ? <VolumeX size={16} /> : <Volume2 size={16} />}
               </button>
-              <span className="text-xs text-purple-400 font-bold">最後まで視聴で 50 GEMS</span>
+              <span className="text-xs text-purple-400 font-bold">視聴完了で 50 GEMS 以上獲得</span>
             </div>
           </div>
           <video
@@ -150,29 +318,101 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
       {phase === 'close-challenge' && (
         <div
           ref={containerRef}
-          className="relative bg-gray-900 border border-gray-700 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden"
-          style={{ height: '300px' }}
+          onClick={handleContainerClick}
+          className="relative bg-gray-900 border border-gray-700 rounded-2xl max-w-sm w-full shadow-2xl overflow-hidden cursor-crosshair"
+          style={{ height: '350px' }}
         >
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div className="text-center">
-              <p className="text-gray-400 text-sm">広告視聴完了！</p>
-              <p className="text-gray-500 text-xs mt-1">✕ボタンを押して閉じてください</p>
+          {/* Rank Info - Show after started */}
+          <div className={clsx(
+            "absolute top-4 left-4 right-4 flex justify-between items-center z-20 pointer-events-none transition-opacity duration-500",
+            hasStarted ? "opacity-100" : "opacity-0"
+          )}>
+            <div className="flex flex-col">
+              <span className={`text-[10px] font-bold uppercase tracking-wider ${AD_RANKS[rank].color}`}>
+                Rank: {AD_RANKS[rank].name}
+              </span>
+              <span className="text-white text-lg font-black italic">
+                {AD_RANKS[rank].label}
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="text-gray-500 text-[10px] block">REWARD</span>
+              <span className="text-yellow-400 font-bold">{AD_RANKS[rank].reward} GEMS</span>
             </div>
           </div>
+
+          <div className={clsx(
+            "absolute inset-x-0 bottom-8 flex items-center justify-center pointer-events-none z-0 transition-opacity duration-1000",
+            hasStarted ? "opacity-20" : "opacity-0"
+          )}>
+            <div className="text-center">
+              <p className="text-white text-4xl font-black italic">CHALLENGE!</p>
+              <p className="text-gray-400 text-xs">✕ボタンの回避を突破せよ</p>
+            </div>
+          </div>
+
+          {/* Miss Effects */}
+          {misses.map(miss => (
+            <div
+              key={miss.id}
+              className="absolute pointer-events-none select-none animate-ping text-red-500 font-black text-xl z-30"
+              style={{
+                left: `${miss.x}%`,
+                top: `${miss.y}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              MISS!
+            </div>
+          ))}
+
+          {/* Fake Buttons */}
+          {fakes.map(fake => (
+            <button
+              key={fake.id}
+              onClick={(e) => handleFakeClick(e, fake.id)}
+              className="absolute w-10 h-10 bg-gray-700 border-gray-600 border-2 rounded-full flex items-center justify-center transition-all shadow-lg z-10 animate-in fade-in zoom-in duration-300"
+              style={{
+                left: `${fake.x}%`,
+                top: `${fake.y}%`,
+                transform: 'translate(-50%, -50%)',
+              }}
+            >
+              <X size={20} className="text-white" />
+            </button>
+          ))}
+
           <button
             onClick={handleCloseClick}
-            onMouseEnter={dodgeCount < maxDodges ? dodgeButton : undefined}
-            onTouchStart={dodgeCount < maxDodges ? dodgeButton : undefined}
-            className="absolute w-10 h-10 bg-gray-700 hover:bg-red-600 rounded-full flex items-center justify-center transition-colors shadow-lg border border-gray-600 z-10"
+            onMouseEnter={dodgeButton}
+            onTouchStart={dodgeButton}
+            className={clsx(
+              "absolute w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg border-2 z-10",
+              hasStarted ? `${AD_RANKS[rank].bgColor} ${AD_RANKS[rank].borderColor}` : "bg-gray-700 border-gray-600"
+            )}
             style={{
               left: `${btnPos.x}%`,
               top: `${btnPos.y}%`,
-              transform: 'translate(-50%, -50%)',
-              transition: dodgeCount > 0 && dodgeCount < maxDodges ? 'left 0.15s ease-out, top 0.15s ease-out' : 'none',
+              transform: `translate(-50%, -50%) ${hasStarted && rank === 'epic' ? `scale(${Math.max(0.3, 1 - (dodgeCount * 0.1))})` : 'scale(1)'}`,
+              opacity: isGhostVisible ? 1 : 0,
+              transition: hasStarted && dodgeCount > 0 && dodgeCount < AD_RANKS[rank].maxDodges && rank !== 'rare' 
+                ? 'left 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease, opacity 0.2s ease' 
+                : 'transform 0.2s ease, opacity 0.2s ease',
             }}
           >
-            <X size={18} className="text-gray-300" />
+            <X size={20} className="text-white" />
           </button>
+
+          {/* Progress Mini Bar */}
+          <div className={clsx(
+            "absolute bottom-0 left-0 right-0 h-1 bg-gray-800 transition-opacity duration-500",
+            hasStarted ? "opacity-100" : "opacity-0"
+          )}>
+            <div 
+              className="h-full bg-purple-500 transition-all duration-300"
+              style={{ width: `${(dodgeCount / AD_RANKS[rank].maxDodges) * 100}%` }}
+            />
+          </div>
         </div>
       )}
 
@@ -182,8 +422,8 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
           <div className="w-20 h-20 rounded-full bg-purple-500/20 flex items-center justify-center mx-auto mb-4 animate-bounce">
             <Gem size={40} className="text-purple-400" />
           </div>
-          <h3 className="text-2xl font-bold text-white mb-2">獲得！</h3>
-          <p className="text-purple-400 text-3xl font-bold mb-6">+50 GEMS</p>
+          <h3 className="text-2xl font-bold text-white mb-2">{AD_RANKS[rank].label}突破！</h3>
+          <p className="text-purple-400 text-3xl font-bold mb-6">+{AD_RANKS[rank].reward} GEMS</p>
           <button
             onClick={handleClose}
             className="w-full py-3 bg-purple-600 hover:bg-purple-500 text-white font-bold rounded-xl transition-colors"
