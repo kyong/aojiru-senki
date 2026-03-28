@@ -133,9 +133,10 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
     const rand = Math.random();
     let selectedRank: AdRank = 'common';
     if (rand < 0.05) selectedRank = 'legend';
-    else if (rand < 0.15) selectedRank = 'epic';
-    else if (rand < 0.35) selectedRank = 'rare';
-    else if (rand < 0.65) selectedRank = 'uncommon';
+    else if (rand < 0.15) selectedRank = 'multi';
+    else if (rand < 0.25) selectedRank = 'epic';
+    else if (rand < 0.45) selectedRank = 'rare';
+    else if (rand < 0.75) selectedRank = 'uncommon';
 
     setRank(selectedRank);
     setDodgeCount(0);
@@ -206,25 +207,27 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
     addMissEffect(x, y);
   }, [phase, addMissEffect]);
 
-  // Hyper logic: active repulsion
+  // Hyper logic: active repulsion & auto-jitter for touch/mouse
   useEffect(() => {
     if (phase !== 'close-challenge' || rank !== 'legend' || dodgeCount >= AD_RANKS.legend.maxDodges) return;
 
-    const handleMouseMove = (e: MouseEvent) => {
+    const handleRepulsion = (clientX: number, clientY: number) => {
       const rect = containerRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const mx = ((e.clientX - rect.left) / rect.width) * 100;
-      const my = ((e.clientY - rect.top) / rect.height) * 100;
+      const mx = ((clientX - rect.left) / rect.width) * 100;
+      const my = ((clientY - rect.top) / rect.height) * 100;
 
       const dx = btnPos.x - mx;
       const dy = btnPos.y - my;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist < 15) { // Threshold for repulsion
+      if (dist < 18) { // Slightly larger threshold for touch/hover repulsion
+        if (!hasStarted) setHasStarted(true);
+
         const angle = Math.atan2(dy, dx);
-        const moveX = Math.cos(angle) * 10;
-        const moveY = Math.sin(angle) * 10;
+        const moveX = Math.cos(angle) * 12;
+        const moveY = Math.sin(angle) * 12;
 
         setBtnPos(prev => ({
           x: Math.max(10, Math.min(90, prev.x + moveX)),
@@ -233,9 +236,31 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
       }
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [phase, rank, btnPos, dodgeCount]);
+    const onMouseMove = (e: MouseEvent) => handleRepulsion(e.clientX, e.clientY);
+    const onTouchMove = (e: TouchEvent) => {
+      if (e.touches.length > 0) handleRepulsion(e.touches[0].clientX, e.touches[0].clientY);
+    };
+
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('touchmove', onTouchMove, { passive: false });
+
+    // Auto-jitter for Legend mode: makes it harder even if not touched
+    let jitterTimer: any;
+    if (hasStarted) {
+      jitterTimer = setInterval(() => {
+        setBtnPos({
+          x: 10 + Math.random() * 80,
+          y: 10 + Math.random() * 80,
+        });
+      }, 1000); // Flee every 1.0s automatically
+    }
+
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('touchmove', onTouchMove);
+      if (jitterTimer) clearInterval(jitterTimer);
+    };
+  }, [phase, rank, btnPos, dodgeCount, hasStarted]);
 
   const handleCloseClick = useCallback((e: React.MouseEvent) => {
     e.stopPropagation();
@@ -396,7 +421,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
               transform: `translate(-50%, -50%) ${hasStarted && rank === 'epic' ? `scale(${Math.max(0.3, 1 - (dodgeCount * 0.1))})` : 'scale(1)'}`,
               opacity: isGhostVisible ? 1 : 0,
               transition: hasStarted && dodgeCount > 0 && dodgeCount < AD_RANKS[rank].maxDodges && rank !== 'rare' 
-                ? 'left 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease, opacity 0.2s ease' 
+                ? 'left 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease, opacity 0.2s ease' 
                 : 'transform 0.2s ease, opacity 0.2s ease',
             }}
           >
