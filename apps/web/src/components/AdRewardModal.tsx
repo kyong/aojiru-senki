@@ -66,7 +66,7 @@ const AD_RANKS: Record<AdRank, AdRankConfig> = {
     name: 'Illusion',
     label: '幻影',
     reward: 250,
-    maxDodges: 5,
+    maxDodges: 1, // Ends immediately once the correct one is clicked
     color: 'text-orange-400',
     bgColor: 'bg-orange-600/20',
     borderColor: 'border-orange-500/50',
@@ -137,7 +137,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
     else if (rand < 0.25) selectedRank = 'epic';
     else if (rand < 0.45) selectedRank = 'rare';
     else if (rand < 0.75) selectedRank = 'uncommon';
-
+    
     setRank(selectedRank);
     setDodgeCount(0);
     setHasStarted(false);
@@ -170,7 +170,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
           y: 10 + Math.random() * 80,
         });
         setIsGhostVisible(true);
-      }, 300);
+      }, 200);
     } else if (rank === 'multi' && dodgeCount === 0) {
       // Split into fakes
       const newFakes = Array.from({ length: 24 }).map((_, i) => ({
@@ -183,7 +183,8 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
         x: 10 + Math.random() * 80,
         y: 10 + Math.random() * 80,
       });
-    } else {
+    } else if (rank !== 'multi') {
+      // Other ranks move normally. Multi doesn't move after the first split.
       setBtnPos({
         x: 10 + Math.random() * 80,
         y: 10 + Math.random() * 80,
@@ -413,7 +414,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
             onTouchStart={dodgeButton}
             className={clsx(
               "absolute w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg border-2 z-10",
-              hasStarted ? `${AD_RANKS[rank].bgColor} ${AD_RANKS[rank].borderColor}` : "bg-gray-700 border-gray-600"
+              hasStarted && rank !== 'multi' ? `${AD_RANKS[rank].bgColor} ${AD_RANKS[rank].borderColor}` : "bg-gray-700 border-gray-600"
             )}
             style={{
               left: `${btnPos.x}%`,
@@ -422,7 +423,7 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
               opacity: isGhostVisible ? 1 : 0,
               transition: hasStarted && dodgeCount > 0 && dodgeCount < AD_RANKS[rank].maxDodges && rank !== 'rare' 
                 ? 'left 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.2s ease, opacity 0.2s ease' 
-                : 'transform 0.2s ease, opacity 0.2s ease',
+                : rank === 'rare' ? 'transform 0.2s ease, opacity 0s' : 'transform 0.2s ease, opacity 0.2s ease',
             }}
           >
             <X size={20} className="text-white" />
