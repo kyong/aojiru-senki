@@ -6,6 +6,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { useGame } from '../context/GameContext';
 import { useNavigationGuard } from '../context/NavigationGuardContext';
 import { QUEST_MAP } from '../store/quests';
+import { CHARACTER_MAP } from '../store/characters';
+import type { Character, SkillType } from '../store/types';
 
 // ============================================================
 // Enemy master data (local to battle)
@@ -35,13 +37,12 @@ const STORY_TEXT: Record<number, string[]> = {
   6: ['時計の針が進むと、どこからともなく宴会の声が。', '「お疲れ様です！カンパーイ！」', '突発的に発生する飲み会……断れない雰囲気。', 'マイスター「肝臓への負担も青汁でカバーする！」', '終わらない飲み会から無事に帰還せよ！'],
 };
 
-const SKILL_COST = 30;
 const MAX_MP = 100;
 
 export const Battle = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { consumeAp, addGold, addGems, addExp, getBattleStats, markQuestCleared, items, useItem } = useGame();
+  const { consumeAp, addGold, addGems, addExp, getBattleStats, markQuestCleared, items, useItem, party } = useGame();
 
   const questId = (location.state?.questId as number) || 1;
   const enemyData = ENEMIES[questId] || ENEMIES[1];
@@ -67,6 +68,13 @@ export const Battle = () => {
   const [playerHit, setPlayerHit] = useState(false);
   const [enemyAttacking, setEnemyAttacking] = useState(false);
   const [floatingDamage, setFloatingDamage] = useState<{ id: number; value: string; type: 'player' | 'enemy' }[]>([]);
+  
+  // 新規追加: スキル関連
+  const [skillMenu, setSkillMenu] = useState(false);
+  const [skillUser, setSkillUser] = useState<Character | null>(null);
+  const [enemyAtkMultiplier, setEnemyAtkMultiplier] = useState(1.0);
+  const [skillFlash, setSkillFlash] = useState<SkillType | null>(null);
+  const [isVictoryCutin, setIsVictoryCutin] = useState(false);
 
   // 戦闘中・ストーリー中の画面遷移をブロック
   const { guardedNavigate, setBlocked } = useNavigationGuard();
@@ -116,9 +124,12 @@ export const Battle = () => {
     setTimeout(() => setEnemyAttacking(true), 100);
 
     setTimeout(() => {
-      const base = enemyData.minAtk + Math.floor(Math.random() * (enemyData.maxAtk - enemyData.minAtk + 1));
+      const baseRaw = enemyData.minAtk + Math.floor(Math.random() * (enemyData.maxAtk - enemyData.minAtk + 1));
+      // デバフ適用
+      const base = Math.floor(baseRaw * enemyAtkMultiplier);
       const dmg = guarding ? Math.floor(base * 0.5) : base;
       const guardText = guarding ? '（防御！ダメージ半減！）' : '';
+      const debuffText = enemyAtkMultiplier < 1.0 ? '（敵ATK減少中！）' : '';
       setIsGuarding(false);
       setEnemyAttacking(false); // ランジ終了
       
@@ -136,9 +147,9 @@ export const Battle = () => {
 
         if (next === 0) {
           setGameState('GAMEOVER');
-          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージ${guardText}……倒れてしまった！`);
+          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージ${guardText}${debuffText}……倒れてしまった！`);
         } else {
-          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージを受けた！${guardText}`);
+          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージを受けた！${guardText}${debuffText}`);
           setIsPlayerTurn(true);
         }
         return next;
@@ -148,7 +159,9 @@ export const Battle = () => {
 
   const handleAttack = () => {
     if (!isPlayerTurn) return;
-    const dmg = baseAtk + Math.floor(Math.random() * atkRange);
+    setSkillMenu(false); // スキルメニューを閉じる
+    const dmgRaw = baseAtk + Math.floor(Math.random() * atkRange);
+    const dmg = Math.floor(dmgRaw * 1.0); // バフ用拡張性のため
     const newHp = Math.max(0, enemyHp - dmg);
     
     // 攻撃演出
@@ -166,30 +179,58 @@ export const Battle = () => {
     doEnemyTurn(false);
   };
 
-  const handleSkill = () => {
-    if (!isPlayerTurn) return;
-    if (playerMp < SKILL_COST) { addLog(`AOJIRUが足りない！（必要: ${SKILL_COST}）`); return; }
-    const dmg = Math.floor((baseAtk + Math.floor(Math.random() * atkRange)) * 2.5);
-    const newHp = Math.max(0, enemyHp - dmg);
+  const handleSkill = (char: Character) => {
+    if (!isPlayerTurn || !char.skill) return;
+    if (playerMp < char.skill.cost) { addLog(`AOJIRUが足りない！（必要: ${char.skill.cost}）`); return; }
     
-    // スキル演出（より強いシェイク）
-    setEnemyHit(true);
-    setIsShaking(true);
-    const damageId = Date.now();
-    setFloatingDamage(prev => [...prev, { id: damageId, value: `CRITICAL!! -${dmg}`, type: 'enemy' }]);
-    setTimeout(() => setEnemyHit(false), 400); // 少し長めに光る
-    setTimeout(() => setIsShaking(false), 500);
-    setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1200);
+    setSkillMenu(false);
+    setSkillUser(char);
+    setSkillFlash(char.skill.type);
+    setPlayerMp(p => p - char.skill!.cost);
 
-    setEnemyHp(newHp);
-    setPlayerMp(p => p - SKILL_COST);
-    addLog(`💚 青汁ストーム！ ${enemyData.name}に${dmg}の大ダメージ！`);
-    if (newHp === 0) { handleWin(); return; }
-    doEnemyTurn(false);
+    // 演出時間
+    setTimeout(() => {
+      const skill = char.skill!;
+      let logMsg = '';
+
+      if (skill.type === 'damage') {
+        const dmg = Math.floor((baseAtk + Math.floor(Math.random() * atkRange)) * (skill.multiplier || 1));
+        const newHp = Math.max(0, enemyHp - dmg);
+        setEnemyHp(newHp);
+        setEnemyHit(true);
+        setIsShaking(true);
+        const damageId = Date.now();
+        setFloatingDamage(prev => [...prev, { id: damageId, value: `${dmg}`, type: 'enemy' }]);
+        setTimeout(() => setEnemyHit(false), 400);
+        setTimeout(() => setIsShaking(false), 500);
+        setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1200);
+        logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}に${dmg}のダメージ！`;
+        if (newHp === 0) { setSkillUser(null); setSkillFlash(null); handleWin(); return; }
+      } 
+      else if (skill.type === 'heal') {
+        const heal = Math.floor(maxHp * (skill.multiplier || 0.3));
+        setPlayerHp(prev => Math.min(maxHp, prev + heal));
+        const damageId = Date.now();
+        setFloatingDamage(prev => [...prev, { id: damageId, value: `+${heal}`, type: 'player' }]);
+        setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1000);
+        logMsg = `✨ ${char.name}の${skill.name}！ HPが${heal}回復した！`;
+      }
+      else if (skill.type === 'debuff') {
+        setEnemyAtkMultiplier(skill.effectValue || 0.7);
+        setTimeout(() => setEnemyAtkMultiplier(1.0), 5000); // 5秒で戻る
+        logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}の攻撃力を下げた！`;
+      }
+
+      addLog(logMsg);
+      setSkillUser(null);
+      setSkillFlash(null);
+      doEnemyTurn(false);
+    }, 1200);
   };
 
   const handleGuard = () => {
     if (!isPlayerTurn) return;
+    setSkillMenu(false); // スキルメニューを閉じる
     setIsGuarding(true);
     setPlayerMp(p => Math.min(MAX_MP, p + 10));
     addLog('🛡️ 防御態勢！ 次の攻撃のダメージを半減。AOJIRU+10！');
@@ -198,6 +239,7 @@ export const Battle = () => {
 
   const handleItem = () => {
     if (!isPlayerTurn) return;
+    setSkillMenu(false); // スキルメニューを閉じる
     if (items.aojiruPotion <= 0) { addLog('青汁ポーションがない！ ショップで購入しよう。'); return; }
     if (!useItem('aojiruPotion')) return;
     const HEAL = 120;
@@ -213,12 +255,20 @@ export const Battle = () => {
     const gold = quest?.goldReward ?? 1000;
     const gems = quest?.gemsReward ?? 0;
     const exp  = gold / 10;
-    setGameState('WIN');
+    
+    setSkillMenu(false); // スキルメニューを閉じる
+    // 勝利演出開始
+    setIsVictoryCutin(true);
     addLog(`${enemyData.name}を倒した！`);
-    addGold(gold);
-    if (gems > 0) addGems(gems);
-    addExp(exp);
-    markQuestCleared(questId);
+
+    setTimeout(() => {
+      setGameState('WIN');
+      setIsVictoryCutin(false);
+      addGold(gold);
+      if (gems > 0) addGems(gems);
+      addExp(exp);
+      markQuestCleared(questId);
+    }, 2000);
   };
 
   // ---- Screens ----
@@ -498,7 +548,104 @@ export const Battle = () => {
             </div>
           )}
 
-          {/* Mobile: Battle Log overlay */}
+          {/* Cinematic Skill Portrait */}
+          {skillUser && (
+            <div className="absolute inset-0 z-40 flex items-center justify-center overflow-hidden">
+               <div className={clsx(
+                 "absolute inset-0 opacity-40 animate-pulse",
+                 skillFlash === 'damage' && "bg-red-500",
+                 skillFlash === 'heal' && "bg-green-500",
+                 skillFlash === 'debuff' && "bg-blue-500"
+               )} />
+               <div className="relative w-full h-full flex items-center justify-center">
+                 <div className="absolute left-0 w-full bg-black/60 py-4 transform -skew-y-6 shadow-2xl border-y-4 border-white animate-[slide-in_1.2s_ease-in-out_forwards]">
+                    <div className="flex items-center justify-center gap-8 skew-y-6 px-12">
+                      <div className="flex-1 text-right">
+                        <h2 className="text-white font-black text-4xl italic drop-shadow-md">{skillUser.skill?.name}</h2>
+                        <p className="text-yellow-400 font-bold text-xl">{skillUser.name}</p>
+                      </div>
+                      <div className="w-64 h-64 relative bg-gray-900 rounded-full border-4 border-white overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.5)]">
+                        <img src={skillUser.image} alt={skillUser.name} className="w-full h-full object-contain transform scale-125 translate-y-4" />
+                      </div>
+                      <div className="flex-1">
+                        <p className="text-gray-200 text-lg leading-tight max-w-xs">{skillUser.skill?.description}</p>
+                      </div>
+                    </div>
+                 </div>
+               </div>
+            </div>
+          )}
+
+          {/* Skill Selection Menu Overlay */}
+          {skillMenu && (
+            <div className="absolute inset-0 z-30 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+              <div className="max-w-xl w-full">
+                <div className="flex items-center justify-between mb-4 border-b border-gray-700 pb-2">
+                  <h3 className="text-xl font-bold text-white flex items-center gap-2">
+                    <Zap className="text-green-400" /> スキル選択
+                  </h3>
+                  <button onClick={() => setSkillMenu(false)} className="text-gray-500 hover:text-white">
+                    閉じる ×
+                  </button>
+                </div>
+                <div className="flex flex-col gap-2 max-h-[60vh] overflow-y-auto pr-1">
+                  {(() => {
+                    const skillChars = [CHARACTER_MAP[1], ...party.filter((id): id is number => id !== null).map(id => CHARACTER_MAP[id!])]
+                      .filter((c): c is Character => !!c);
+                    // IDで重複排除 (マイスターがパーティにいても1つだけ表示)
+                    const uniqueChars = Array.from(new Map(skillChars.map(c => [c.id, c])).values());
+                    
+                    return uniqueChars.map(char => (
+                      <button
+                        key={char.id}
+                        onClick={() => handleSkill(char)}
+                        disabled={playerMp < (char.skill?.cost || 0)}
+                        className={clsx(
+                          "flex items-center gap-3 p-3 rounded-xl border transition-all text-left group",
+                          playerMp >= (char.skill?.cost || 0)
+                            ? "bg-gray-800 border-gray-700 hover:border-green-500 hover:bg-green-900/20"
+                            : "bg-gray-900 border-gray-800 opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        <div className="w-12 h-12 bg-gray-900 rounded-lg overflow-hidden border border-gray-700 group-hover:border-green-500 transition-colors">
+                          <img src={char.image} alt={char.name} className="w-full h-full object-contain" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <span className="text-white font-bold text-sm truncate">{char.skill?.name}</span>
+                            <span className="text-[10px] font-mono text-green-400 bg-green-900/50 px-1.5 rounded">{(char.skill?.cost || 0)} AP</span>
+                          </div>
+                          <p className="text-[10px] text-gray-400 leading-tight">{char.skill?.description}</p>
+                          <p className="text-[9px] text-gray-500 mt-0.5">使用：{char.name}</p>
+                        </div>
+                      </button>
+                    ));
+                  })()}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Victory Cut-in Overlay */}
+          {isVictoryCutin && (
+            <div className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden bg-white/20 backdrop-blur-sm animate-[fade-in_0.3s_ease-out_forwards]">
+               <div className="absolute inset-0 bg-gradient-to-r from-green-500/80 via-white/40 to-green-500/80 animate-pulse" />
+               <div className="relative w-full h-[300px] flex items-center justify-center">
+                 <div className="absolute left-0 w-full bg-green-600 py-6 transform skew-y-6 shadow-2xl border-y-8 border-white animate-[victory-slide_0.6s_ease-out_forwards]">
+                    <div className="flex items-center justify-center gap-12 -skew-y-6">
+                      <div className="w-80 h-80 relative bg-white/20 rounded-full border-8 border-white overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.8)]">
+                         <img src="/images/player.png" alt="Victory" className="w-full h-full object-contain transform scale-125 translate-y-4" />
+                      </div>
+                      <div className="text-left">
+                        <h2 className="text-white font-black text-7xl italic drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] tracking-tighter animate-bounce">VICTORY!!</h2>
+                        <div className="h-1 w-32 bg-yellow-400 mt-2 rounded-full" />
+                        <p className="text-green-100 font-bold text-2xl mt-2 drop-shadow-md">QUEST CLEARED</p>
+                      </div>
+                    </div>
+                 </div>
+               </div>
+            </div>
+          )}
           <div className="md:hidden absolute bottom-2 left-2 right-2 bg-black/70 rounded-lg p-2 backdrop-blur-sm border border-gray-700/50 max-h-16 overflow-hidden">
             {battleLog.slice(-2).map((log, i) => (
               <p key={i} className={clsx('text-[11px] font-mono leading-tight', i === battleLog.slice(-2).length - 1 ? 'text-white font-bold' : 'text-gray-500')}>
@@ -538,7 +685,7 @@ export const Battle = () => {
           <div className="col-span-6 grid grid-cols-2 gap-2">
             {([
               { label: '攻撃 (Attack)', sub: null,           icon: <Sword size={24} />,   cls: 'from-red-900/70 to-gray-800 hover:from-red-800/80 hover:to-red-900/60 border-red-700/60 hover:border-red-400', textCls: 'text-red-100', subCls: undefined, iconCls: 'text-red-400 group-hover:text-red-300', fn: handleAttack },
-              { label: '青汁スキル',   sub: `AOJIRU -${SKILL_COST}`, icon: <Zap size={24} />,    cls: 'from-green-900/70 to-gray-800 hover:from-green-800/80 hover:to-green-900/60 border-green-700/60 hover:border-green-400', textCls: 'text-green-100', subCls: 'text-green-400', iconCls: 'text-green-400 group-hover:text-green-300', fn: handleSkill },
+              { label: '青汁スキル',   sub: 'Select Skill', icon: <Zap size={24} />,    cls: 'from-green-900/70 to-gray-800 hover:from-green-800/80 hover:to-green-900/60 border-green-700/60 hover:border-green-400', textCls: 'text-green-100', subCls: 'text-green-400', iconCls: 'text-green-400 group-hover:text-green-300', fn: () => setSkillMenu(true) },
               { label: '防御 (Guard)', sub: 'AOJIRU +10',   icon: <Shield size={24} />, cls: 'from-blue-900/70 to-gray-800 hover:from-blue-800/80 hover:to-blue-900/60 border-blue-700/60 hover:border-blue-400',   textCls: 'text-blue-100',  subCls: 'text-blue-300',  iconCls: 'text-blue-400 group-hover:text-blue-300',   fn: handleGuard },
               { label: 'アイテム',     sub: `回復+120 (残${items.aojiruPotion})`,  icon: <Package size={24} />, cls: 'from-yellow-900/70 to-gray-800 hover:from-yellow-800/80 hover:to-yellow-900/60 border-yellow-700/60 hover:border-yellow-400', textCls: 'text-yellow-100', subCls: items.aojiruPotion > 0 ? 'text-yellow-300' : 'text-red-400', iconCls: 'text-yellow-400 group-hover:text-yellow-300', fn: handleItem },
             ] as const).map(({ label, sub, icon, cls, textCls, subCls, iconCls, fn }) => (
@@ -572,7 +719,7 @@ export const Battle = () => {
         <div className="md:hidden grid grid-cols-2 gap-1.5">
           {([
             { label: '攻撃',    sub: null,           icon: <Sword size={18} />,   cls: 'from-red-900/70 to-gray-800 border-red-700/60 active:border-red-400', textCls: 'text-red-100',    iconCls: 'text-red-400',    fn: handleAttack },
-            { label: 'スキル',  sub: `-${SKILL_COST}`, icon: <Zap size={18} />,    cls: 'from-green-900/70 to-gray-800 border-green-700/60 active:border-green-400', textCls: 'text-green-100',  iconCls: 'text-green-400',  fn: handleSkill },
+            { label: 'スキル',  sub: 'Select',        icon: <Zap size={18} />,    cls: 'from-green-900/70 to-gray-800 border-green-700/60 active:border-green-400', textCls: 'text-green-100',  iconCls: 'text-green-400',  fn: () => setSkillMenu(true) },
             { label: '防御',    sub: '+10',          icon: <Shield size={18} />,  cls: 'from-blue-900/70 to-gray-800 border-blue-700/60 active:border-blue-400',  textCls: 'text-blue-100',   iconCls: 'text-blue-400',   fn: handleGuard },
             { label: 'アイテム', sub: `×${items.aojiruPotion}`,       icon: <Package size={18} />, cls: 'from-yellow-900/70 to-gray-800 border-yellow-700/60 active:border-yellow-400', textCls: items.aojiruPotion > 0 ? 'text-yellow-100' : 'text-red-300', iconCls: 'text-yellow-400', fn: handleItem },
           ] as const).map(({ label, sub, icon, cls, textCls, iconCls, fn }) => (
@@ -609,6 +756,20 @@ style.textContent = `
     0% { transform: translateY(0); opacity: 0; scale: 0.5; }
     20% { transform: translateY(-20px); opacity: 1; scale: 1.2; }
     100% { transform: translateY(-60px); opacity: 0; scale: 1; }
+  }
+  @keyframes slide-in {
+    0% { transform: translateX(-100%) skewY(-6deg); opacity: 0; }
+    15% { transform: translateX(0) skewY(-6deg); opacity: 1; }
+    85% { transform: translateX(0) skewY(-6deg); opacity: 1; }
+    100% { transform: translateX(100%) skewY(-6deg); opacity: 0; }
+  }
+  @keyframes victory-slide {
+    0% { transform: translateX(-100%) skewY(6deg); opacity: 0; }
+    100% { transform: translateX(0) skewY(6deg); opacity: 1; }
+  }
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
   }
 `;
 document.head.appendChild(style);

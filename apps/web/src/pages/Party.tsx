@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
-import { Users, PlusCircle, X, ChevronRight } from 'lucide-react';
+import { Users, PlusCircle, X, ChevronRight, Zap } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
 import { getCharacterById, ALL_CHARACTERS } from '../store/characters';
@@ -138,10 +138,16 @@ export const Party = () => {
                         <span className={clsx('text-xs font-black px-1.5 py-0.5 rounded', rarityBadge[char.rarity])}>{char.rarity}</span>
                         <span className="text-white font-bold text-sm truncate">{char.name}</span>
                       </div>
-                      <div className="flex gap-2 text-xs text-gray-400 font-mono">
+                      <div className="flex gap-2 text-xs text-gray-400 font-mono mb-1">
                         <span>ATK {char.atk}</span>
                         <span>DEF {char.def}</span>
                         <span>HP {char.hp.toLocaleString()}</span>
+                      </div>
+                      <div className="bg-gray-900/50 p-1.5 rounded-lg border border-gray-700/50">
+                        <p className="text-[10px] text-green-400 font-bold flex items-center gap-1">
+                           <Zap size={10} /> {char.skill?.name}
+                        </p>
+                        <p className="text-[9px] text-gray-500 leading-tight">{char.skill?.description}</p>
                       </div>
                     </div>
                     {inParty && <span className="text-xs text-green-500 font-bold whitespace-nowrap">編成中</span>}

@@ -4,6 +4,17 @@
 
 export type Rarity = 'SSR' | 'SR' | 'R';
 
+export type SkillType = 'damage' | 'heal' | 'buff' | 'debuff';
+
+export type Skill = {
+  name: string;
+  description: string;
+  type: SkillType;
+  multiplier?: number;
+  effectValue?: number;
+  cost: number;
+};
+
 export type Character = {
   id: number;
   name: string;
@@ -14,6 +25,7 @@ export type Character = {
   def: number;
   hp: number;
   image?: string;
+  skill?: Skill;
 };
 
 export type Quest = {
