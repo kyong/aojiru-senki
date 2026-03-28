@@ -1,12 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Phaser from 'phaser';
 import SplashScene from './SplashScene';
 import { LiquidProgressBar } from '../components/LiquidProgressBar';
 
-export const Splash = () => {
+interface SplashProps {
+  onComplete: () => void;
+}
+
+export const Splash = ({ onComplete }: SplashProps) => {
   const gameRef = useRef<HTMLDivElement>(null);
-  const navigate = useNavigate();
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -22,7 +24,7 @@ export const Splash = () => {
           clearInterval(timer);
           // 100%になってから少し待機して遷移
           setTimeout(() => {
-            navigate('/');
+            onComplete();
           }, 800);
           return 100;
         }
@@ -31,7 +33,7 @@ export const Splash = () => {
     }, intervalTime);
 
     return () => clearInterval(timer);
-  }, [navigate]);
+  }, [onComplete]);
 
   useEffect(() => {
     if (!gameRef.current) return;
