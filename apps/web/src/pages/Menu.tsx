@@ -1,6 +1,7 @@
-import { useState } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Settings, User, Volume2, Music, MessageSquare, HelpCircle, LogOut, ChevronRight, Shield } from 'lucide-react';
+import { soundManager } from '../utils/sound';
+import { useGame } from '../context/GameContext';
 
 const PLAYER = {
   name: '青汁マイスター',
@@ -23,7 +24,11 @@ const Slider = ({ label, icon, value, onChange }: SliderProps) => (
       min={0}
       max={100}
       value={value}
-      onChange={e => onChange(Number(e.target.value))}
+      onChange={e => {
+        const v = Number(e.target.value);
+        if (Math.abs(v - value) > 10) soundManager.playPikori(); // 大きく動かした時だけ鳴らす
+        onChange(v);
+      }}
       className="flex-1 accent-green-500"
     />
     <span className="w-8 text-right font-mono text-sm text-gray-400">{value}</span>
@@ -34,7 +39,7 @@ type MenuLinkProps = { icon: React.ReactNode; label: string; desc?: string; dang
 
 const MenuLink = ({ icon, label, desc, danger, onClick }: MenuLinkProps) => (
   <button
-    onClick={onClick}
+    onClick={() => { soundManager.playPikori(); onClick?.(); }}
     className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all text-left group ${
       danger
         ? 'border-red-900/50 bg-red-900/10 hover:bg-red-900/20 hover:border-red-700'
@@ -51,8 +56,17 @@ const MenuLink = ({ icon, label, desc, danger, onClick }: MenuLinkProps) => (
 );
 
 export const Menu = () => {
-  const [bgmVolume, setBgmVolume] = useState(70);
-  const [seVolume, setSeVolume]   = useState(80);
+  const { settings, updateSettings } = useGame();
+
+  const handleBgmChange = (v: number) => {
+    updateSettings({ bgmVolume: v });
+    soundManager.setVolume(settings.seVolume, v);
+  };
+
+  const handleSeChange = (v: number) => {
+    updateSettings({ seVolume: v });
+    soundManager.setVolume(v, settings.bgmVolume);
+  };
 
   return (
     <Layout>
@@ -88,8 +102,8 @@ export const Menu = () => {
             <Volume2 size={18} className="text-green-400" /> サウンド設定
           </h3>
           <div className="flex flex-col gap-4">
-            <Slider label="BGM音量" icon={<Music size={16} />} value={bgmVolume} onChange={setBgmVolume} />
-            <Slider label="SE音量"  icon={<Volume2 size={16} />} value={seVolume} onChange={setSeVolume} />
+            <Slider label="BGM音量" icon={<Music size={16} />} value={settings.bgmVolume} onChange={handleBgmChange} />
+            <Slider label="SE音量"  icon={<Volume2 size={16} />} value={settings.seVolume} onChange={handleSeChange} />
           </div>
         </div>
 

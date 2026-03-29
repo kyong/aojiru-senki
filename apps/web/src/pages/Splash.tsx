@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import SplashScene from './SplashScene';
 import { LiquidProgressBar } from '../components/LiquidProgressBar';
+import { soundManager } from '../utils/sound';
 
 interface SplashProps {
   onComplete: () => void;
@@ -10,6 +11,10 @@ interface SplashProps {
 export const Splash = ({ onComplete }: SplashProps) => {
   const gameRef = useRef<HTMLDivElement>(null);
   const [progress, setProgress] = useState(0);
+
+  useEffect(() => {
+    soundManager.playBGM('home.wav');
+  }, []);
 
   useEffect(() => {
     // プログレスバーのアニメーション（2.5秒で100%に）

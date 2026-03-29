@@ -3,6 +3,7 @@ import { Home, Swords, Store, Mail, Settings, User, ShoppingBag } from 'lucide-r
 import { useLocation } from 'react-router-dom';
 import { twMerge } from 'tailwind-merge';
 import { useNavigationGuard } from '../../context/NavigationGuardContext';
+import { soundManager } from '../../utils/sound';
 
 const NavItem = ({ to, icon: Icon, label, onGuardedClick }: { to: string; icon: any; label: string; onGuardedClick: (path: string) => void }) => {
   const location = useLocation();
@@ -10,7 +11,7 @@ const NavItem = ({ to, icon: Icon, label, onGuardedClick }: { to: string; icon: 
 
   return (
     <button
-      onClick={() => onGuardedClick(to)}
+      onClick={() => { soundManager.playPikori(); onGuardedClick(to); }}
       className={twMerge(
         "flex flex-col items-center justify-center gap-0.5 md:gap-1 p-2 md:p-3 rounded-lg transition-all duration-200 group relative overflow-hidden w-full",
         isActive

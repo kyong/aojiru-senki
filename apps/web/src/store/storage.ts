@@ -5,6 +5,7 @@ import type {
   ReceivedPresentState,
   ClearedQuestsState,
   ItemsState,
+  SettingsState,
 } from './types';
 import {
   DEFAULT_PLAYER,
@@ -13,6 +14,7 @@ import {
   DEFAULT_RECEIVED_PRESENTS,
   DEFAULT_CLEARED_QUESTS,
   DEFAULT_ITEMS,
+  DEFAULT_SETTINGS,
 } from './defaults';
 
 // ============================================================
@@ -33,6 +35,7 @@ const KEYS = {
   ITEMS: 'aojiru_items',
   AP_RECOVERY_TIME: 'aojiru_ap_recovery_time',
   GACHA_PULLS: 'aojiru_gacha_pulls',
+  SETTINGS: 'aojiru_settings',
 } as const;
 
 const ENCRYPTION_KEY = 'ao_ji_ru_secret_key_2026';
@@ -171,6 +174,17 @@ export function getGachaPulls(): number {
 
 export function saveGachaPulls(count: number): void {
   write(KEYS.GACHA_PULLS, count);
+}
+
+// ---- Settings ----
+
+export function getSettings(): SettingsState {
+  const saved = read<Partial<SettingsState>>(KEYS.SETTINGS, DEFAULT_SETTINGS);
+  return { ...DEFAULT_SETTINGS, ...saved };
+}
+
+export function saveSettings(settings: SettingsState): void {
+  write(KEYS.SETTINGS, settings);
 }
 
 // ---- Reset (デバッグ用) ----

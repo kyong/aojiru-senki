@@ -14,6 +14,7 @@ import type {
   ReceivedPresentState,
   ClearedQuestsState,
   ItemsState,
+  SettingsState,
 } from '../store/types';
 import * as storage from '../store/storage';
 import { getCharacterById } from '../store/characters';
@@ -33,6 +34,7 @@ type GameContextValue = {
   receivedPresentIds: ReceivedPresentState;
   clearedQuests: ClearedQuestsState;
   items: ItemsState;
+  settings: SettingsState;
   /** 次のAP回復まで残り何秒か（AP満タン時は null） */
   nextApRecoveryIn: number | null;
   /** ガチャの累計スカウト回数 */
@@ -68,6 +70,8 @@ type GameContextValue = {
 
   incrementGachaPulls: (amount: number) => void;
 
+  updateSettings: (newSettings: Partial<SettingsState>) => void;
+
   // Battle helpers
   /** 編成から計算したバトル用プレイヤーステータス */
   getBattleStats: () => { maxHp: number; baseAtk: number; atkRange: number };
@@ -93,6 +97,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     () => storage.getClearedQuests()
   );
   const [items, setItems] = useState<ItemsState>(() => storage.getItems());
+  const [settings, setSettings] = useState<SettingsState>(() => storage.getSettings());
   const [totalGachaPulls, setTotalGachaPulls] = useState<number>(() => storage.getGachaPulls());
   const [nextApRecoveryIn, setNextApRecoveryIn] = useState<number | null>(null);
   const apRecoveryTimeRef = useRef<number>(storage.getApRecoveryTime());
@@ -105,6 +110,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => { storage.saveClearedQuests(clearedQuests); }, [clearedQuests]);
   useEffect(() => { storage.saveItems(items); }, [items]);
   useEffect(() => { storage.saveGachaPulls(totalGachaPulls); }, [totalGachaPulls]);
+  useEffect(() => { storage.saveSettings(settings); }, [settings]);
 
   // ---- AP 自動回復 ----
   // 起動時: アプリを閉じていた間に回復すべきAPを遡って加算
@@ -252,6 +258,10 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setTotalGachaPulls(prev => prev + amount);
   }, []);
 
+  const updateSettings = useCallback((newSettings: Partial<SettingsState>) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  }, []);
+
   // ---- Battle helpers ----
 
   const getBattleStats = useCallback(() => {
@@ -288,10 +298,11 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     setReceivedPresentIds(storage.getReceivedPresentIds());
     setClearedQuests(storage.getClearedQuests());
     setItems(storage.getItems());
+    setSettings(storage.getSettings());
   }, []);
 
   const value: GameContextValue = {
-    player, party, inventory, receivedPresentIds, clearedQuests, items,
+    player, party, inventory, receivedPresentIds, clearedQuests, items, settings,
     nextApRecoveryIn,
     totalGachaPulls,
     addGold, addGems, spendGold, spendGems, consumeAp, recoverAp, addExp,
@@ -299,6 +310,7 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
     addToInventory, setPartySlot,
     receivePresent, receiveAllPresents, markQuestCleared,
     incrementGachaPulls,
+    updateSettings,
     getBattleStats,
     resetAll,
   };

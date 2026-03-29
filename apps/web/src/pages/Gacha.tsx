@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Layout } from '../components/layout/Layout';
-import { Gem, Sparkles, Star, RotateCcw, Play } from 'lucide-react';
+import { Gem, Sparkles, Star, Play } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
+import { soundManager } from '../utils/sound';
 import { AdRewardModal } from '../components/AdRewardModal';
 import {
   drawRandomCharacter,
@@ -31,10 +32,27 @@ export const Gacha = () => {
   const [isAnimating, setIsAnimating] = useState(false);
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
 
+  // ガチャ結果の排出音（10連は最高レアリティの音を再生）
+  useEffect(() => {
+    if (modal.visible && modal.cards.length > 0) {
+      if (modal.cards.length === 1) {
+        soundManager.playGachaReveal(modal.cards[0].rarity);
+      } else {
+        const rarityOrder: Record<string, number> = { SSR: 3, SR: 2, R: 1 };
+        const best = modal.cards.reduce((a, b) =>
+          (rarityOrder[b.rarity] ?? 0) > (rarityOrder[a.rarity] ?? 0) ? b : a
+        );
+        soundManager.playGachaReveal(best.rarity);
+      }
+    }
+  }, [modal.visible, modal.cards]);
+
   const runGacha = (ten: boolean) => {
+    soundManager.playPikori();
     const cost = ten ? TEN_COST : SINGLE_COST;
     if (!spendGems(cost)) return; // GEMS不足でキャンセル
     setIsAnimating(true);
+    soundManager.playGachaWait(1500);
     setTimeout(() => {
       const cards = ten ? drawTenCharacters() : [drawRandomCharacter()];
       // インベントリに追加
@@ -42,7 +60,7 @@ export const Gacha = () => {
       setModal({ cards, visible: true });
       incrementGachaPulls(cards.length);
       setIsAnimating(false);
-    }, 600);
+    }, 1500);
   };
 
   return (
@@ -70,7 +88,7 @@ export const Gacha = () => {
             </div>
           </div>
           <button 
-            onClick={() => setIsAdModalOpen(true)}
+            onClick={() => { soundManager.playPikori(); setIsAdModalOpen(true); }}
             className="bg-purple-600 hover:bg-purple-500 text-white px-5 py-2.5 rounded-xl font-bold text-sm md:text-base transition-all shadow-lg active:scale-95 hover:shadow-purple-500/20"
           >
             今すぐ視聴
@@ -215,11 +233,15 @@ export const Gacha = () => {
 
         {/* Loading overlay */}
         {isAnimating && (
-          <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center">
-            <div className="text-white text-center">
-              <RotateCcw size={48} className="animate-spin text-yellow-400 mx-auto mb-4" />
-              <p className="text-xl font-bold">ガチャ演出中……</p>
-            </div>
+          <div className="fixed inset-0 bg-black/90 z-[200] flex flex-col items-center justify-center backdrop-blur-xl animate-in fade-in duration-500">
+             <div className="relative w-48 h-48 md:w-64 md:h-64 flex items-center justify-center animate-[bounce_1s_infinite]">
+                 {/* Shaking glow effect */}
+                 <div className="absolute inset-0 bg-yellow-500/20 rounded-full blur-3xl animate-[pulse_0.5s_infinite]" />
+                 <Sparkles size={120} className="text-yellow-400 drop-shadow-[0_0_30px_rgba(234,179,8,0.8)] animate-[spin_3s_linear_infinite]" />
+             </div>
+             <p className="mt-8 text-white text-2xl font-black tracking-widest animate-pulse drop-shadow-lg">
+                スカウト中...
+             </p>
           </div>
         )}
 
@@ -243,7 +265,7 @@ export const Gacha = () => {
                         'rounded-2xl border-2 p-3 flex flex-col items-center gap-1 text-center transition-all duration-500 animate-in fade-in zoom-in',
                         rarityStyle[card.rarity]
                       )} 
-                      style={{ animationDelay: `${i * 80}ms`, animationFillMode: 'both' }}
+                      style={{ animationDelay: `${i * 300}ms`, animationFillMode: 'both' }}
                     >
                       <div className="flex items-center justify-between w-full mb-1">
                         <span className={clsx('text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm', rarityBadge[card.rarity])}>{card.rarity}</span>
@@ -264,7 +286,7 @@ export const Gacha = () => {
               </div>
               
               <button 
-                onClick={() => setModal({ cards: [], visible: false })} 
+                onClick={() => { soundManager.playPikori(); setModal({ cards: [], visible: false }); }} 
                 className="mt-4 md:mt-8 w-full py-4 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-white font-black rounded-2xl transition-all shadow-xl active:scale-[0.98] hover:shadow-green-500/20"
               >
                 スカウト結果を閉じる

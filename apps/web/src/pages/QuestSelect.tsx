@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Swords, Play, Star, AlertCircle, ArrowRight, Clock } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
+import { soundManager } from '../utils/sound';
 import { ALL_QUESTS } from '../store/quests';
 import type { Quest } from '../store/types';
 
@@ -52,6 +53,7 @@ export const QuestSelect = () => {
   const sortedQuests = [...guerrillaQuests, ...normalQuests];
 
   const handleQuestClick = (quest: Quest) => {
+    soundManager.playPikori();
     if (player.ap < quest.stamina) {
       setApRecoveryQuest(quest);
       return;
@@ -60,11 +62,13 @@ export const QuestSelect = () => {
   };
 
   const handleConfirmStart = () => {
+    soundManager.playPikori();
     if (!selectedQuest) return;
     navigate('/battle', { state: { questId: selectedQuest.id } });
   };
 
   const handleRecoverAp = () => {
+    soundManager.playPikori();
     if (spendGems(AP_RECOVERY_COST)) {
       recoverAp(AP_RECOVERY_AMOUNT);
       // 回復後、元のクエストの確認モーダルへ移行するか、閉じるか
@@ -219,7 +223,7 @@ export const QuestSelect = () => {
 
             <div className="flex gap-4">
               <button
-                onClick={() => setSelectedQuest(null)}
+                onClick={() => { soundManager.playPikori(); setSelectedQuest(null); }}
                 className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-colors"
               >
                 キャンセル
@@ -266,7 +270,7 @@ export const QuestSelect = () => {
 
             <div className="flex gap-4">
               <button
-                onClick={() => setApRecoveryQuest(null)}
+                onClick={() => { soundManager.playPikori(); setApRecoveryQuest(null); }}
                 className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-colors text-sm"
               >
                 キャンセル

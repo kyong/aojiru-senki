@@ -2,12 +2,33 @@ import React, { type PropsWithChildren } from 'react';
 import { Header } from './Header';
 import { Sidebar } from './Sidebar';
 import { useNavigationGuard } from '../../context/NavigationGuardContext';
+import { WelcomeModal } from '../WelcomeModal';
+import { useLocation } from 'react-router-dom';
+import { soundManager } from '../../utils/sound';
+import { useEffect } from 'react';
 
 export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const { pendingPath, confirmNavigation, cancelNavigation } = useNavigationGuard();
+  const location = useLocation();
+
+  // BGM switching based on route
+  useEffect(() => {
+    const path = location.pathname;
+    if (path === '/gacha') {
+      soundManager.playBGM('gacha.wav');
+    } else if (path === '/battle') {
+      // Battle BGM is usually handled inside Battle.tsx for quest-specific support,
+      // but we can set a default here or skip.
+    } else if (path === '/story') {
+      soundManager.playBGM('story.wav');
+    } else {
+      soundManager.playBGM('home.wav');
+    }
+  }, [location.pathname]);
 
   return (
     <div className="min-h-screen text-gray-100 font-sans relative overflow-x-hidden">
+      <WelcomeModal />
       {/* Global Background Layer */}
       <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#0a0a0a]">
         <img 

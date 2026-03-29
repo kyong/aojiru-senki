@@ -8,6 +8,7 @@ import { useNavigationGuard } from '../context/NavigationGuardContext';
 import { QUEST_MAP } from '../store/quests';
 import { CHARACTER_MAP } from '../store/characters';
 import type { Character, SkillType } from '../store/types';
+import { soundManager } from '../utils/sound';
 
 // ============================================================
 // Enemy master data (local to battle)
@@ -95,11 +96,28 @@ export const Battle = () => {
     return () => window.removeEventListener('beforeunload', handler);
   }, [shouldBlock]);
 
+  // BGM switching based on state (cleanup stops BGM when leaving battle)
+  useEffect(() => {
+    if (gameState === 'STORY') {
+      soundManager.playBGM('story.wav');
+    } else if (gameState === 'BATTLE') {
+      soundManager.playBGM(quest?.bgm || 'battle.wav');
+    } else if (gameState === 'WIN') {
+      soundManager.playBGM('fanfare.wav');
+    } else if (gameState === 'GAMEOVER') {
+      soundManager.stopBGM();
+    }
+    return () => {
+      soundManager.stopBGM();
+    };
+  }, [gameState, quest?.bgm]);
+
   const addLog = useCallback((msg: string) => {
     setBattleLog(prev => [...prev.slice(-4), msg]);
   }, []);
 
   const handleStoryNext = () => {
+    soundManager.playPikori();
     if (currentStoryIndex < STORY_TEXT[questId].length - 1) {
       setCurrentStoryIndex(p => p + 1);
     } else {
@@ -108,12 +126,14 @@ export const Battle = () => {
   };
 
   const handleStartBattle = () => {
+    soundManager.playSortie();
     consumeAp(quest?.stamina ?? 10);
     setGameState('BATTLE');
     addLog('戦闘開始！');
   };
 
   const handleUseChoHado = () => {
+    soundManager.playPikori();
     if (!useItem('choHadoAojiru')) return;
     setChoHadoBuff(true);
   };
@@ -137,6 +157,7 @@ export const Battle = () => {
         const next = Math.max(0, prev - dmg);
         
         // 被ダメージ演出
+        soundManager.playHit();
         setPlayerHit(true);
         setIsShaking(true);
         const damageId = Date.now();
@@ -165,6 +186,8 @@ export const Battle = () => {
     const newHp = Math.max(0, enemyHp - dmg);
     
     // 攻撃演出
+    soundManager.playAttack();
+    setTimeout(() => soundManager.playHit(), 100);
     setEnemyHit(true);
     setIsShaking(true);
     const damageId = Date.now();
@@ -194,6 +217,7 @@ export const Battle = () => {
       let logMsg = '';
 
       if (skill.type === 'damage') {
+        soundManager.playSkill();
         const dmg = Math.floor((baseAtk + Math.floor(Math.random() * atkRange)) * (skill.multiplier || 1));
         const newHp = Math.max(0, enemyHp - dmg);
         setEnemyHp(newHp);
@@ -208,6 +232,7 @@ export const Battle = () => {
         if (newHp === 0) { setSkillUser(null); setSkillFlash(null); handleWin(); return; }
       } 
       else if (skill.type === 'heal') {
+        soundManager.playSkillHeal();
         const heal = Math.floor(maxHp * (skill.multiplier || 0.3));
         setPlayerHp(prev => Math.min(maxHp, prev + heal));
         const damageId = Date.now();
@@ -216,6 +241,7 @@ export const Battle = () => {
         logMsg = `✨ ${char.name}の${skill.name}！ HPが${heal}回復した！`;
       }
       else if (skill.type === 'debuff') {
+        soundManager.playSkill();
         setEnemyAtkMultiplier(skill.effectValue || 0.7);
         setTimeout(() => setEnemyAtkMultiplier(1.0), 5000); // 5秒で戻る
         logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}の攻撃力を下げた！`;
@@ -230,6 +256,7 @@ export const Battle = () => {
 
   const handleGuard = () => {
     if (!isPlayerTurn) return;
+    soundManager.playClick();
     setSkillMenu(false); // スキルメニューを閉じる
     setIsGuarding(true);
     setPlayerMp(p => Math.min(MAX_MP, p + 10));
@@ -239,9 +266,11 @@ export const Battle = () => {
 
   const handleItem = () => {
     if (!isPlayerTurn) return;
+    soundManager.playClick();
     setSkillMenu(false); // スキルメニューを閉じる
     if (items.aojiruPotion <= 0) { addLog('青汁ポーションがない！ ショップで購入しよう。'); return; }
     if (!useItem('aojiruPotion')) return;
+    soundManager.playHeal();
     const HEAL = 120;
     setPlayerHp(prev => {
       const next = Math.min(maxHp, prev + HEAL);
@@ -256,6 +285,7 @@ export const Battle = () => {
     const gems = quest?.gemsReward ?? 0;
     const exp  = gold / 10;
     
+    soundManager.playWin();
     setSkillMenu(false); // スキルメニューを閉じる
     // 勝利演出開始
     setIsVictoryCutin(true);
@@ -584,7 +614,7 @@ export const Battle = () => {
                   <h3 className="text-xl font-bold text-white flex items-center gap-2">
                     <Zap className="text-green-400" /> スキル選択
                   </h3>
-                  <button onClick={() => setSkillMenu(false)} className="text-gray-500 hover:text-white">
+                  <button onClick={() => { soundManager.playPikori(); setSkillMenu(false); }} className="text-gray-500 hover:text-white">
                     閉じる ×
                   </button>
                 </div>

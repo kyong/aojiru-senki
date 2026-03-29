@@ -45,6 +45,7 @@ export type Quest = {
   };
   guerrilla?: boolean;
   gemsReward?: number;
+  bgm?: string; // e.g., 'battle.wav'
 };
 
 export type PlayerState = {
@@ -73,4 +74,11 @@ export type ClearedQuestsState = number[];
 export type ItemsState = {
   aojiruPotion: number;
   choHadoAojiru: number;
+};
+
+/** 各種設定（0-100） */
+export type SettingsState = {
+  bgmVolume: number;
+  seVolume: number;
+  isFirstLaunch: boolean;
 };

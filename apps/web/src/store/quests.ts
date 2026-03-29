@@ -14,6 +14,7 @@ export const ALL_QUESTS: Quest[] = [
     goldReward: 500,
     description: 'ギトギトの朝を浄化せよ！',
     thumbnail: '/images/bacon_general.png',
+    bgm: 'battle.wav',
   },
   {
     id: 2,
@@ -24,6 +25,7 @@ export const ALL_QUESTS: Quest[] = [
     goldReward: 2000,
     description: '午後の眠気に打ち勝て！',
     thumbnail: '/images/carb_the_great.png',
+    bgm: 'battle.wav',
   },
   {
     id: 4,
@@ -34,6 +36,7 @@ export const ALL_QUESTS: Quest[] = [
     goldReward: 8000,
     description: '甘い誘惑を断ち切れ！',
     thumbnail: '/images/sweets_majin.png',
+    bgm: 'battle.wav',
     unlockCondition: { requireClearId: 2 },
   },
   {
@@ -45,6 +48,7 @@ export const ALL_QUESTS: Quest[] = [
     goldReward: 15000,
     description: '世界に健康を取り戻す時だ！',
     thumbnail: '/images/cholesterol_king.png',
+    bgm: 'boss_battle.wav',
     unlockCondition: { requireClearId: 4 },
   },
   {
@@ -70,6 +74,7 @@ export const ALL_QUESTS: Quest[] = [
     timeCondition: { activeRule: 'every_other_hour' },
     guerrilla: true,
     gemsReward: 10,
+    bgm: 'battle.wav',
   },
 ];
 
