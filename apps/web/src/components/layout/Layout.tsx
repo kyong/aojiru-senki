@@ -7,11 +7,22 @@ export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   const { pendingPath, confirmNavigation, cancelNavigation } = useNavigationGuard();
 
   return (
-    <div className="min-h-screen bg-[#1a1a1a] text-gray-100 font-sans">
+    <div className="min-h-screen text-gray-100 font-sans relative overflow-x-hidden">
+      {/* Global Background Layer */}
+      <div className="fixed inset-0 z-[-1] pointer-events-none bg-[#0a0a0a]">
+        <img 
+          src="/images/global_bg.png" 
+          alt="App Background" 
+          className="w-full h-full object-cover scale-105 opacity-40 blur-[1px]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0a0a]/60 via-transparent to-[#0a0a0a]/60" />
+        <div className="absolute inset-0 bg-black/20" />
+      </div>
+
       <Header />
       <Sidebar />
       {/* pl-0 + pb-20 for mobile bottom nav, pl-24 + pb-0 for desktop sidebar */}
-      <main className="pl-0 pb-20 pt-14 md:pl-24 md:pb-0 md:pt-16 min-h-screen">
+      <main className="relative z-10 pl-0 pb-20 pt-14 md:pl-24 md:pb-0 md:pt-16 min-h-screen">
         <div className="p-4 md:p-6 max-w-7xl mx-auto animate-[fadeIn_0.5s_ease-out]">
           {children}
         </div>
