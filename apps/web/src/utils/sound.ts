@@ -3,6 +3,7 @@ class SoundManager {
   private masterGain: GainNode | null = null;
   private seVolume: number = 0.8;
   private bgmVolume: number = 0.7;
+  private isMuted: boolean = false;
   
   // BGM specific
   private bgmAudio: HTMLAudioElement | null = null;
@@ -26,17 +27,26 @@ class SoundManager {
   private updateVolumes() {
     if (!this.ctx) return;
     const now = this.ctx.currentTime;
+    const finalSeVolume = this.isMuted ? 0 : this.seVolume;
+    const finalBgmVolume = this.isMuted ? 0 : this.bgmVolume;
+
     if (this.masterGain) {
-      this.masterGain.gain.setTargetAtTime(this.seVolume, now, 0.02);
+      this.masterGain.gain.setTargetAtTime(finalSeVolume, now, 0.02);
     }
     if (this.bgmGain) {
-      this.bgmGain.gain.setTargetAtTime(this.bgmVolume, now, 0.02);
+      this.bgmGain.gain.setTargetAtTime(finalBgmVolume, now, 0.02);
     }
   }
 
   public setVolume(se: number, bgm: number) {
     this.seVolume = Math.max(0, Math.min(1, se / 100));
     this.bgmVolume = Math.max(0, Math.min(1, bgm / 100));
+    if (!this.ctx) this.init();
+    this.updateVolumes();
+  }
+
+  public setMuted(muted: boolean) {
+    this.isMuted = muted;
     if (!this.ctx) this.init();
     this.updateVolumes();
   }

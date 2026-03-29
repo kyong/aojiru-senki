@@ -28,4 +28,9 @@ export const DEFAULT_CLEARED_QUESTS: ClearedQuestsState = [];
 export const DEFAULT_ITEMS: ItemsState = { aojiruPotion: 3, choHadoAojiru: 0 };
 
 /** 初期設定: BGM 70%, SE 80% */
-export const DEFAULT_SETTINGS: SettingsState = { bgmVolume: 70, seVolume: 80, isFirstLaunch: true };
+export const DEFAULT_SETTINGS: SettingsState = { 
+  bgmVolume: 70, 
+  seVolume: 80, 
+  isFirstLaunch: true,
+  isMuted: false 
+};

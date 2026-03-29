@@ -81,4 +81,5 @@ export type SettingsState = {
   bgmVolume: number;
   seVolume: number;
   isFirstLaunch: boolean;
+  isMuted: boolean;
 };

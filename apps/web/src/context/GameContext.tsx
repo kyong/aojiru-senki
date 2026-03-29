@@ -18,6 +18,7 @@ import type {
 } from '../store/types';
 import * as storage from '../store/storage';
 import { getCharacterById } from '../store/characters';
+import { soundManager } from '../utils/sound';
 
 // 1AP回復にかかる秒数（5分）
 const AP_RECOVERY_INTERVAL_SEC = 5 * 60;
@@ -111,6 +112,12 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => { storage.saveItems(items); }, [items]);
   useEffect(() => { storage.saveGachaPulls(totalGachaPulls); }, [totalGachaPulls]);
   useEffect(() => { storage.saveSettings(settings); }, [settings]);
+
+  // 初期化 & サウンド同期
+  useEffect(() => {
+    soundManager.setMuted(settings.isMuted);
+    soundManager.setVolume(settings.seVolume, settings.bgmVolume);
+  }, [settings.isMuted, settings.seVolume, settings.bgmVolume]);
 
   // ---- AP 自動回復 ----
   // 起動時: アプリを閉じていた間に回復すべきAPを遡って加算

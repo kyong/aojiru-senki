@@ -5,6 +5,7 @@ import { Swords, Play, Star, AlertCircle, ArrowRight, Clock } from 'lucide-react
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
 import { soundManager } from '../utils/sound';
+import { ApRecoveryModal } from '../components/ApRecoveryModal';
 import { ALL_QUESTS } from '../store/quests';
 import type { Quest } from '../store/types';
 
@@ -19,12 +20,11 @@ function getGuerrillaRemainingMin(): number {
 
 export const QuestSelect = () => {
   const navigate = useNavigate();
-  const { player, clearedQuests, spendGems, recoverAp } = useGame();
+  const { player, clearedQuests } = useGame();
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [apRecoveryQuest, setApRecoveryQuest] = useState<Quest | null>(null);
+  const [isApModalOpen, setIsApModalOpen] = useState(false);
   const [guerrillaMin, setGuerrillaMin] = useState(getGuerrillaRemainingMin);
-  const AP_RECOVERY_COST = 50;
-  const AP_RECOVERY_AMOUNT = player.maxAp;
 
   // 毎分ゲリラ残り時間を更新
   useEffect(() => {
@@ -56,6 +56,7 @@ export const QuestSelect = () => {
     soundManager.playPikori();
     if (player.ap < quest.stamina) {
       setApRecoveryQuest(quest);
+      setIsApModalOpen(true);
       return;
     }
     setSelectedQuest(quest);
@@ -67,15 +68,10 @@ export const QuestSelect = () => {
     navigate('/battle', { state: { questId: selectedQuest.id } });
   };
 
-  const handleRecoverAp = () => {
-    soundManager.playPikori();
-    if (spendGems(AP_RECOVERY_COST)) {
-      recoverAp(AP_RECOVERY_AMOUNT);
-      // 回復後、元のクエストの確認モーダルへ移行するか、閉じるか
-      if (apRecoveryQuest) {
-        setSelectedQuest(apRecoveryQuest);
-        setApRecoveryQuest(null);
-      }
+  const handleRecoverSuccess = () => {
+    if (apRecoveryQuest) {
+      setSelectedQuest(apRecoveryQuest);
+      setApRecoveryQuest(null);
     }
   };
 
@@ -239,53 +235,11 @@ export const QuestSelect = () => {
         </div>
       )}
 
-      {/* AP Recovery Modal */}
-      {apRecoveryQuest && (
-        <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4 backdrop-blur-sm">
-          <div className="bg-gray-900 border border-gray-700 rounded-2xl p-6 max-w-sm w-full shadow-2xl">
-            <h3 className="text-xl font-bold text-center text-white mb-4">
-              AP回復
-            </h3>
-            <p className="text-center text-gray-300 text-sm mb-6 leading-relaxed">
-              APが不足しています。<br/>
-              ジェムを消費してAPを回復しますか？
-            </p>
-            
-            <div className="flex flex-col gap-2 bg-gray-800 rounded-xl p-4 mb-8">
-              <div className="flex justify-between items-center text-sm">
-                <span className="text-gray-400">消費ジェム</span>
-                <span className="font-mono text-pink-400 font-bold">-{AP_RECOVERY_COST}</span>
-              </div>
-              <div className="flex justify-between items-center text-sm border-t border-gray-700 pt-2">
-                <span className="text-gray-400">回復AP</span>
-                <span className="font-mono text-green-400 font-bold">+{AP_RECOVERY_AMOUNT}</span>
-              </div>
-              <div className="flex justify-between items-center text-xs mt-2 text-gray-500">
-                <span>所持ジェム</span>
-                <span className={clsx("font-mono", player.gems < AP_RECOVERY_COST ? 'text-red-400' : 'text-gray-300')}>
-                  {player.gems.toLocaleString()}
-                </span>
-              </div>
-            </div>
-
-            <div className="flex gap-4">
-              <button
-                onClick={() => { soundManager.playPikori(); setApRecoveryQuest(null); }}
-                className="flex-1 py-3 bg-gray-700 hover:bg-gray-600 text-white font-bold rounded-xl transition-colors text-sm"
-              >
-                キャンセル
-              </button>
-              <button
-                onClick={handleRecoverAp}
-                disabled={player.gems < AP_RECOVERY_COST}
-                className="flex-1 py-3 bg-green-700 hover:bg-green-600 disabled:bg-gray-800 disabled:text-gray-500 text-white font-bold rounded-xl transition-colors text-sm shadow-lg shadow-green-900/50"
-              >
-                回復する
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ApRecoveryModal 
+        isOpen={isApModalOpen} 
+        onClose={() => { setIsApModalOpen(false); setApRecoveryQuest(null); }} 
+        onSuccess={handleRecoverSuccess}
+      />
     </Layout>
   );
 };
