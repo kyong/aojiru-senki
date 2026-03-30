@@ -13,6 +13,8 @@ import PresentPage from './pages/Present';
 import Menu from './pages/Menu';
 import Shop from './pages/Shop';
 import Splash from './pages/Splash';
+import Terms from './pages/Terms';
+import Privacy from './pages/Privacy';
 
 function App() {
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -35,6 +37,8 @@ function App() {
               <Route path="/present" element={<PresentPage />} />
               <Route path="/shop"    element={<Shop />} />
               <Route path="/menu"    element={<Menu />} />
+              <Route path="/terms"   element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
             </Routes>
           )}
         </NavigationGuardProvider>

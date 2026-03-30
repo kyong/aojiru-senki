@@ -1,15 +1,9 @@
 import { Layout } from '../components/layout/Layout';
-import { Settings, User, Volume2, Music, MessageSquare, HelpCircle, LogOut, ChevronRight, Shield } from 'lucide-react';
+import { Settings, User, Volume2, Music, MessageSquare, HelpCircle, ChevronRight, Shield } from 'lucide-react';
 import { soundManager } from '../utils/sound';
 import { useGame } from '../context/GameContext';
 
-const PLAYER = {
-  name: '青汁マイスター',
-  uid: 'UID: 123456789',
-  rank: 'S',
-  level: 50,
-  joinDate: '2026/04/01',
-};
+import { useNavigate } from 'react-router-dom';
 
 type SliderProps = { label: string; icon: React.ReactNode; value: number; onChange: (v: number) => void };
 
@@ -56,7 +50,8 @@ const MenuLink = ({ icon, label, desc, danger, onClick }: MenuLinkProps) => (
 );
 
 export const Menu = () => {
-  const { settings, updateSettings } = useGame();
+  const { player, settings, updateSettings } = useGame();
+  const navigate = useNavigate();
 
   const handleBgmChange = (v: number) => {
     updateSettings({ bgmVolume: v });
@@ -84,13 +79,13 @@ export const Menu = () => {
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-3">
-              <h3 className="text-xl font-bold text-white">{PLAYER.name}</h3>
-              <span className="bg-yellow-500 text-black text-xs font-black px-2 py-0.5 rounded">Rank {PLAYER.rank}</span>
+              <h3 className="text-xl font-bold text-white">青汁マイスター</h3>
+              <span className="bg-yellow-500 text-black text-xs font-black px-2 py-0.5 rounded">Rank S</span>
             </div>
-            <p className="text-gray-400 text-sm">{PLAYER.uid}</p>
+            <p className="text-gray-400 text-sm">{player.uid}</p>
             <div className="flex gap-4 mt-1 text-xs text-gray-500">
-              <span>Lv. {PLAYER.level}</span>
-              <span>開始日: {PLAYER.joinDate}</span>
+              <span>Lv. {player.level}</span>
+              <span>開始日: {player.joinDate}</span>
             </div>
           </div>
           <User size={24} className="text-gray-600" />
@@ -110,21 +105,41 @@ export const Menu = () => {
         {/* Other Menu Items */}
         <div className="flex flex-col gap-3">
           <h3 className="text-sm font-bold text-gray-500 tracking-wider uppercase px-1">その他</h3>
-          <MenuLink icon={<MessageSquare size={20} />} label="お問い合わせ" desc="不具合・ご意見はこちら" />
-          <MenuLink icon={<HelpCircle size={20} />}   label="ヘルプ・FAQ" desc="よくあるご質問" />
-          <MenuLink icon={<Shield size={20} />}         label="プライバシーポリシー" desc="個人情報の取り扱いについて" />
-          <MenuLink
-            icon={<LogOut size={20} />}
-            label="ログアウト"
-            desc="アカウントからサインアウト"
-            danger
+          <MenuLink 
+            icon={<MessageSquare size={20} />} 
+            label="お問い合わせ" 
+            desc="不具合・ご意見はこちら（外部サイト）" 
+            onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScopIUuQWi_w5xh5--T34y8QtLVQzL9BpHnD5AMF1HI1Fw6eQ/viewform?usp=publish-editor', '_blank')}
+          />
+          <MenuLink 
+            icon={<HelpCircle size={20} />}   
+            label="ヘルプ・FAQ" 
+            desc="アプリの使い方・よくある質問" 
+            onClick={() => alert("【よくある質問】\n\nQ: このアプリは何のためにありますか？\nA: 青汁を飲んで元気になる気分を味わうためのジョークアプリです。健康効果を保証するものではありません。\n\nQ: 課金はありますか？\nA: 現時点ではすべて無料で遊べますが、広告が表示されることがあります。")}
+          />
+          <MenuLink 
+            icon={<Shield size={20} />}         
+            label="利用規約" 
+            desc="免責事項・ルールについて" 
+            onClick={() => navigate('/terms')}
+          />
+          <MenuLink 
+            icon={<Shield size={20} />}         
+            label="プライバシーポリシー" 
+            desc="データの取り扱いについて" 
+            onClick={() => navigate('/privacy')}
           />
         </div>
 
         {/* App Info */}
-        <p className="text-center text-xs text-gray-600 pb-4">
-          青汁戦記 ver 1.0.0 &copy; 2026 Aojiru Studio
-        </p>
+        <div className="text-center pb-8 space-y-1">
+          <p className="text-[10px] text-red-500/70 font-bold">
+            ※セーブデータはブラウザにのみ保存されます。キャッシュ削除等でデータが消えた場合、復旧はできません。
+          </p>
+          <p className="text-[10px] text-gray-600">
+            青汁戦記 ver 1.0.0 &copy; 2026 Aojiru Studio
+          </p>
+        </div>
       </div>
     </Layout>
   );

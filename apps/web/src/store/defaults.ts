@@ -12,6 +12,8 @@ export const DEFAULT_PLAYER: PlayerState = {
   level: 1,
   exp: 0,
   nextExp: 100,
+  joinDate: '2026/03/30',
+  uid: 'UID: 123456789',
 };
 
 /** 初期編成: スロット0に青汁マイスター（ID:1）を配置 */

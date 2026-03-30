@@ -56,6 +56,8 @@ export type PlayerState = {
   level: number;
   exp: number;
   nextExp: number;
+  joinDate: string;
+  uid: string;
 };
 
 /** スロット 0〜2: キャラクターID または null（空） */

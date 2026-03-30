@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { Volume2, VolumeX, Play } from 'lucide-react';
 import { useGame } from '../context/GameContext';
 import { soundManager } from '../utils/sound';
+import { LegalModal, type LegalType } from './LegalModal';
 
 export const WelcomeModal: React.FC = () => {
   const { settings, updateSettings } = useGame();
   const [muteOnStart, setMuteOnStart] = useState(false);
+  const [legal, setLegal] = useState<{ open: boolean; type: LegalType }>({ open: false, type: 'terms' });
 
   if (!settings.isFirstLaunch) return null;
 
@@ -59,7 +61,33 @@ export const WelcomeModal: React.FC = () => {
           <Play size={20} fill="currentColor" />
           ゲームを開始する
         </button>
+
+        <div className="mt-8 pt-6 border-t border-gray-800">
+          <p className="text-[10px] text-gray-500 mb-2">
+            開始することで、開発者の提示する規約に同意したものとみなします。
+          </p>
+          <div className="flex items-center justify-center gap-4 text-[10px] font-bold">
+            <button 
+              onClick={() => setLegal({ open: true, type: 'terms' })}
+              className="text-gray-400 hover:text-green-400 transition-colors underline decoration-gray-700 underline-offset-4"
+            >
+              利用規約
+            </button>
+            <button 
+              onClick={() => setLegal({ open: true, type: 'privacy' })}
+              className="text-gray-400 hover:text-green-400 transition-colors underline decoration-gray-700 underline-offset-4"
+            >
+              プライバシーポリシー
+            </button>
+          </div>
+        </div>
       </div>
+
+      <LegalModal 
+        open={legal.open} 
+        type={legal.type} 
+        onClose={() => setLegal({ ...legal, open: false })} 
+      />
     </div>
   );
 };
