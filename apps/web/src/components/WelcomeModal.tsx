@@ -6,24 +6,23 @@ import { LegalModal, type LegalType } from './LegalModal';
 
 export const WelcomeModal: React.FC = () => {
   const { settings, updateSettings } = useGame();
-  const [muteOnStart, setMuteOnStart] = useState(false);
   const [legal, setLegal] = useState<{ open: boolean; type: LegalType }>({ open: false, type: 'terms' });
+
+  React.useEffect(() => {
+    if (settings.isFirstLaunch) {
+      soundManager.pauseBGM();
+    }
+  }, [settings.isFirstLaunch]);
 
   if (!settings.isFirstLaunch) return null;
 
   const handleStart = () => {
-    if (muteOnStart) {
-      updateSettings({ 
-        bgmVolume: 0, 
-        seVolume: 0, 
-        isFirstLaunch: false 
-      });
-      soundManager.setVolume(0, 0);
-    } else {
-      updateSettings({ isFirstLaunch: false });
-      // Initialize with default volumes
-      soundManager.setVolume(settings.seVolume, settings.bgmVolume);
-    }
+    updateSettings({ isFirstLaunch: false });
+    soundManager.resumeBGM();
+  };
+
+  const toggleMute = () => {
+    updateSettings({ isMuted: !settings.isMuted });
   };
 
   return (
@@ -42,15 +41,15 @@ export const WelcomeModal: React.FC = () => {
           公共の場所などでプレイされる際は、音量にご注意ください。
         </p>
 
-        <div className="bg-gray-850 rounded-2xl p-4 mb-8 border border-gray-800 flex items-center justify-between cursor-pointer group" onClick={() => setMuteOnStart(!muteOnStart)}>
+        <div className="bg-gray-850 rounded-2xl p-4 mb-8 border border-gray-800 flex items-center justify-between cursor-pointer group" onClick={toggleMute}>
           <div className="flex items-center gap-3">
-            <div className={`p-2 rounded-lg transition-colors ${muteOnStart ? 'bg-red-500/20 text-red-400' : 'bg-gray-700 text-gray-400'}`}>
+            <div className={`p-2 rounded-lg transition-colors ${settings.isMuted ? 'bg-red-500/20 text-red-400' : 'bg-gray-700 text-gray-400'}`}>
               <VolumeX size={20} />
             </div>
             <span className="text-sm font-bold text-gray-300">ミュートで始める</span>
           </div>
-          <div className={`w-6 h-6 rounded-md border-2 transition-all flex items-center justify-center ${muteOnStart ? 'bg-green-500 border-green-500' : 'border-gray-600'}`}>
-            {muteOnStart && <div className="w-2 h-2 bg-white rounded-sm" />}
+          <div className={`w-6 h-6 rounded-md border-2 transition-all flex items-center justify-center ${settings.isMuted ? 'bg-green-500 border-green-500' : 'border-gray-600'}`}>
+            {settings.isMuted && <div className="w-2 h-2 bg-white rounded-sm" />}
           </div>
         </div>
 

@@ -1,5 +1,5 @@
 import { Layout } from '../components/layout/Layout';
-import { Settings, User, Volume2, Music, MessageSquare, HelpCircle, ChevronRight, Shield } from 'lucide-react';
+import { Settings, User, Volume2, Music, MessageSquare, HelpCircle, ChevronRight, Shield, Trash2 } from 'lucide-react';
 import { soundManager } from '../utils/sound';
 import { useGame } from '../context/GameContext';
 
@@ -50,7 +50,7 @@ const MenuLink = ({ icon, label, desc, danger, onClick }: MenuLinkProps) => (
 );
 
 export const Menu = () => {
-  const { player, settings, updateSettings } = useGame();
+  const { player, settings, updateSettings, resetAll } = useGame();
   const navigate = useNavigate();
 
   const handleBgmChange = (v: number) => {
@@ -128,6 +128,21 @@ export const Menu = () => {
             label="プライバシーポリシー" 
             desc="データの取り扱いについて" 
             onClick={() => navigate('/privacy')}
+          />
+          <MenuLink 
+            icon={<Trash2 size={20} />}         
+            label="全データの削除" 
+            desc="セーブデータを消去し、最初から始めます" 
+            danger
+            onClick={() => {
+              if (window.confirm('【警告】すべてのセーブデータを完全に削除しますか？\nこの操作は取り消せません。')) {
+                if (window.confirm('本当に削除しますか？\nレベルや入手したキャラクター等、すべてが失われます。')) {
+                  resetAll();
+                  navigate('/');
+                  window.location.reload(); // 確実に初期状態に戻す
+                }
+              }
+            }}
           />
         </div>
 
