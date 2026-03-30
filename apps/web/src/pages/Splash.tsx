@@ -13,7 +13,7 @@ export const Splash = ({ onComplete }: SplashProps) => {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    soundManager.playBGM('home.wav');
+    soundManager.playBGM('home.mp3');
   }, []);
 
   useEffect(() => {

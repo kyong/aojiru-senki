@@ -44,6 +44,8 @@ export const Gacha = () => {
         );
         soundManager.playGachaReveal(best.rarity);
       }
+      // Results BGM
+      soundManager.playBGM('gacha_result.mp3');
     }
   }, [modal.visible, modal.cards]);
 
@@ -286,7 +288,11 @@ export const Gacha = () => {
               </div>
               
               <button 
-                onClick={() => { soundManager.playPikori(); setModal({ cards: [], visible: false }); }} 
+                onClick={() => { 
+                  soundManager.playPikori(); 
+                  setModal({ cards: [], visible: false }); 
+                  soundManager.playBGM('gacha.mp3');
+                }} 
                 className="mt-4 md:mt-8 w-full py-4 bg-gradient-to-r from-green-700 to-green-600 hover:from-green-600 hover:to-green-500 text-white font-black rounded-2xl transition-all shadow-xl active:scale-[0.98] hover:shadow-green-500/20"
               >
                 スカウト結果を閉じる

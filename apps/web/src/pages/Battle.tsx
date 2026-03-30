@@ -99,13 +99,13 @@ export const Battle = () => {
   // BGM switching based on state (cleanup stops BGM when leaving battle)
   useEffect(() => {
     if (gameState === 'STORY') {
-      soundManager.playBGM('story.wav');
+      soundManager.playBGM('story.mp3');
     } else if (gameState === 'BATTLE') {
-      soundManager.playBGM(quest?.bgm || 'battle.wav');
+      soundManager.playBGM(quest?.bgm || 'battle.mp3');
     } else if (gameState === 'WIN') {
-      soundManager.playBGM('fanfare.wav');
+      soundManager.playBGM('fanfare.mp3');
     } else if (gameState === 'GAMEOVER') {
-      soundManager.stopBGM();
+      soundManager.playBGM('gameover.mp3');
     }
     return () => {
       soundManager.stopBGM();

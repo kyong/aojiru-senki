@@ -15,14 +15,14 @@ export const Layout: React.FC<PropsWithChildren> = ({ children }) => {
   useEffect(() => {
     const path = location.pathname;
     if (path === '/gacha') {
-      soundManager.playBGM('gacha.wav');
+      soundManager.playBGM('gacha.mp3');
     } else if (path === '/battle') {
       // Battle BGM is usually handled inside Battle.tsx for quest-specific support,
       // but we can set a default here or skip.
     } else if (path === '/story') {
-      soundManager.playBGM('story.wav');
+      soundManager.playBGM('story.mp3');
     } else {
-      soundManager.playBGM('home.wav');
+      soundManager.playBGM('home.mp3');
     }
   }, [location.pathname]);
 
