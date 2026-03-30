@@ -25,7 +25,7 @@ const ENEMIES: Record<number, EnemyData> = {
   2: { name: '炭水化物・ザ・グレート', hp: 1500, maxHp: 1500, minAtk: 40, maxAtk: 55, image: '/images/carb_the_great.png', intro: '「血糖値を上げてやる……眠くなれぇ……」', bgImage: '/images/carb_the_great_bg.png' },
   3: { name: '魔王コレステロール・キング', hp: 3000, maxHp: 3000, minAtk: 70, maxAtk: 90, image: '/images/cholesterol_king.png', intro: '「我こそは成人病の王なり……健康など不要！」', bgImage: '/images/cholesterol_king_bg.png' },
   4: { name: 'スイーツ魔人ショートケーキ', hp: 2000, maxHp: 2000, minAtk: 50, maxAtk: 70, image: '/images/sweets_majin.png', intro: '「あま〜い罠から逃れられるかな？」', bgImage: '/images/sweets_majin_bg.png' },
-  5: { name: '深夜のラーメン怪人', hp: 4000, maxHp: 4000, minAtk: 80, maxAtk: 100, image: '/images/ramen_kaijin.png', intro: '「寝る前に…すすってけよ……」', bgImage: '/images/ramen_kaijin_bg.png' },
+  5: { name: '深夜のラーメン怪人', hp: 5000, maxHp: 5000, minAtk: 90, maxAtk: 120, image: '/images/ramen_kaijin.png', intro: '「寝る前に…すすってけよ……」', bgImage: '/images/ramen_kaijin_bg.png' },
   6: { name: '終わらない飲み会部長', hp: 2500, maxHp: 2500, minAtk: 60, maxAtk: 80, image: '/images/nomikai_bucho.png', intro: '「まだまだ帰さんぞ～！次行くぞ次！」', bgImage: '/images/nomikai_bucho_bg.png' },
 };
 
@@ -271,7 +271,7 @@ export const Battle = () => {
     if (items.aojiruPotion <= 0) { addLog('青汁ポーションがない！ ショップで購入しよう。'); return; }
     if (!useItem('aojiruPotion')) return;
     soundManager.playHeal();
-    const HEAL = 120;
+    const HEAL = 200;
     setPlayerHp(prev => {
       const next = Math.min(maxHp, prev + HEAL);
       addLog(`🧃 青汁ポーションを飲んだ！ HPが${next - prev}回復した。（残り${items.aojiruPotion - 1}個）`);
@@ -717,7 +717,7 @@ export const Battle = () => {
               { label: '攻撃 (Attack)', sub: null,           icon: <Sword size={24} />,   cls: 'from-red-900/70 to-gray-800 hover:from-red-800/80 hover:to-red-900/60 border-red-700/60 hover:border-red-400', textCls: 'text-red-100', subCls: undefined, iconCls: 'text-red-400 group-hover:text-red-300', fn: handleAttack },
               { label: '青汁スキル',   sub: 'Select Skill', icon: <Zap size={24} />,    cls: 'from-green-900/70 to-gray-800 hover:from-green-800/80 hover:to-green-900/60 border-green-700/60 hover:border-green-400', textCls: 'text-green-100', subCls: 'text-green-400', iconCls: 'text-green-400 group-hover:text-green-300', fn: () => setSkillMenu(true) },
               { label: '防御 (Guard)', sub: 'AOJIRU +10',   icon: <Shield size={24} />, cls: 'from-blue-900/70 to-gray-800 hover:from-blue-800/80 hover:to-blue-900/60 border-blue-700/60 hover:border-blue-400',   textCls: 'text-blue-100',  subCls: 'text-blue-300',  iconCls: 'text-blue-400 group-hover:text-blue-300',   fn: handleGuard },
-              { label: 'アイテム',     sub: `回復+120 (残${items.aojiruPotion})`,  icon: <Package size={24} />, cls: 'from-yellow-900/70 to-gray-800 hover:from-yellow-800/80 hover:to-yellow-900/60 border-yellow-700/60 hover:border-yellow-400', textCls: 'text-yellow-100', subCls: items.aojiruPotion > 0 ? 'text-yellow-300' : 'text-red-400', iconCls: 'text-yellow-400 group-hover:text-yellow-300', fn: handleItem },
+              { label: 'アイテム',     sub: `回復+200 (残${items.aojiruPotion})`,  icon: <Package size={24} />, cls: 'from-yellow-900/70 to-gray-800 hover:from-yellow-800/80 hover:to-yellow-900/60 border-yellow-700/60 hover:border-yellow-400', textCls: 'text-yellow-100', subCls: items.aojiruPotion > 0 ? 'text-yellow-300' : 'text-red-400', iconCls: 'text-yellow-400 group-hover:text-yellow-300', fn: handleItem },
             ] as const).map(({ label, sub, icon, cls, textCls, subCls, iconCls, fn }) => (
               <button key={label} onClick={() => fn()} disabled={disabled}
                 className={clsx('bg-gradient-to-br border rounded-lg flex items-center justify-center gap-2 transition-all active:scale-95 group disabled:opacity-40 disabled:cursor-not-allowed', cls)}>

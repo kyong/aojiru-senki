@@ -14,7 +14,7 @@ type ShopItem = {
 };
 
 const SHOP_ITEMS: ShopItem[] = [
-  { id: 'potion1',  name: '青汁ポーション×1',  description: 'HPを120回復する回復アイテム。',          emoji: '🧃', price: 500,   itemKey: 'aojiruPotion' },
+  { id: 'potion1',  name: '青汁ポーション×1',  description: 'HPを200回復する回復アイテム。',          emoji: '🧃', price: 500,   itemKey: 'aojiruPotion' },
   { id: 'potion5',  name: '青汁ポーション×5',  description: 'お得な5個セット！',                    emoji: '🧃', price: 2000,  itemKey: 'aojiruPotion' },
   { id: 'potion10', name: '青汁ポーション×10', description: 'まとめ買いでさらにお得！',              emoji: '🧃', price: 3500,  itemKey: 'aojiruPotion' },
   { id: 'chohado1', name: '超波動青汁×1',      description: 'クエスト開始時に使用。ATK+30%・HP+20%。', emoji: '🌀', price: 5000,  itemKey: 'choHadoAojiru' },
