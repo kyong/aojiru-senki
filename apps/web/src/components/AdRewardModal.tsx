@@ -335,6 +335,12 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
             <span className="text-xs text-gray-400">広告再生中...</span>
             <div className="flex items-center gap-3">
               <button
+                onClick={handleClose}
+                className="text-[10px] bg-red-500/20 hover:bg-red-500/40 text-red-400 px-2 py-0.5 rounded border border-red-500/30 transition-colors font-bold"
+              >
+                中断
+              </button>
+              <button
                 onClick={() => setMuted(m => !m)}
                 className="text-gray-400 hover:text-white transition-colors"
               >
