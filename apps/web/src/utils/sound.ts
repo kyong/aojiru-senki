@@ -10,6 +10,7 @@ class SoundManager {
   private bgmSource: MediaElementAudioSourceNode | null = null;
   private bgmGain: GainNode | null = null;
   private currentBgm: string | null = null;
+  private bgmPausedByApp: boolean = false;
 
   // Convolver for reverb
   private reverbNode: ConvolverNode | null = null;
@@ -102,6 +103,7 @@ class SoundManager {
     this.currentBgm = filename;
     this.bgmAudio = new Audio(`/assets/sounds/bgm/${filename}`);
     this.bgmAudio.loop = true;
+    this.bgmPausedByApp = false;
 
     this.bgmSource = this.ctx!.createMediaElementSource(this.bgmAudio);
     this.bgmSource.connect(this.bgmGain!);
@@ -437,9 +439,21 @@ class SoundManager {
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume();
     }
-    if (this.bgmAudio && this.bgmAudio.paused) {
+    if (this.bgmAudio && this.bgmAudio.paused && !this.bgmPausedByApp) {
       this.bgmAudio.play().catch(() => {});
     }
+  }
+
+  public pauseBGM() {
+    this.bgmPausedByApp = true;
+    if (this.bgmAudio) {
+      this.bgmAudio.pause();
+    }
+  }
+
+  public resumeBGM() {
+    this.bgmPausedByApp = false;
+    this.resume();
   }
 
   private createOsc(type: OscillatorType, freq: number, startTime: number): OscillatorNode {

@@ -2,6 +2,7 @@ import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { X, Play, Gem, Volume2, VolumeX } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useGame } from '../context/GameContext';
+import { soundManager } from '../utils/sound';
 
 import adVideo1 from '../assets/ad/132fd59fadd43415.mp4';
 import adVideo2 from '../assets/ad/e644b9242716b3d2.mp4';
@@ -106,6 +107,18 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
   const [fakes, setFakes] = useState<{ id: number; x: number; y: number }[]>([]);
   const [misses, setMisses] = useState<{ id: number; x: number; y: number }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
+
+  // Pause BGM when ad modal is open
+  useEffect(() => {
+    if (open) {
+      soundManager.pauseBGM();
+    }
+    return () => {
+      if (open) {
+        soundManager.resumeBGM();
+      }
+    };
+  }, [open]);
 
   const reset = useCallback(() => {
     setPhase('confirm');
