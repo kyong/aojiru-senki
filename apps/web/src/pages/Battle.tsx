@@ -152,29 +152,26 @@ export const Battle = () => {
       const debuffText = enemyAtkMultiplier < 1.0 ? '（敵ATK減少中！）' : '';
       setIsGuarding(false);
       setEnemyAttacking(false); // ランジ終了
-      
-      setPlayerHp(prev => {
-        const next = Math.max(0, prev - dmg);
-        
-        // 被ダメージ演出
-        soundManager.playHit();
-        setPlayerHit(true);
-        setIsShaking(true);
-        const damageId = Date.now();
-        setFloatingDamage(prev => [...prev, { id: damageId, value: `-${dmg}`, type: 'player' }]);
-        setTimeout(() => setPlayerHit(false), 200);
-        setTimeout(() => setIsShaking(false), 300);
-        setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1000);
 
-        if (next === 0) {
-          setGameState('GAMEOVER');
-          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージ${guardText}${debuffText}……倒れてしまった！`);
-        } else {
-          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージを受けた！${guardText}${debuffText}`);
-          setIsPlayerTurn(true);
-        }
-        return next;
-      });
+      // 被ダメージ演出（副作用はステートアップデーター外で実行）
+      soundManager.playHit();
+      setPlayerHit(true);
+      setIsShaking(true);
+      const damageId = Date.now();
+      setFloatingDamage(prev => [...prev, { id: damageId, value: `-${dmg}`, type: 'player' }]);
+      setTimeout(() => setPlayerHit(false), 200);
+      setTimeout(() => setIsShaking(false), 300);
+      setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1000);
+
+      const nextHp = Math.max(0, playerHp - dmg);
+      setPlayerHp(nextHp);
+      if (nextHp === 0) {
+        setGameState('GAMEOVER');
+        addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージ${guardText}${debuffText}……倒れてしまった！`);
+      } else {
+        addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージを受けた！${guardText}${debuffText}`);
+        setIsPlayerTurn(true);
+      }
     }, 1000); // 演出に合わせて少し遅らせる
   };
 

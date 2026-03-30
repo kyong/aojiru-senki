@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { GameProvider } from './context/GameContext';
 import { NavigationGuardProvider } from './context/NavigationGuardContext';
 import Home from './pages/Home';
@@ -16,6 +16,13 @@ import Splash from './pages/Splash';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
 
+/** location.state.retryKey が変わるたびに Battle を再マウントさせるラッパー */
+function BattleWrapper() {
+  const location = useLocation();
+  const key = (location.state as { retryKey?: number } | null)?.retryKey ?? 0;
+  return <Battle key={key} />;
+}
+
 function App() {
   const [hasLoaded, setHasLoaded] = useState(false);
 
@@ -29,7 +36,7 @@ function App() {
             <Routes>
               <Route path="/"        element={<Home />} />
               <Route path="/quest"   element={<QuestSelect />} />
-              <Route path="/battle"  element={<Battle />} />
+              <Route path="/battle"  element={<BattleWrapper />} />
               <Route path="/gacha"   element={<Gacha />} />
               <Route path="/gacha/list" element={<GachaList />} />
               <Route path="/character/:id" element={<CharacterDetail />} />

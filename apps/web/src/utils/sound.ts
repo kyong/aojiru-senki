@@ -1,6 +1,7 @@
 class SoundManager {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;
+  private seGain: GainNode | null = null;
   private seVolume: number = 0.8;
   private bgmVolume: number = 0.7;
   private isMuted: boolean = false;
@@ -20,7 +21,12 @@ class SoundManager {
     if (this.ctx) return;
     this.ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
     this.masterGain = this.ctx.createGain();
+    this.masterGain.gain.value = 1.0;
     this.masterGain.connect(this.ctx.destination);
+
+    // SE node setup
+    this.seGain = this.ctx.createGain();
+    this.seGain.connect(this.masterGain);
 
     // BGM node setup
     this.bgmGain = this.ctx.createGain();
@@ -33,7 +39,7 @@ class SoundManager {
   }
 
   private setupReverb() {
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const sampleRate = this.ctx.sampleRate;
     const length = sampleRate * 1.5; // 1.5 second reverb tail
     const impulse = this.ctx.createBuffer(2, length, sampleRate);
@@ -49,16 +55,16 @@ class SoundManager {
     this.reverbGain = this.ctx.createGain();
     this.reverbGain.gain.value = 0.15;
     this.reverbNode.connect(this.reverbGain);
-    this.reverbGain.connect(this.masterGain);
+    this.reverbGain.connect(this.seGain!);
   }
 
   private connectWithReverb(node: AudioNode, dryAmount: number = 1.0, wetAmount: number = 0.2) {
-    if (!this.masterGain) return;
+    if (!this.seGain) return;
     // Dry signal
     const dryGain = this.ctx!.createGain();
     dryGain.gain.value = dryAmount;
     node.connect(dryGain);
-    dryGain.connect(this.masterGain);
+    dryGain.connect(this.seGain);
     // Wet signal (reverb)
     if (this.reverbNode) {
       const wetGain = this.ctx!.createGain();
@@ -74,8 +80,8 @@ class SoundManager {
     const finalSeVolume = this.isMuted ? 0 : this.seVolume;
     const finalBgmVolume = this.isMuted ? 0 : this.bgmVolume;
 
-    if (this.masterGain) {
-      this.masterGain.gain.setTargetAtTime(finalSeVolume, now, 0.02);
+    if (this.seGain) {
+      this.seGain.gain.setTargetAtTime(finalSeVolume, now, 0.02);
     }
     if (this.bgmGain) {
       this.bgmGain.gain.setTargetAtTime(finalBgmVolume, now, 0.02);
@@ -127,7 +133,7 @@ class SoundManager {
   // Gacha Reveal Sound - Heavy, impactful gacha-style
   public playGachaReveal(rarity: string) {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
     const createTone = (freq: number, startTime: number, duration: number, vol: number, type: OscillatorType = 'triangle') => {
@@ -176,7 +182,7 @@ class SoundManager {
       subGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.8);
       sub.frequency.exponentialRampToValueAtTime(30, startTime + 0.5);
       sub.connect(subGain);
-      if (this.masterGain) subGain.connect(this.masterGain);
+      if (this.seGain) subGain.connect(this.seGain);
       sub.start(startTime);
       sub.stop(startTime + 0.8);
 
@@ -186,7 +192,7 @@ class SoundManager {
       sub2Gain.gain.setValueAtTime(vol * 0.6, startTime);
       sub2Gain.gain.exponentialRampToValueAtTime(0.001, startTime + 1.0);
       sub2.connect(sub2Gain);
-      if (this.masterGain) sub2Gain.connect(this.masterGain);
+      if (this.seGain) sub2Gain.connect(this.seGain);
       sub2.start(startTime);
       sub2.stop(startTime + 1.0);
 
@@ -208,7 +214,7 @@ class SoundManager {
       noiseGain.gain.exponentialRampToValueAtTime(0.001, startTime + 0.25);
       noise.connect(lpf);
       lpf.connect(noiseGain);
-      if (this.masterGain) noiseGain.connect(this.masterGain);
+      if (this.seGain) noiseGain.connect(this.seGain);
       noise.start(startTime);
       noise.stop(startTime + 0.3);
 
@@ -223,7 +229,7 @@ class SoundManager {
       crunchFilter.frequency.setValueAtTime(400, startTime);
       crunch.connect(crunchFilter);
       crunchFilter.connect(crunchGain);
-      if (this.masterGain) crunchGain.connect(this.masterGain);
+      if (this.seGain) crunchGain.connect(this.seGain);
       crunch.start(startTime);
       crunch.stop(startTime + 0.4);
     };
@@ -308,7 +314,7 @@ class SoundManager {
       swooshGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
       swoosh.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
       swoosh.connect(swooshGain);
-      if (this.masterGain) swooshGain.connect(this.masterGain);
+      if (this.seGain) swooshGain.connect(this.seGain);
       swoosh.start(now);
       swoosh.stop(now + 0.15);
       // Second swoosh layer
@@ -318,7 +324,7 @@ class SoundManager {
       swoosh2Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
       swoosh2.frequency.exponentialRampToValueAtTime(2400, now + 0.08);
       swoosh2.connect(swoosh2Gain);
-      if (this.masterGain) swoosh2Gain.connect(this.masterGain);
+      if (this.seGain) swoosh2Gain.connect(this.seGain);
       swoosh2.start(now);
       swoosh2.stop(now + 0.12);
       // Impact
@@ -346,7 +352,7 @@ class SoundManager {
   // Suspenseful Drumroll/Wait Sound - Heavy gacha anticipation
   public playGachaWait(duration: number) {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
     const totalSec = duration / 1000;
 
@@ -364,7 +370,7 @@ class SoundManager {
       gain.gain.linearRampToValueAtTime(vol, time + 0.01);
       gain.gain.exponentialRampToValueAtTime(0.001, time + 0.05);
       osc.connect(gain);
-      if (this.masterGain) gain.connect(this.masterGain);
+      if (this.seGain) gain.connect(this.seGain);
       osc.start(time);
       osc.stop(time + 0.05);
 
@@ -384,7 +390,7 @@ class SoundManager {
         nGain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
         src.connect(lpf);
         lpf.connect(nGain);
-        if (this.masterGain) nGain.connect(this.masterGain);
+        if (this.seGain) nGain.connect(this.seGain);
         src.start(time);
         src.stop(time + 0.04);
       }
@@ -397,7 +403,7 @@ class SoundManager {
         hiGain.gain.linearRampToValueAtTime(vol * 0.15, time + 0.005);
         hiGain.gain.exponentialRampToValueAtTime(0.001, time + 0.03);
         hiOsc.connect(hiGain);
-        if (this.masterGain) hiGain.connect(this.masterGain);
+        if (this.seGain) hiGain.connect(this.seGain);
         hiOsc.start(time);
         hiOsc.stop(time + 0.03);
       }
@@ -417,7 +423,7 @@ class SoundManager {
     tensionFilter.Q.setValueAtTime(3, now);
     tensionOsc.connect(tensionFilter);
     tensionFilter.connect(tensionGain);
-    if (this.masterGain) tensionGain.connect(this.masterGain);
+    if (this.seGain) tensionGain.connect(this.seGain);
     tensionOsc.start(now);
     tensionOsc.stop(now + totalSec);
 
@@ -429,7 +435,7 @@ class SoundManager {
     rumbleGain.gain.linearRampToValueAtTime(0.25, now + totalSec);
     rumble.frequency.linearRampToValueAtTime(60, now + totalSec);
     rumble.connect(rumbleGain);
-    if (this.masterGain) rumbleGain.connect(this.masterGain);
+    if (this.seGain) rumbleGain.connect(this.seGain);
     rumble.start(now);
     rumble.stop(now + totalSec);
   }
@@ -500,7 +506,7 @@ class SoundManager {
   // Sharp slash sound "Zusha" (ズシャッ！) - Multi-layered with impact
   public playAttack() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
     // Layer 1: Sub-bass body "ズ" - deeper and heavier
@@ -508,7 +514,7 @@ class SoundManager {
     const subGain = this.createGain(now, 0.12, 0.35);
     sub.frequency.exponentialRampToValueAtTime(30, now + 0.1);
     sub.connect(subGain);
-    if (this.masterGain) subGain.connect(this.masterGain);
+    if (this.seGain) subGain.connect(this.seGain);
     sub.start(now);
     sub.stop(now + 0.12);
 
@@ -517,7 +523,7 @@ class SoundManager {
     const gain = this.createGain(now, 0.18, 0.35);
     osc.frequency.exponentialRampToValueAtTime(40, now + 0.12);
     osc.connect(gain);
-    if (this.masterGain) gain.connect(this.masterGain);
+    if (this.seGain) gain.connect(this.seGain);
     osc.start(now);
     osc.stop(now + 0.18);
 
@@ -531,7 +537,7 @@ class SoundManager {
     const noiseGain = this.createGain(now, 0.2, 0.18);
     noise.connect(filter);
     filter.connect(noiseGain);
-    if (this.masterGain) noiseGain.connect(this.masterGain);
+    if (this.seGain) noiseGain.connect(this.seGain);
     noise.start(now);
     noise.stop(now + 0.2);
 
@@ -550,7 +556,7 @@ class SoundManager {
     const click = this.createOsc('square', 1500, now);
     const clickGain = this.createGain(now, 0.02, 0.15);
     click.connect(clickGain);
-    if (this.masterGain) clickGain.connect(this.masterGain);
+    if (this.seGain) clickGain.connect(this.seGain);
     click.start(now);
     click.stop(now + 0.02);
   }
@@ -558,7 +564,7 @@ class SoundManager {
   // Blunt hit sound - Heavy double impact with body
   public playHit() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
     // Layer 1: Sub-bass thud
@@ -566,7 +572,7 @@ class SoundManager {
     const thudGain = this.createGain(now, 0.15, 0.45);
     thud.frequency.exponentialRampToValueAtTime(30, now + 0.1);
     thud.connect(thudGain);
-    if (this.masterGain) thudGain.connect(this.masterGain);
+    if (this.seGain) thudGain.connect(this.seGain);
     thud.start(now);
     thud.stop(now + 0.15);
 
@@ -579,7 +585,7 @@ class SoundManager {
     const noiseGain = this.createGain(now, 0.12, 0.5);
     noise.connect(filter);
     filter.connect(noiseGain);
-    if (this.masterGain) noiseGain.connect(this.masterGain);
+    if (this.seGain) noiseGain.connect(this.seGain);
     noise.start(now);
     noise.stop(now + 0.12);
 
@@ -591,7 +597,7 @@ class SoundManager {
     const crackGain = this.createGain(now, 0.03, 0.12);
     crack.connect(hpf);
     hpf.connect(crackGain);
-    if (this.masterGain) crackGain.connect(this.masterGain);
+    if (this.seGain) crackGain.connect(this.seGain);
     crack.start(now);
     crack.stop(now + 0.03);
 
@@ -600,7 +606,7 @@ class SoundManager {
     const thud2Gain = this.createGain(now + 0.04, 0.1, 0.25);
     thud2.frequency.exponentialRampToValueAtTime(25, now + 0.12);
     thud2.connect(thud2Gain);
-    if (this.masterGain) thud2Gain.connect(this.masterGain);
+    if (this.seGain) thud2Gain.connect(this.seGain);
     thud2.start(now + 0.04);
     thud2.stop(now + 0.14);
   }
@@ -608,91 +614,144 @@ class SoundManager {
   // Shimmering Skill Heal (Luxurious harp-like with reverb)
   public playSkillHeal() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
-    // Harp-like ascending arpeggio with extended notes
-    const notes = [392.00, 523.25, 659.25, 783.99, 1046.50, 1318.51]; // G4, C5, E5, G5, C6, E6
-    notes.forEach((freq, i) => {
-      const timeOffset = i * 0.08;
-      // Main tone
-      const osc = this.ctx!.createOscillator();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + timeOffset);
-      osc.frequency.exponentialRampToValueAtTime(freq * 1.3, now + timeOffset + 0.8);
+    // === 回復魔法 "シュインシュインキラキラ！" ===
 
-      const gain = this.ctx!.createGain();
-      gain.gain.setValueAtTime(0, now + timeOffset);
-      gain.gain.linearRampToValueAtTime(0.18, now + timeOffset + 0.03);
-      gain.gain.setValueAtTime(0.15, now + timeOffset + 0.1);
-      gain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 1.0);
+    // Phase 1: "シュイン！" x2 - 上昇スイープ音を2回繰り返す (0.0s ~ 0.6s)
+    for (let rep = 0; rep < 2; rep++) {
+      const base = now + rep * 0.3;
 
-      osc.connect(gain);
-      this.connectWithReverb(gain, 0.8, 0.5);
-      osc.start(now + timeOffset);
-      osc.stop(now + timeOffset + 1.0);
+      // メインスイープ "シュイーン"
+      const sweep = this.createOsc('sine', 400, base);
+      sweep.frequency.exponentialRampToValueAtTime(2400, base + 0.2);
+      sweep.frequency.exponentialRampToValueAtTime(1800, base + 0.28);
+      const sweepGain = this.ctx.createGain();
+      sweepGain.gain.setValueAtTime(0, base);
+      sweepGain.gain.linearRampToValueAtTime(0.14, base + 0.03);
+      sweepGain.gain.setValueAtTime(0.12, base + 0.15);
+      sweepGain.gain.exponentialRampToValueAtTime(0.001, base + 0.28);
+      sweep.connect(sweepGain);
+      this.connectWithReverb(sweepGain, 0.7, 0.5);
+      sweep.start(base);
+      sweep.stop(base + 0.28);
 
-      // Harmonic overtone for richness
-      const harm = this.ctx!.createOscillator();
-      harm.type = 'sine';
-      harm.frequency.setValueAtTime(freq * 2, now + timeOffset);
-      const harmGain = this.ctx!.createGain();
-      harmGain.gain.setValueAtTime(0, now + timeOffset);
-      harmGain.gain.linearRampToValueAtTime(0.04, now + timeOffset + 0.03);
-      harmGain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.5);
-      harm.connect(harmGain);
-      this.connectWithReverb(harmGain, 0.8, 0.4);
-      harm.start(now + timeOffset);
-      harm.stop(now + timeOffset + 0.5);
+      // 倍音スイープ (きらめき感)
+      const harmSweep = this.createOsc('triangle', 800, base);
+      harmSweep.frequency.exponentialRampToValueAtTime(4800, base + 0.2);
+      const harmSweepGain = this.ctx.createGain();
+      harmSweepGain.gain.setValueAtTime(0, base);
+      harmSweepGain.gain.linearRampToValueAtTime(0.05, base + 0.03);
+      harmSweepGain.gain.exponentialRampToValueAtTime(0.001, base + 0.22);
+      harmSweep.connect(harmSweepGain);
+      this.connectWithReverb(harmSweepGain, 0.6, 0.5);
+      harmSweep.start(base);
+      harmSweep.stop(base + 0.22);
 
-      // Shimmer pulse
-      const pulseOsc = this.ctx!.createOscillator();
-      pulseOsc.type = 'triangle';
-      pulseOsc.frequency.setValueAtTime(freq * 3, now + timeOffset);
-      const pulseGain = this.ctx!.createGain();
-      pulseGain.gain.setValueAtTime(0, now + timeOffset);
-      pulseGain.gain.linearRampToValueAtTime(0.02, now + timeOffset + 0.02);
-      pulseGain.gain.exponentialRampToValueAtTime(0.001, now + timeOffset + 0.25);
-      pulseOsc.connect(pulseGain);
-      this.connectWithReverb(pulseGain, 0.7, 0.5);
-      pulseOsc.start(now + timeOffset);
-      pulseOsc.stop(now + timeOffset + 0.25);
+      // スイープに伴うシュワノイズ
+      const sweepNoise = this.createNoise(0.25, true);
+      const sweepBpf = this.ctx.createBiquadFilter();
+      sweepBpf.type = 'bandpass';
+      sweepBpf.frequency.setValueAtTime(2000, base);
+      sweepBpf.frequency.exponentialRampToValueAtTime(8000, base + 0.2);
+      sweepBpf.Q.setValueAtTime(2, base);
+      const sweepNoiseGain = this.ctx.createGain();
+      sweepNoiseGain.gain.setValueAtTime(0, base);
+      sweepNoiseGain.gain.linearRampToValueAtTime(0.05, base + 0.03);
+      sweepNoiseGain.gain.exponentialRampToValueAtTime(0.001, base + 0.25);
+      sweepNoise.connect(sweepBpf);
+      sweepBpf.connect(sweepNoiseGain);
+      this.connectWithReverb(sweepNoiseGain, 0.5, 0.4);
+      sweepNoise.start(base);
+      sweepNoise.stop(base + 0.25);
+    }
+
+    // Phase 2: "キラキラ！" - 高域のベルトーン連打 (0.5s ~ 1.2s)
+    const sparkleNotes = [1318.51, 1567.98, 2093.00, 1760.00, 2349.32, 2637.02, 3135.96]; // E6, G6, C7, A6, D7, E7, G7
+    sparkleNotes.forEach((freq, i) => {
+      const t = now + 0.5 + i * 0.07;
+
+      // ベルトーン (キラッ)
+      const bell = this.createOsc('sine', freq, t);
+      const bellGain = this.ctx!.createGain();
+      bellGain.gain.setValueAtTime(0, t);
+      bellGain.gain.linearRampToValueAtTime(0.12, t + 0.01);
+      bellGain.gain.exponentialRampToValueAtTime(0.001, t + 0.35);
+      bell.connect(bellGain);
+      this.connectWithReverb(bellGain, 0.6, 0.6);
+      bell.start(t);
+      bell.stop(t + 0.35);
+
+      // 高次倍音 (キラッの輝き部分)
+      const shimmer = this.createOsc('sine', freq * 2.5, t);
+      const shimmerGain = this.ctx!.createGain();
+      shimmerGain.gain.setValueAtTime(0, t);
+      shimmerGain.gain.linearRampToValueAtTime(0.03, t + 0.008);
+      shimmerGain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+      shimmer.connect(shimmerGain);
+      this.connectWithReverb(shimmerGain, 0.5, 0.7);
+      shimmer.start(t);
+      shimmer.stop(t + 0.15);
     });
 
-    // Warm pad sustain underneath
-    [523.25, 659.25, 783.99].forEach(f => {
-      const pad = this.createOsc('sine', f, now + 0.2);
+    // Phase 3: 温かいパッドの和音 - 癒し感の下地 (0.3s ~ 1.5s)
+    [523.25, 659.25, 783.99, 1046.50].forEach((f) => { // C5, E5, G5, C6
+      const pad = this.createOsc('sine', f, now + 0.3);
       const padGain = this.ctx!.createGain();
-      padGain.gain.setValueAtTime(0, now + 0.2);
-      padGain.gain.linearRampToValueAtTime(0.05, now + 0.5);
+      padGain.gain.setValueAtTime(0, now + 0.3);
+      padGain.gain.linearRampToValueAtTime(0.04, now + 0.6);
       padGain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
       pad.connect(padGain);
-      this.connectWithReverb(padGain, 0.6, 0.6);
-      pad.start(now + 0.2);
+      this.connectWithReverb(padGain, 0.5, 0.7);
+      pad.start(now + 0.3);
       pad.stop(now + 1.5);
     });
 
-    // Shimmering Noise - stereo sparkle
-    const noise = this.createNoise(0.8, true);
-    const filter = this.ctx.createBiquadFilter();
-    filter.type = 'highpass';
-    filter.frequency.setValueAtTime(4000, now);
-    filter.Q.setValueAtTime(2, now);
-    const noiseGain = this.ctx!.createGain();
-    noiseGain.gain.setValueAtTime(0, now);
-    noiseGain.gain.linearRampToValueAtTime(0.04, now + 0.15);
-    noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.8);
-    noise.connect(filter);
-    filter.connect(noiseGain);
-    this.connectWithReverb(noiseGain, 0.7, 0.5);
-    noise.start(now);
-    noise.stop(now + 0.8);
+    // Phase 4: ステレオキラキラノイズ - 全体にまぶす星屑感 (0.4s ~ 1.3s)
+    const sparkleNoise = this.createNoise(1.0, true);
+    const sparkleHpf = this.ctx.createBiquadFilter();
+    sparkleHpf.type = 'highpass';
+    sparkleHpf.frequency.setValueAtTime(6000, now + 0.4);
+    sparkleHpf.Q.setValueAtTime(3, now + 0.4);
+    const sparkleNoiseGain = this.ctx.createGain();
+    sparkleNoiseGain.gain.setValueAtTime(0, now + 0.4);
+    sparkleNoiseGain.gain.linearRampToValueAtTime(0.05, now + 0.55);
+    sparkleNoiseGain.gain.setValueAtTime(0.05, now + 0.8);
+    sparkleNoiseGain.gain.exponentialRampToValueAtTime(0.001, now + 1.3);
+    sparkleNoise.connect(sparkleHpf);
+    sparkleHpf.connect(sparkleNoiseGain);
+    this.connectWithReverb(sparkleNoiseGain, 0.5, 0.6);
+    sparkleNoise.start(now + 0.4);
+    sparkleNoise.stop(now + 1.4);
+
+    // 仕上げ: 最後の "キラーン！" (1.0s ~ 1.6s)
+    const finalBell = this.createOsc('sine', 2093.00, now + 1.0); // C7
+    finalBell.frequency.exponentialRampToValueAtTime(2093.00 * 1.02, now + 1.5);
+    const finalBellGain = this.ctx.createGain();
+    finalBellGain.gain.setValueAtTime(0, now + 1.0);
+    finalBellGain.gain.linearRampToValueAtTime(0.1, now + 1.02);
+    finalBellGain.gain.exponentialRampToValueAtTime(0.001, now + 1.6);
+    finalBell.connect(finalBellGain);
+    this.connectWithReverb(finalBellGain, 0.5, 0.8);
+    finalBell.start(now + 1.0);
+    finalBell.stop(now + 1.6);
+
+    const finalHarm = this.createOsc('sine', 2093.00 * 3, now + 1.0);
+    const finalHarmGain = this.ctx.createGain();
+    finalHarmGain.gain.setValueAtTime(0, now + 1.0);
+    finalHarmGain.gain.linearRampToValueAtTime(0.025, now + 1.015);
+    finalHarmGain.gain.exponentialRampToValueAtTime(0.001, now + 1.3);
+    finalHarm.connect(finalHarmGain);
+    this.connectWithReverb(finalHarmGain, 0.4, 0.7);
+    finalHarm.start(now + 1.0);
+    finalHarm.stop(now + 1.3);
   }
 
   // Simple Item Heal - Brighter, more sparkly
   public playHeal() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
     const healNotes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
@@ -731,116 +790,156 @@ class SoundManager {
   // Aojiru skill sound "トクトクトク...ドバシャーッ！" - More dramatic
   public playSkill() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
-    // "トクトクトク" - Pouring bubbles, denser and more resonant
-    for (let i = 0; i < 7; i++) {
-      const t = now + i * 0.065;
-      const freq = 260 + Math.random() * 100;
-      const osc = this.createOsc('sine', freq, t);
-      const gain = this.ctx.createGain();
-      gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.14, t + 0.012);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.055);
-      osc.frequency.exponentialRampToValueAtTime(freq * 0.55, t + 0.045);
-      osc.connect(gain);
-      if (this.masterGain) gain.connect(this.masterGain);
-      osc.start(t);
-      osc.stop(t + 0.055);
+    // === 水属性攻撃魔法 "翠水の波動" ===
 
-      // Add resonant "glug" undertone
-      if (i % 2 === 0) {
-        const glug = this.createOsc('sine', freq * 0.5, t);
-        const glugGain = this.ctx.createGain();
-        glugGain.gain.setValueAtTime(0, t);
-        glugGain.gain.linearRampToValueAtTime(0.06, t + 0.01);
-        glugGain.gain.exponentialRampToValueAtTime(0.001, t + 0.04);
-        glug.connect(glugGain);
-        if (this.masterGain) glugGain.connect(this.masterGain);
-        glug.start(t);
-        glug.stop(t + 0.04);
-      }
-    }
+    // Phase 1: 詠唱 "シュイーン" - 水が渦を巻いて集まる (0.0s ~ 0.35s)
+    const chargeOsc = this.createOsc('sine', 220, now);
+    chargeOsc.frequency.exponentialRampToValueAtTime(880, now + 0.3);
+    const chargeGain = this.ctx.createGain();
+    chargeGain.gain.setValueAtTime(0, now);
+    chargeGain.gain.linearRampToValueAtTime(0.15, now + 0.05);
+    chargeGain.gain.setValueAtTime(0.15, now + 0.2);
+    chargeGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    chargeOsc.connect(chargeGain);
+    this.connectWithReverb(chargeGain, 0.7, 0.5);
+    chargeOsc.start(now);
+    chargeOsc.stop(now + 0.35);
 
-    // "ドバシャーッ！" - Bigger splash impact at 0.45s
-    const splashStart = now + 0.45;
+    // 詠唱の倍音レイヤー
+    const chargeHarm = this.createOsc('triangle', 440, now);
+    chargeHarm.frequency.exponentialRampToValueAtTime(1760, now + 0.3);
+    const chargeHarmGain = this.ctx.createGain();
+    chargeHarmGain.gain.setValueAtTime(0, now);
+    chargeHarmGain.gain.linearRampToValueAtTime(0.06, now + 0.05);
+    chargeHarmGain.gain.exponentialRampToValueAtTime(0.001, now + 0.3);
+    chargeHarm.connect(chargeHarmGain);
+    this.connectWithReverb(chargeHarmGain, 0.6, 0.4);
+    chargeHarm.start(now);
+    chargeHarm.stop(now + 0.3);
 
-    // Heavy body of splash - doubled
-    const splashOsc = this.createOsc('sine', 140, splashStart);
+    // 水流ノイズ (チャージ中)
+    const chargeNoise = this.createNoise(0.35, true);
+    const chargeBpf = this.ctx.createBiquadFilter();
+    chargeBpf.type = 'bandpass';
+    chargeBpf.frequency.setValueAtTime(1000, now);
+    chargeBpf.frequency.exponentialRampToValueAtTime(4000, now + 0.3);
+    chargeBpf.Q.setValueAtTime(3, now);
+    const chargeNoiseGain = this.ctx.createGain();
+    chargeNoiseGain.gain.setValueAtTime(0, now);
+    chargeNoiseGain.gain.linearRampToValueAtTime(0.08, now + 0.1);
+    chargeNoiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+    chargeNoise.connect(chargeBpf);
+    chargeBpf.connect(chargeNoiseGain);
+    this.connectWithReverb(chargeNoiseGain, 0.7, 0.4);
+    chargeNoise.start(now);
+    chargeNoise.stop(now + 0.35);
+
+    // Phase 2: 発射 "ドゴォン！" - 水の衝撃波 (0.35s)
+    const impactTime = now + 0.35;
+
+    // 重低音インパクト
+    const impactOsc = this.createOsc('sine', 80, impactTime);
+    impactOsc.frequency.exponentialRampToValueAtTime(30, impactTime + 0.3);
+    const impactGain = this.ctx.createGain();
+    impactGain.gain.setValueAtTime(0.35, impactTime);
+    impactGain.gain.exponentialRampToValueAtTime(0.001, impactTime + 0.4);
+    impactOsc.connect(impactGain);
+    this.connectWithReverb(impactGain, 0.9, 0.3);
+    impactOsc.start(impactTime);
+    impactOsc.stop(impactTime + 0.4);
+
+    // 中域の衝撃波
+    const midImpact = this.createOsc('sawtooth', 150, impactTime);
+    midImpact.frequency.exponentialRampToValueAtTime(60, impactTime + 0.15);
+    const midImpactGain = this.ctx.createGain();
+    midImpactGain.gain.setValueAtTime(0.12, impactTime);
+    midImpactGain.gain.exponentialRampToValueAtTime(0.001, impactTime + 0.2);
+    const midLpf = this.ctx.createBiquadFilter();
+    midLpf.type = 'lowpass';
+    midLpf.frequency.setValueAtTime(800, impactTime);
+    midImpact.connect(midLpf);
+    midLpf.connect(midImpactGain);
+    this.connectWithReverb(midImpactGain, 0.8, 0.4);
+    midImpact.start(impactTime);
+    midImpact.stop(impactTime + 0.2);
+
+    // Phase 3: 水流の爆発 "ザバァーッ！" - ノイズ + フィルタスイープ (0.35s ~ 0.9s)
+    const burstNoise = this.createNoise(0.6, true);
+    const burstBpf = this.ctx.createBiquadFilter();
+    burstBpf.type = 'bandpass';
+    burstBpf.frequency.setValueAtTime(3000, impactTime);
+    burstBpf.frequency.exponentialRampToValueAtTime(300, impactTime + 0.5);
+    burstBpf.Q.setValueAtTime(1.5, impactTime);
+    const burstGain = this.ctx.createGain();
+    burstGain.gain.setValueAtTime(0.25, impactTime);
+    burstGain.gain.exponentialRampToValueAtTime(0.001, impactTime + 0.55);
+    burstNoise.connect(burstBpf);
+    burstBpf.connect(burstGain);
+    this.connectWithReverb(burstGain, 0.8, 0.4);
+    burstNoise.start(impactTime);
+    burstNoise.stop(impactTime + 0.6);
+
+    // 水しぶき高域
+    const splashNoise = this.createNoise(0.3);
+    const splashHpf = this.ctx.createBiquadFilter();
+    splashHpf.type = 'highpass';
+    splashHpf.frequency.setValueAtTime(5000, impactTime + 0.05);
     const splashGain = this.ctx.createGain();
-    splashGain.gain.setValueAtTime(0.3, splashStart);
-    splashGain.gain.exponentialRampToValueAtTime(0.001, splashStart + 0.35);
-    splashOsc.frequency.exponentialRampToValueAtTime(50, splashStart + 0.25);
-    splashOsc.connect(splashGain);
-    if (this.masterGain) splashGain.connect(this.masterGain);
-    splashOsc.start(splashStart);
-    splashOsc.stop(splashStart + 0.35);
+    splashGain.gain.setValueAtTime(0.1, impactTime + 0.05);
+    splashGain.gain.exponentialRampToValueAtTime(0.001, impactTime + 0.3);
+    splashNoise.connect(splashHpf);
+    splashHpf.connect(splashGain);
+    this.connectWithReverb(splashGain, 0.6, 0.5);
+    splashNoise.start(impactTime + 0.05);
+    splashNoise.stop(impactTime + 0.35);
 
-    // Sub-bass layer
-    const subSplash = this.createOsc('sine', 70, splashStart);
-    const subGain = this.ctx.createGain();
-    subGain.gain.setValueAtTime(0.2, splashStart);
-    subGain.gain.exponentialRampToValueAtTime(0.001, splashStart + 0.4);
-    subSplash.connect(subGain);
-    if (this.masterGain) subGain.connect(this.masterGain);
-    subSplash.start(splashStart);
-    subSplash.stop(splashStart + 0.4);
-
-    // Filtered noise for water/splash texture - wider
-    const noise = this.createNoise(0.45, true);
-    const bpf = this.ctx.createBiquadFilter();
-    bpf.type = 'bandpass';
-    bpf.frequency.setValueAtTime(2500, splashStart);
-    bpf.frequency.exponentialRampToValueAtTime(500, splashStart + 0.4);
-    bpf.Q.setValueAtTime(1.2, splashStart);
-    const nGain = this.ctx.createGain();
-    nGain.gain.setValueAtTime(0.22, splashStart);
-    nGain.gain.exponentialRampToValueAtTime(0.001, splashStart + 0.4);
-    noise.connect(bpf);
-    bpf.connect(nGain);
-    if (this.masterGain) nGain.connect(this.masterGain);
-    noise.start(splashStart);
-    noise.stop(splashStart + 0.45);
-
-    // High splash droplets
-    const drops = this.createNoise(0.2);
-    const dropsHpf = this.ctx.createBiquadFilter();
-    dropsHpf.type = 'highpass';
-    dropsHpf.frequency.setValueAtTime(4000, splashStart + 0.05);
-    const dropsGain = this.createGain(splashStart + 0.05, 0.2, 0.08);
-    drops.connect(dropsHpf);
-    dropsHpf.connect(dropsGain);
-    if (this.masterGain) dropsGain.connect(this.masterGain);
-    drops.start(splashStart + 0.05);
-    drops.stop(splashStart + 0.25);
-
-    // Bright "power-up" shimmer - fuller chord with reverb
-    [392.00, 523.25, 659.25, 783.99, 1046.50].forEach((f, i) => {
-      const t = splashStart + 0.15 + i * 0.05;
+    // Phase 4: 魔法の残響 - 和音の余韻 (0.5s ~ 1.2s)
+    // 水属性らしい清涼感のあるマイナー系和音
+    [329.63, 493.88, 659.25, 987.77].forEach((f, i) => { // E4, B4, E5, B5
+      const t = impactTime + 0.15 + i * 0.04;
       const osc = this.createOsc('sine', f, t);
+      osc.frequency.exponentialRampToValueAtTime(f * 1.05, t + 0.6);
       const gain = this.ctx!.createGain();
       gain.gain.setValueAtTime(0, t);
-      gain.gain.linearRampToValueAtTime(0.08, t + 0.025);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.5);
+      gain.gain.linearRampToValueAtTime(0.07, t + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.001, t + 0.6);
       osc.connect(gain);
-      this.connectWithReverb(gain, 0.8, 0.35);
+      this.connectWithReverb(gain, 0.6, 0.6);
       osc.start(t);
-      osc.stop(t + 0.5);
+      osc.stop(t + 0.6);
     });
+
+    // 水泡 "ポコポコ" (着弾後の演出)
+    for (let i = 0; i < 5; i++) {
+      const t = impactTime + 0.2 + i * 0.07 + Math.random() * 0.03;
+      const freq = 600 + Math.random() * 400;
+      const bubble = this.createOsc('sine', freq, t);
+      bubble.frequency.exponentialRampToValueAtTime(freq * 0.4, t + 0.06);
+      const bGain = this.ctx.createGain();
+      bGain.gain.setValueAtTime(0, t);
+      bGain.gain.linearRampToValueAtTime(0.06, t + 0.008);
+      bGain.gain.exponentialRampToValueAtTime(0.001, t + 0.06);
+      bubble.connect(bGain);
+      this.connectWithReverb(bGain, 0.8, 0.3);
+      bubble.start(t);
+      bubble.stop(t + 0.06);
+    }
   }
 
   // UI click "Pikori" (ピコリ) - Richer with harmonic
   public playPikori() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
     // Note 1 (ピ) - brighter
     const osc1 = this.createOsc('sine', 880, now);
     const gain1 = this.createGain(now, 0.06, 0.12);
     osc1.connect(gain1);
-    if (this.masterGain) gain1.connect(this.masterGain);
+    if (this.seGain) gain1.connect(this.seGain);
     osc1.start(now);
     osc1.stop(now + 0.06);
 
@@ -848,7 +947,7 @@ class SoundManager {
     const osc2 = this.createOsc('sine', 1100, now + 0.05);
     const gain2 = this.createGain(now + 0.05, 0.05, 0.1);
     osc2.connect(gain2);
-    if (this.masterGain) gain2.connect(this.masterGain);
+    if (this.seGain) gain2.connect(this.seGain);
     osc2.start(now + 0.05);
     osc2.stop(now + 0.1);
 
@@ -864,7 +963,7 @@ class SoundManager {
     const harm = this.createOsc('triangle', 2200, now + 0.05);
     const harmGain = this.createGain(now + 0.05, 0.06, 0.02);
     harm.connect(harmGain);
-    if (this.masterGain) harmGain.connect(this.masterGain);
+    if (this.seGain) harmGain.connect(this.seGain);
     harm.start(now + 0.05);
     harm.stop(now + 0.11);
   }
@@ -877,7 +976,7 @@ class SoundManager {
   // Sortie / Departure sound "ドゥン！→シュイーン！" - Epic orchestral feel
   public playSortie() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
     // Heavy low impact "ドゥン！" - Layered
@@ -887,7 +986,7 @@ class SoundManager {
     subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
     sub.frequency.exponentialRampToValueAtTime(35, now + 0.35);
     sub.connect(subGain);
-    if (this.masterGain) subGain.connect(this.masterGain);
+    if (this.seGain) subGain.connect(this.seGain);
     sub.start(now);
     sub.stop(now + 0.45);
 
@@ -897,7 +996,7 @@ class SoundManager {
     sub2Gain.gain.setValueAtTime(0.3, now);
     sub2Gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
     sub2.connect(sub2Gain);
-    if (this.masterGain) sub2Gain.connect(this.masterGain);
+    if (this.seGain) sub2Gain.connect(this.seGain);
     sub2.start(now);
     sub2.stop(now + 0.5);
 
@@ -912,7 +1011,7 @@ class SoundManager {
     nGain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
     noise.connect(lpf);
     lpf.connect(nGain);
-    if (this.masterGain) nGain.connect(this.masterGain);
+    if (this.seGain) nGain.connect(this.seGain);
     noise.start(now);
     noise.stop(now + 0.18);
 
@@ -920,7 +1019,7 @@ class SoundManager {
     const transient = this.createNoise(0.02);
     const tGain = this.createGain(now, 0.02, 0.2);
     transient.connect(tGain);
-    if (this.masterGain) tGain.connect(this.masterGain);
+    if (this.seGain) tGain.connect(this.seGain);
     transient.start(now);
     transient.stop(now + 0.02);
 
@@ -994,7 +1093,7 @@ class SoundManager {
   // Victory Fanfare - Grand and triumphant
   public playWin() {
     this.resume();
-    if (!this.ctx || !this.masterGain) return;
+    if (!this.ctx || !this.seGain) return;
     const now = this.ctx.currentTime;
 
     // Timpani hit to start
@@ -1004,7 +1103,7 @@ class SoundManager {
     timpGain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
     timpani.frequency.exponentialRampToValueAtTime(40, now + 0.3);
     timpani.connect(timpGain);
-    if (this.masterGain) timpGain.connect(this.masterGain);
+    if (this.seGain) timpGain.connect(this.seGain);
     timpani.start(now);
     timpani.stop(now + 0.5);
 
@@ -1016,7 +1115,7 @@ class SoundManager {
     const timpNoiseGain = this.createGain(now, 0.15, 0.15);
     timpNoise.connect(timpLpf);
     timpLpf.connect(timpNoiseGain);
-    if (this.masterGain) timpNoiseGain.connect(this.masterGain);
+    if (this.seGain) timpNoiseGain.connect(this.seGain);
     timpNoise.start(now);
     timpNoise.stop(now + 0.15);
 
