@@ -18,6 +18,9 @@ export const WelcomeModal: React.FC = () => {
 
   const handleStart = () => {
     updateSettings({ isFirstLaunch: false });
+    if (!settings.isMuted) {
+      soundManager.playPikori();
+    }
     soundManager.resumeBGM();
   };
 
