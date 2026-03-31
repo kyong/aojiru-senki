@@ -109,15 +109,27 @@ const Home = () => {
               <h3 className="font-bold text-gray-200">運営からのお知らせ</h3>
             </div>
             <div className="p-4 space-y-3 overflow-y-auto flex-1">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600">
-                  <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 whitespace-nowrap">NEWS</span>
-                  <div>
-                    <p className="text-sm text-gray-200 font-medium">「聖なる苦味のワンデイ・ウォー」イベント開始！</p>
-                    <p className="text-xs text-gray-500 mt-1">2026/04/01 12:00</p>
-                  </div>
+              <div className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600">
+                <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 whitespace-nowrap">NEWS</span>
+                <div>
+                  <p className="text-sm text-gray-200 font-medium">「聖なる苦味のワンデイ・ウォー」イベント開始！</p>
+                  <p className="text-xs text-gray-500 mt-1">2026/04/01 00:00</p>
                 </div>
-              ))}
+              </div>
+              <div className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600">
+                <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 whitespace-nowrap">NEWS</span>
+                <div>
+                  <p className="text-sm text-gray-200 font-medium">開設記念キャンペーン ゴールド配布中</p>
+                  <p className="text-xs text-gray-500 mt-1">2026/04/01 00:00</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600">
+                <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 whitespace-nowrap">NEWS</span>
+                <div>
+                  <p className="text-sm text-gray-200 font-medium">「青汁戦記」リリース！</p>
+                  <p className="text-xs text-gray-500 mt-1">2026/04/01 00:00</p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
