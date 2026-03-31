@@ -163,15 +163,17 @@ export const Battle = () => {
       setTimeout(() => setIsShaking(false), 300);
       setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1000);
 
-      const nextHp = Math.max(0, playerHp - dmg);
-      setPlayerHp(nextHp);
-      if (nextHp === 0) {
-        setGameState('GAMEOVER');
-        addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージ${guardText}${debuffText}……倒れてしまった！`);
-      } else {
-        addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージを受けた！${guardText}${debuffText}`);
-        setIsPlayerTurn(true);
-      }
+      setPlayerHp(prev => {
+        const nextHp = Math.max(0, prev - dmg);
+        if (nextHp === 0) {
+          setGameState('GAMEOVER');
+          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージ${guardText}${debuffText}……倒れてしまった！`);
+        } else {
+          addLog(`${enemyData.name}の攻撃！ ${dmg}のダメージを受けた！${guardText}${debuffText}`);
+          setIsPlayerTurn(true);
+        }
+        return nextHp;
+      });
     }, 1000); // 演出に合わせて少し遅らせる
   };
 

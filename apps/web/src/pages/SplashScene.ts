@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 export default class SplashScene extends Phaser.Scene {
   private isLandscape: boolean = true;
   private bg!: Phaser.GameObjects.Image;
-  private titleText!: Phaser.GameObjects.Text;
+  private logo!: Phaser.GameObjects.Image;
   private subText!: Phaser.GameObjects.Text;
 
   constructor() {
@@ -12,6 +12,7 @@ export default class SplashScene extends Phaser.Scene {
 
   preload() {
     this.load.image('splash_bg', '/images/splash_bg.png');
+    this.load.image('logo', '/images/logo.png');
 
     // フェイクのローディングプログレス生成用
     for (let i = 0; i < 50; i++) {
@@ -26,16 +27,9 @@ export default class SplashScene extends Phaser.Scene {
     // 1. 背景の配置 (リサイズ対応のため参照保持)
     this.bg = this.add.image(width / 2, height / 2, 'splash_bg');
 
-    // 2. タイトルテキストの配置
-    this.titleText = this.add.text(width / 2, height / 2 + (this.isLandscape ? 120 : 60), '青汁戦記', {
-      fontFamily: '"Helvetica Neue", Arial, sans-serif',
-      fontSize: this.isLandscape ? '48px' : '40px',
-      fontStyle: 'bold',
-      color: '#4ade80',
-      stroke: '#064e3b',
-      strokeThickness: 8,
-      shadow: { blur: 10, color: '#22c55e', fill: true }
-    }).setOrigin(0.5);
+    // 2. ロゴ画像の配置（画面幅基準でリサイズ）
+    this.logo = this.add.image(width / 2, height / 2 + (this.isLandscape ? 120 : 60), 'logo').setOrigin(0.5);
+    this.logo.setDisplaySize(this.getLogoWidth(width), this.getLogoWidth(width) * (this.logo.height / this.logo.width));
 
     this.subText = this.add.text(width / 2, height / 2 + (this.isLandscape ? 180 : 110), '～苦味の果てに待つ健やかな世界～', {
       fontFamily: '"Helvetica Neue", Arial, sans-serif',
@@ -104,12 +98,18 @@ export default class SplashScene extends Phaser.Scene {
     }
   }
 
-  private updateLayout(width: number, height: number) {
-    if (!this.titleText) return;
+  private getLogoWidth(screenWidth: number): number {
+    // PC: 画面幅の30%, スマホ: 画面幅の60%
+    return screenWidth * (this.isLandscape ? 0.3 : 0.6);
+  }
 
-    // テキスト配置
-    this.titleText.setPosition(width / 2, height / 2 + (this.isLandscape ? 150 : 90));
-    this.titleText.setFontSize(this.isLandscape ? '48px' : '40px');
+  private updateLayout(width: number, height: number) {
+    if (!this.logo) return;
+
+    // ロゴ配置（画面幅基準でリサイズ）
+    this.logo.setPosition(width / 2, height / 2 + (this.isLandscape ? 150 : 90));
+    const logoW = this.getLogoWidth(width);
+    this.logo.setDisplaySize(logoW, logoW * (this.logo.height / this.logo.width));
 
     this.subText.setPosition(width / 2, height / 2 + (this.isLandscape ? 210 : 140));
     this.subText.setFontSize(this.isLandscape ? '20px' : '16px');

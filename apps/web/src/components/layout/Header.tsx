@@ -27,10 +27,8 @@ export const Header: React.FC = () => {
         className="flex items-center gap-2 flex-shrink-0 cursor-pointer group active:scale-95 transition-transform"
         onClick={() => { soundManager.playPikori(); navigate('/'); }}
       >
-        <h1 className="font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent text-[10px] leading-tight md:text-[3.2em] md:leading-[1.1] md:whitespace-nowrap md:tracking-normal group-hover:from-green-300 group-hover:to-emerald-500 transition-all">
-          <span className="md:hidden">青汁<br />戦記</span>
-          <span className="hidden md:inline">青汁戦記</span>
-        </h1>
+        <img src="/images/logo_sp.png" alt="青汁戦記" className="h-10 md:hidden" />
+        <img src="/images/logo.png" alt="青汁戦記" className="hidden md:block h-12" />
       </div>
 
       <div className="flex items-center gap-1.5 md:gap-3">
