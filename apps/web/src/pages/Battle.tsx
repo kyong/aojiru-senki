@@ -46,10 +46,11 @@ export const Battle = () => {
   const { consumeAp, addGold, addGems, addExp, getBattleStats, markQuestCleared, items, useItem, party } = useGame();
 
   const questId = (location.state?.questId as number) || 1;
+  const isRetry = !!(location.state as { retryKey?: number } | null)?.retryKey;
   const enemyData = ENEMIES[questId] || ENEMIES[1];
   const quest = QUEST_MAP[questId];
 
-  const [gameState, setGameState] = useState<'STORY' | 'PREP' | 'BATTLE' | 'WIN' | 'GAMEOVER'>('STORY');
+  const [gameState, setGameState] = useState<'STORY' | 'PREP' | 'BATTLE' | 'WIN' | 'GAMEOVER'>(isRetry ? 'PREP' : 'STORY');
   const [choHadoBuff, setChoHadoBuff] = useState(false);
 
   // 編成ステータスをバトル開始時に確定（超波動青汁バフ適用）
@@ -100,6 +101,8 @@ export const Battle = () => {
   useEffect(() => {
     if (gameState === 'STORY') {
       soundManager.playBGM('story.mp3');
+    } else if (gameState === 'PREP') {
+      soundManager.playBGM('ready.mp3');
     } else if (gameState === 'BATTLE') {
       soundManager.playBGM(quest?.bgm || 'battle.mp3');
     } else if (gameState === 'WIN') {
@@ -489,7 +492,7 @@ export const Battle = () => {
           <p className="text-sm text-gray-500 mb-6 md:mb-8">健康は一日にして成らず……</p>
           <div className="flex flex-col md:flex-row gap-3 md:gap-4 justify-center">
             <button onClick={() => navigate('/quest')} className="px-6 md:px-8 py-3 bg-gray-800 hover:bg-gray-700 border border-gray-600 rounded-lg text-white font-bold">クエスト一覧へ戻る</button>
-            <button onClick={() => navigate('/battle', { state: { questId } })} className="px-6 md:px-8 py-3 bg-red-800 hover:bg-red-700 border border-red-600 rounded-lg text-white font-bold">リトライ</button>
+            <button onClick={() => navigate('/battle', { state: { questId, retryKey: Date.now() } })} className="px-6 md:px-8 py-3 bg-red-800 hover:bg-red-700 border border-red-600 rounded-lg text-white font-bold">リトライ</button>
           </div>
         </div>
       </div>
