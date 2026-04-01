@@ -109,6 +109,14 @@ const Home = () => {
               <h3 className="font-bold text-gray-200">運営からのお知らせ</h3>
             </div>
             <div className="p-4 space-y-3 overflow-y-auto flex-1">
+              <div className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600 group">
+                <span className="bg-red-500/20 text-red-300 text-xs px-2 py-0.5 rounded border border-red-500/30 whitespace-nowrap font-bold font-mono">UPDATE</span>
+                <div>
+                  <p className="text-sm text-white font-bold group-hover:text-red-400 transition-colors">【新ステージ】不摂生の連鎖！4つのクエスト追加</p>
+                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">「深夜3時の誘惑」「終わらないSNS」など、最強の誘惑たちが牙を剥く。健康を取り戻せ！</p>
+                  <p className="text-[10px] text-gray-500 mt-1.5">2026/04/01 16:30</p>
+                </div>
+              </div>
               <div className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600">
                 <span className="bg-blue-500/20 text-blue-400 text-xs px-2 py-0.5 rounded border border-blue-500/30 whitespace-nowrap">NEWS</span>
                 <div>
