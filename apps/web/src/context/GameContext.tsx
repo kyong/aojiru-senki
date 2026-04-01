@@ -23,6 +23,9 @@ import { soundManager } from '../utils/sound';
 // 1AP回復にかかる秒数（5分）
 const AP_RECOVERY_INTERVAL_SEC = 5 * 60;
 
+/** レベルからAP上限を算出 */
+const calcMaxAp = (level: number) => 120 + (level - 1) * 3;
+
 // ============================================================
 // Context 型定義
 // ============================================================
@@ -88,7 +91,11 @@ const GameContext = createContext<GameContextValue | null>(null);
 // ============================================================
 
 export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
-  const [player, setPlayer] = useState<PlayerState>(() => storage.getPlayer());
+  const [player, setPlayer] = useState<PlayerState>(() => {
+    const p = storage.getPlayer();
+    // 既存セーブデータのmaxApをレベルに基づいて補正
+    return { ...p, maxAp: calcMaxAp(p.level) };
+  });
   const [party, setParty] = useState<PartyState>(() => storage.getParty());
   const [inventory, setInventory] = useState<InventoryState>(() => storage.getInventory());
   const [receivedPresentIds, setReceivedPresentIds] = useState<ReceivedPresentState>(
@@ -202,14 +209,20 @@ export const GameProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
   const addExp = useCallback((amount: number) => {
     setPlayer(p => {
-      let { exp, level, nextExp } = p;
+      const MAX_LEVEL = 100;
+      let { exp, level, nextExp, maxAp } = p;
       exp += amount;
-      while (exp >= nextExp) {
+      while (exp >= nextExp && level < MAX_LEVEL) {
         exp -= nextExp;
         level += 1;
+        maxAp = calcMaxAp(level);
         nextExp = Math.floor(nextExp * 1.5);
       }
-      return { ...p, exp, level, nextExp };
+      // レベル上限到達時は経験値を溢れさせない
+      if (level >= MAX_LEVEL) {
+        exp = 0;
+      }
+      return { ...p, exp, level, nextExp, maxAp };
     });
   }, []);
 
