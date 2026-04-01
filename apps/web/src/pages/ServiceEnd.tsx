@@ -36,7 +36,7 @@ const ServiceEnd: React.FC<ServiceEndProps> = ({ onRestore }) => {
   const [popups, setPopups] = useState<Popup[]>([]);
   const [round, setRound] = useState(1);
   const [score, setScore] = useState(0);
-  const [isMuted, setIsMuted] = useState((soundManager as any).isMuted || false);
+  const [isMuted, setIsMuted] = useState(soundManager.getIsMuted());
   const totalRounds = 3;
   const targetScore = 5;
 
@@ -123,7 +123,10 @@ const ServiceEnd: React.FC<ServiceEndProps> = ({ onRestore }) => {
       soundManager.playBGM('click_game.mp3');
       soundManager.resume();
     } else if (phase === 'shattering') {
-      soundManager.stopBGM();
+      // Allow gem_get.mp3 to play if it was just started
+      if (soundManager.getCurrentBGM() !== 'gem_get.mp3') {
+        soundManager.stopBGM();
+      }
     }
   }, [phase]);
 
@@ -212,6 +215,7 @@ const ServiceEnd: React.FC<ServiceEndProps> = ({ onRestore }) => {
         if (round >= totalRounds) {
           setPhase('shattering');
           playSE('shatter');
+          soundManager.playBGM('gem_get.mp3');
           localStorage.setItem('aojiru_service_restored', 'true');
           setTimeout(() => onRestore(), 2500);
         } else {

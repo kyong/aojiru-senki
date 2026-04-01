@@ -349,6 +349,14 @@ class SoundManager {
     }
   }
 
+  public getCurrentBGM(): string | null {
+    return this.currentBgm;
+  }
+
+  public getIsMuted(): boolean {
+    return this.isMuted;
+  }
+
   // Suspenseful Drumroll/Wait Sound - Heavy gacha anticipation
   public playGachaWait(duration: number) {
     this.resume();
