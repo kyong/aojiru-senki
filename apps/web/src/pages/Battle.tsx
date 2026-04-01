@@ -25,11 +25,11 @@ const ENEMIES: Record<number, EnemyData> = {
   2: { name: '炭水化物・ザ・グレート', hp: 1500, maxHp: 1500, minAtk: 40, maxAtk: 55, image: '/images/carb_the_great.png', intro: '「血糖値を上げてやる……眠くなれぇ……」', bgImage: '/images/carb_the_great_bg.png' },
   3: { name: '魔王コレステロール・キング', hp: 3000, maxHp: 3000, minAtk: 70, maxAtk: 90, image: '/images/cholesterol_king.png', intro: '「我こそは成人病の王なり……健康など不要！」', bgImage: '/images/cholesterol_king_bg.png' },
   4: { name: 'スイーツ魔人ショートケーキ', hp: 2000, maxHp: 2000, minAtk: 50, maxAtk: 70, image: '/images/sweets_majin.png', intro: '「あま〜い罠から逃れられるかな？」', bgImage: '/images/sweets_majin_bg.png' },
-  5: { name: '深夜のラーメン怪人', hp: 5000, maxHp: 5000, minAtk: 90, maxAtk: 120, image: '/images/ramen_kaijin.png', intro: '「寝る前に…すすってけよ……」', bgImage: '/images/ramen_kaijin_bg.png' },
+  5: { name: '深夜のラーメン怪人', hp: 4000, maxHp: 4000, minAtk: 80, maxAtk: 100, image: '/images/ramen_kaijin.png', intro: '「寝る前に…すすってけよ……」', bgImage: '/images/ramen_kaijin_bg.png' },
   6: { name: '終わらない飲み会部長', hp: 2500, maxHp: 2500, minAtk: 60, maxAtk: 80, image: '/images/nomikai_bucho.png', intro: '「まだまだ帰さんぞ～！次行くぞ次！」', bgImage: '/images/nomikai_bucho_bg.png' },
-  7: { name: 'ホットスナック・ゴーレム', hp: 8000, maxHp: 8000, minAtk: 120, maxAtk: 150, image: '/images/snack_monster.png', intro: '「揚げたて……サクサク……食べていきなよ……」', bgImage: '/images/snack_bg.png' },
-  8: { name: 'エナジードリンク・タワー', hp: 11000, maxHp: 11000, minAtk: 160, maxAtk: 200, image: '/images/caffeine_tower.png', intro: '「ヒャッハー！ 徹夜だ！ 翼を授けてやるぜぇ！！」', bgImage: '/images/caffeine_bg.png' },
-  9: { name: 'タイムライン・ゴースト', hp: 20000, maxHp: 20000, minAtk: 200, maxAtk: 300, image: '/images/sns_ghost.png', intro: '「……まだ寝ないの？ この動画も……面白いよ……？」', bgImage: '/images/sns_bg.png' },
+  7: { name: 'ホットスナック・ゴーレム', hp: 6000, maxHp: 6000, minAtk: 110, maxAtk: 140, image: '/images/snack_monster.png', intro: '「揚げたて……サクサク……食べていきなよ……」', bgImage: '/images/snack_bg.png' },
+  8: { name: 'エナジードリンク・タワー', hp: 8000, maxHp: 8000, minAtk: 130, maxAtk: 170, image: '/images/caffeine_tower.png', intro: '「ヒャッハー！ 徹夜だ！ 翼を授けてやるぜぇ！！」', bgImage: '/images/caffeine_bg.png' },
+  9: { name: 'タイムライン・ゴースト', hp: 10000, maxHp: 10000, minAtk: 160, maxAtk: 210, image: '/images/sns_ghost.png', intro: '「……まだ寝ないの？ この動画も……面白いよ……？」', bgImage: '/images/sns_bg.png' },
   10: { name: '二日酔いケルベロス', hp: 6500, maxHp: 6500, minAtk: 110, maxAtk: 140, image: '/images/hangover_cerberus.png', intro: '「ウッ……頭が……気持ち悪い……もう酒なんて……」', bgImage: '/images/hangover_bg.png' },
 };
 

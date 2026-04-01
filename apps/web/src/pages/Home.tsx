@@ -110,6 +110,14 @@ const Home = () => {
             </div>
             <div className="p-4 space-y-3 overflow-y-auto flex-1">
               <div className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600 group">
+                <span className="bg-yellow-500/20 text-yellow-300 text-xs px-2 py-0.5 rounded border border-yellow-500/30 whitespace-nowrap font-bold font-mono">BALANCE</span>
+                <div>
+                  <p className="text-sm text-white font-bold group-hover:text-yellow-400 transition-colors">【バランス調整】一部クエスト・キャラクターの調整を実施</p>
+                  <p className="text-xs text-gray-400 mt-1 leading-relaxed">各クエストの敵ステータスを見直しました。詳細はゲーム内にてご確認ください。</p>
+                  <p className="text-[10px] text-gray-500 mt-1.5">2026/04/01 11:00</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3 p-3 hover:bg-white/5 rounded-lg transition-colors cursor-pointer border border-transparent hover:border-gray-600 group">
                 <span className="bg-red-500/20 text-red-300 text-xs px-2 py-0.5 rounded border border-red-500/30 whitespace-nowrap font-bold font-mono">UPDATE</span>
                 <div>
                   <p className="text-sm text-white font-bold group-hover:text-red-400 transition-colors">【新ステージ】不摂生の連鎖！4つのクエスト追加</p>
