@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { BrowserRouter, Routes, Route, useLocation } from 'react-router-dom';
 import { GameProvider } from './context/GameContext';
 import { NavigationGuardProvider } from './context/NavigationGuardContext';
@@ -15,6 +15,7 @@ import Shop from './pages/Shop';
 import Splash from './pages/Splash';
 import Terms from './pages/Terms';
 import Privacy from './pages/Privacy';
+import ServiceEnd from './pages/ServiceEnd';
 
 /** location.state.retryKey が変わるたびに Battle を再マウントさせるラッパー */
 function BattleWrapper() {
@@ -25,6 +26,20 @@ function BattleWrapper() {
 
 function App() {
   const [hasLoaded, setHasLoaded] = useState(false);
+  const [isServiceRestored, setIsServiceRestored] = useState(
+    localStorage.getItem('aojiru_service_restored') === 'true'
+  );
+
+  // サービス終了日時: 2026年4月2日
+  const isServiceEnded = useMemo(() => {
+    // デバッグ用にURLパラメータ ?debug_sashu=1 で強制表示可能にする
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('debug_sashu') === '1' && !isServiceRestored) return true;
+
+    const now = new Date();
+    const serviceEndDate = new Date('2026-04-02T00:00:00+09:00');
+    return now >= serviceEndDate && !isServiceRestored;
+  }, [isServiceRestored]);
 
   return (
     <GameProvider>
@@ -32,6 +47,8 @@ function App() {
         <NavigationGuardProvider>
           {!hasLoaded ? (
             <Splash onComplete={() => setHasLoaded(true)} />
+          ) : isServiceEnded ? (
+            <ServiceEnd onRestore={() => setIsServiceRestored(true)} />
           ) : (
             <Routes>
               <Route path="/"        element={<Home />} />
