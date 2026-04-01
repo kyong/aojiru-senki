@@ -21,12 +21,16 @@ type EnemyData = {
 };
 
 const ENEMIES: Record<number, EnemyData> = {
-  1: { name: 'カリカリベーコン将軍', hp: 600,  maxHp: 600,  minAtk: 15, maxAtk: 25, image: '/images/bacon_general.png',          intro: '「朝から脂ギッシュにしてやるぜぇ……！」', bgImage: '/images/bacon_general_bg.png' },
+  1: { name: 'カリカリベーコン将軍', hp: 600, maxHp: 600, minAtk: 15, maxAtk: 25, image: '/images/bacon_general.png', intro: '「朝から脂ギッシュにしてやるぜぇ……！」', bgImage: '/images/bacon_general_bg.png' },
   2: { name: '炭水化物・ザ・グレート', hp: 1500, maxHp: 1500, minAtk: 40, maxAtk: 55, image: '/images/carb_the_great.png', intro: '「血糖値を上げてやる……眠くなれぇ……」', bgImage: '/images/carb_the_great_bg.png' },
   3: { name: '魔王コレステロール・キング', hp: 3000, maxHp: 3000, minAtk: 70, maxAtk: 90, image: '/images/cholesterol_king.png', intro: '「我こそは成人病の王なり……健康など不要！」', bgImage: '/images/cholesterol_king_bg.png' },
   4: { name: 'スイーツ魔人ショートケーキ', hp: 2000, maxHp: 2000, minAtk: 50, maxAtk: 70, image: '/images/sweets_majin.png', intro: '「あま〜い罠から逃れられるかな？」', bgImage: '/images/sweets_majin_bg.png' },
   5: { name: '深夜のラーメン怪人', hp: 5000, maxHp: 5000, minAtk: 90, maxAtk: 120, image: '/images/ramen_kaijin.png', intro: '「寝る前に…すすってけよ……」', bgImage: '/images/ramen_kaijin_bg.png' },
   6: { name: '終わらない飲み会部長', hp: 2500, maxHp: 2500, minAtk: 60, maxAtk: 80, image: '/images/nomikai_bucho.png', intro: '「まだまだ帰さんぞ～！次行くぞ次！」', bgImage: '/images/nomikai_bucho_bg.png' },
+  7: { name: 'ホットスナック・ゴーレム', hp: 8000, maxHp: 8000, minAtk: 120, maxAtk: 150, image: '/images/snack_monster.png', intro: '「揚げたて……サクサク……食べていきなよ……」', bgImage: '/images/snack_bg.png' },
+  8: { name: 'エナジードリンク・タワー', hp: 11000, maxHp: 11000, minAtk: 160, maxAtk: 200, image: '/images/caffeine_tower.png', intro: '「ヒャッハー！ 徹夜だ！ 翼を授けてやるぜぇ！！」', bgImage: '/images/caffeine_bg.png' },
+  9: { name: 'タイムライン・ゴースト', hp: 20000, maxHp: 20000, minAtk: 200, maxAtk: 300, image: '/images/sns_ghost.png', intro: '「……まだ寝ないの？ この動画も……面白いよ……？」', bgImage: '/images/sns_bg.png' },
+  10: { name: '二日酔いケルベロス', hp: 6500, maxHp: 6500, minAtk: 110, maxAtk: 140, image: '/images/hangover_cerberus.png', intro: '「ウッ……頭が……気持ち悪い……もう酒なんて……」', bgImage: '/images/hangover_bg.png' },
 };
 
 const STORY_TEXT: Record<number, string[]> = {
@@ -36,6 +40,10 @@ const STORY_TEXT: Record<number, string[]> = {
   4: ['夕立の中、甘い匂いが漂う。', 'マイスター「この誘惑は……おやつだ！」', '最終決戦を前に、油断を誘う甘い罠。', 'ショートケーキ魔人が立ちふさがる！', '糖分を振り払い、魔王のもとへ急げ！'],
   5: ['魔王を倒し、世界に平和が訪れた……ように見えた。', 'しかし、深夜0時。', '強烈な空腹感がマイスターを襲う。', 'マイスター「こ、これは……深夜ラーメンの誘惑！」', '真の恐ろしさは、寝る前の炭水化物だった！'],
   6: ['時計の針が進むと、どこからともなく宴会の声が。', '「お疲れ様です！カンパーイ！」', '突発的に発生する飲み会……断れない雰囲気。', 'マイスター「肝臓への負担も青汁でカバーする！」', '終わらない飲み会から無事に帰還せよ！'],
+  7: ['深夜3時。コンビニの灯りが眩しい。', 'マイスター「ダメだ……この匂いには抗えない！」', '目の前には、黄金色に輝くホットスナック。', '社長「待てマイスター！ その脂は今の君には毒だ！」', '誘惑の化身を倒し、健全な眠りを取り戻せ！'],
+  8: ['締め切り直前。意識が遠のく。', 'マイスター「あと……あと一行だけ……」', '机の上には、積み上げられたエナドリの缶。', 'ケナ氏「心臓がバクバクしてるよ！ もう休んで！」', 'カフェインの暴走を止め、強制シャットダウンせよ！'],
+  9: ['午前4時。布団の中で光る画面。', 'マイスター「あ、これ面白い……え、もうこんな時間？」', '無限に続くスクロール。終わりのない通知。', 'タイムラインの亡霊が、魂をデジタル世界へ引きずり込む。', '最強の誘惑を断切り、現実の世界に帰還せよ！'],
+  10: ['翌朝。世界が回っている。', 'マイスター「うぅ……喉が渇いた……」', '昨夜の深酒が、牙を剥いて襲いかかる。', '三つの頭が、痛みと吐き気とめまいを運んでくる。', '二日酔いの魔獣を退け、今日という日を生き残れ！'],
 };
 
 const MAX_MP = 100;
@@ -55,7 +63,7 @@ export const Battle = () => {
 
   // 編成ステータスをバトル開始時に確定（超波動青汁バフ適用）
   const [rawBattleStats] = useState(() => getBattleStats());
-  const maxHp   = choHadoBuff ? Math.floor(rawBattleStats.maxHp * 1.2) : rawBattleStats.maxHp;
+  const maxHp = choHadoBuff ? Math.floor(rawBattleStats.maxHp * 1.2) : rawBattleStats.maxHp;
   const baseAtk = choHadoBuff ? Math.floor(rawBattleStats.baseAtk * 1.3) : rawBattleStats.baseAtk;
   const atkRange = rawBattleStats.atkRange;
   const [currentStoryIndex, setCurrentStoryIndex] = useState(0);
@@ -70,7 +78,7 @@ export const Battle = () => {
   const [playerHit, setPlayerHit] = useState(false);
   const [enemyAttacking, setEnemyAttacking] = useState(false);
   const [floatingDamage, setFloatingDamage] = useState<{ id: number; value: string; type: 'player' | 'enemy' }[]>([]);
-  
+
   // 新規追加: スキル関連
   const [skillMenu, setSkillMenu] = useState(false);
   const [skillUser, setSkillUser] = useState<Character | null>(null);
@@ -186,7 +194,7 @@ export const Battle = () => {
     const dmgRaw = baseAtk + Math.floor(Math.random() * atkRange);
     const dmg = Math.floor(dmgRaw * 1.0); // バフ用拡張性のため
     const newHp = Math.max(0, enemyHp - dmg);
-    
+
     // 攻撃演出
     soundManager.playAttack();
     setTimeout(() => soundManager.playHit(), 100);
@@ -207,7 +215,7 @@ export const Battle = () => {
   const handleSkill = (char: Character) => {
     if (!isPlayerTurn || !char.skill) return;
     if (playerMp < char.skill.cost) { addLog(`AOJIRUが足りない！（必要: ${char.skill.cost}）`); return; }
-    
+
     setSkillMenu(false);
     setSkillUser(char);
     setSkillFlash(char.skill.type);
@@ -232,7 +240,7 @@ export const Battle = () => {
         setTimeout(() => setFloatingDamage(prev => prev.filter(d => d.id !== damageId)), 1200);
         logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}に${dmg}のダメージ！`;
         if (newHp === 0) { setSkillUser(null); setSkillFlash(null); handleWin(); return; }
-      } 
+      }
       else if (skill.type === 'heal') {
         soundManager.playSkillHeal();
         const heal = Math.floor(maxHp * (skill.multiplier || 0.3));
@@ -285,8 +293,8 @@ export const Battle = () => {
   const handleWin = () => {
     const gold = quest?.goldReward ?? 1000;
     const gems = quest?.gemsReward ?? 0;
-    const exp  = gold / 10;
-    
+    const exp = gold / 10;
+
     soundManager.playWin();
     setSkillMenu(false); // スキルメニューを閉じる
     // 勝利演出開始
@@ -453,21 +461,21 @@ export const Battle = () => {
                     onClick={handleShareBluesky}
                     className="flex items-center gap-1.5 px-4 py-2 bg-[#0085ff] hover:bg-[#0070dd] text-white text-sm font-bold rounded-lg transition-colors"
                   >
-                    <svg viewBox="0 0 600 530" className="w-4 h-4 fill-current"><path d="M135.72 44.03C202.216 93.951 273.74 195.17 300 249.49c26.262-54.316 97.782-155.54 164.28-205.46C512.26 8.009 590-19.862 590 68.825c0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.38-3.69-10.832-3.708-7.896-.017-2.935-1.193.516-3.707 7.896-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.256 82.697-152.22-67.108 11.421-142.549-7.449-163.25-81.433C20.15 217.613 9.997 86.535 9.997 68.825c0-88.687 77.742-60.816 125.723-24.795z"/></svg>
+                    <svg viewBox="0 0 600 530" className="w-4 h-4 fill-current"><path d="M135.72 44.03C202.216 93.951 273.74 195.17 300 249.49c26.262-54.316 97.782-155.54 164.28-205.46C512.26 8.009 590-19.862 590 68.825c0 17.712-10.155 148.79-16.111 170.07-20.703 73.984-96.144 92.854-163.25 81.433 117.3 19.964 147.14 86.092 82.697 152.22-122.39 125.59-175.91-31.511-189.63-71.766-2.514-7.38-3.69-10.832-3.708-7.896-.017-2.935-1.193.516-3.707 7.896-13.714 40.255-67.233 197.36-189.63 71.766-64.444-66.128-34.605-132.256 82.697-152.22-67.108 11.421-142.549-7.449-163.25-81.433C20.15 217.613 9.997 86.535 9.997 68.825c0-88.687 77.742-60.816 125.723-24.795z" /></svg>
                     Bluesky
                   </button>
                   <button
                     onClick={handleShareTwitter}
                     className="flex items-center gap-1.5 px-4 py-2 bg-black hover:bg-gray-800 text-white text-sm font-bold rounded-lg border border-gray-600 transition-colors"
                   >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" /></svg>
                     X (Twitter)
                   </button>
                   <button
                     onClick={handleShareFediverse}
                     className="flex items-center gap-1.5 px-4 py-2 bg-[#6364FF] hover:bg-[#5253dd] text-white text-sm font-bold rounded-lg transition-colors"
                   >
-                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M21.327 8.566c0-4.339-2.843-5.61-2.843-5.61-1.433-.658-3.894-.935-6.451-.956h-.063c-2.557.021-5.016.298-6.45.956 0 0-2.843 1.272-2.843 5.61 0 .993-.019 2.181.012 3.441.103 4.243.778 8.425 4.701 9.463 1.809.479 3.362.579 4.612.51 2.268-.126 3.541-.809 3.541-.809l-.075-1.646s-1.621.511-3.441.449c-1.804-.062-3.707-.194-3.999-2.409a4.523 4.523 0 0 1-.04-.621s1.77.433 4.014.536c1.372.063 2.658-.08 3.965-.236 2.506-.299 4.688-1.843 4.962-3.254.433-2.22.397-5.424.397-5.424zm-3.353 5.59h-2.081V9.057c0-1.075-.452-1.62-1.357-1.62-1 0-1.501.647-1.501 1.927v2.791h-2.069V9.364c0-1.28-.501-1.927-1.502-1.927-.904 0-1.357.546-1.357 1.62v5.099H6.026V8.903c0-1.074.273-1.927.823-2.558.566-.631 1.307-.955 2.228-.955 1.065 0 1.872.41 2.405 1.228l.518.869.519-.869c.533-.818 1.34-1.228 2.405-1.228.92 0 1.662.324 2.228.955.549.631.822 1.484.822 2.558v5.253z"/></svg>
+                    <svg viewBox="0 0 24 24" className="w-4 h-4 fill-current"><path d="M21.327 8.566c0-4.339-2.843-5.61-2.843-5.61-1.433-.658-3.894-.935-6.451-.956h-.063c-2.557.021-5.016.298-6.45.956 0 0-2.843 1.272-2.843 5.61 0 .993-.019 2.181.012 3.441.103 4.243.778 8.425 4.701 9.463 1.809.479 3.362.579 4.612.51 2.268-.126 3.541-.809 3.541-.809l-.075-1.646s-1.621.511-3.441.449c-1.804-.062-3.707-.194-3.999-2.409a4.523 4.523 0 0 1-.04-.621s1.77.433 4.014.536c1.372.063 2.658-.08 3.965-.236 2.506-.299 4.688-1.843 4.962-3.254.433-2.22.397-5.424.397-5.424zm-3.353 5.59h-2.081V9.057c0-1.075-.452-1.62-1.357-1.62-1 0-1.501.647-1.501 1.927v2.791h-2.069V9.364c0-1.28-.501-1.927-1.502-1.927-.904 0-1.357.546-1.357 1.62v5.099H6.026V8.903c0-1.074.273-1.927.823-2.558.566-.631 1.307-.955 2.228-.955 1.065 0 1.872.41 2.405 1.228l.518.869.519-.869c.533-.818 1.34-1.228 2.405-1.228.92 0 1.662.324 2.228.955.549.631.822 1.484.822 2.558v5.253z" /></svg>
                     Fediverse
                   </button>
                 </div>
@@ -536,7 +544,7 @@ export const Battle = () => {
           playerHit ? "border-red-500 shadow-[inset_0_0_50px_rgba(239,68,68,0.5)]" : "border-gray-700"
         )} style={{ backgroundImage: enemyData.bgImage ? `url('${enemyData.bgImage}')` : "url('https://placehold.co/1200x800/222/333?text=Battle+Background')" }}>
           <div className="absolute inset-0 bg-black/40" />
-          
+
           <div className={clsx(
             "z-10 flex flex-col items-center transition-all duration-300",
             !enemyAttacking && "animate-[float_3s_ease-in-out_infinite]",
@@ -548,7 +556,7 @@ export const Battle = () => {
             )}>
               <img src={enemyData.image} alt={enemyData.name} className="w-56 h-56 md:w-96 md:h-96 object-contain" />
             </div>
-            
+
             {/* Enemy HP */}
             <div className="mt-3 md:mt-4 bg-gray-900/80 p-2 md:p-3 rounded-lg border border-red-900/50 backdrop-blur-sm w-48 md:w-64">
               <h3 className="text-red-400 font-bold text-center mb-1 text-sm md:text-base">{enemyData.name}</h3>
@@ -583,28 +591,28 @@ export const Battle = () => {
           {/* Cinematic Skill Portrait */}
           {skillUser && (
             <div className="absolute inset-0 z-40 flex items-center justify-center overflow-hidden">
-               <div className={clsx(
-                 "absolute inset-0 opacity-40 animate-pulse",
-                 skillFlash === 'damage' && "bg-red-500",
-                 skillFlash === 'heal' && "bg-green-500",
-                 skillFlash === 'debuff' && "bg-blue-500"
-               )} />
-               <div className="relative w-full h-full flex items-center justify-center">
-                 <div className="absolute left-0 w-full bg-black/60 py-4 transform -skew-y-6 shadow-2xl border-y-4 border-white animate-[slide-in_1.2s_ease-in-out_forwards]">
-                    <div className="flex items-center justify-center gap-8 skew-y-6 px-12">
-                      <div className="flex-1 text-right">
-                        <h2 className="text-white font-black text-4xl italic drop-shadow-md">{skillUser.skill?.name}</h2>
-                        <p className="text-yellow-400 font-bold text-xl">{skillUser.name}</p>
-                      </div>
-                      <div className="w-64 h-64 relative bg-gray-900 rounded-full border-4 border-white overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.5)]">
-                        <img src={skillUser.image} alt={skillUser.name} className="w-full h-full object-contain transform scale-125 translate-y-4" />
-                      </div>
-                      <div className="flex-1">
-                        <p className="text-gray-200 text-lg leading-tight max-w-xs">{skillUser.skill?.description}</p>
-                      </div>
+              <div className={clsx(
+                "absolute inset-0 opacity-40 animate-pulse",
+                skillFlash === 'damage' && "bg-red-500",
+                skillFlash === 'heal' && "bg-green-500",
+                skillFlash === 'debuff' && "bg-blue-500"
+              )} />
+              <div className="relative w-full h-full flex items-center justify-center">
+                <div className="absolute left-0 w-full bg-black/60 py-4 transform -skew-y-6 shadow-2xl border-y-4 border-white animate-[slide-in_1.2s_ease-in-out_forwards]">
+                  <div className="flex items-center justify-center gap-8 skew-y-6 px-12">
+                    <div className="flex-1 text-right">
+                      <h2 className="text-white font-black text-4xl italic drop-shadow-md">{skillUser.skill?.name}</h2>
+                      <p className="text-yellow-400 font-bold text-xl">{skillUser.name}</p>
                     </div>
-                 </div>
-               </div>
+                    <div className="w-64 h-64 relative bg-gray-900 rounded-full border-4 border-white overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.5)]">
+                      <img src={skillUser.image} alt={skillUser.name} className="w-full h-full object-contain transform scale-125 translate-y-4" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-gray-200 text-lg leading-tight max-w-xs">{skillUser.skill?.description}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
@@ -626,7 +634,7 @@ export const Battle = () => {
                       .filter((c): c is Character => !!c);
                     // IDで重複排除 (マイスターがパーティにいても1つだけ表示)
                     const uniqueChars = Array.from(new Map(skillChars.map(c => [c.id, c])).values());
-                    
+
                     return uniqueChars.map(char => (
                       <button
                         key={char.id}
@@ -661,21 +669,21 @@ export const Battle = () => {
           {/* Victory Cut-in Overlay */}
           {isVictoryCutin && (
             <div className="absolute inset-0 z-50 flex items-center justify-center overflow-hidden bg-white/20 backdrop-blur-sm animate-[fade-in_0.3s_ease-out_forwards]">
-               <div className="absolute inset-0 bg-gradient-to-r from-green-500/80 via-white/40 to-green-500/80 animate-pulse" />
-               <div className="relative w-full h-[300px] flex items-center justify-center">
-                 <div className="absolute left-0 w-full bg-green-600 py-6 transform skew-y-6 shadow-2xl border-y-8 border-white animate-[victory-slide_0.6s_ease-out_forwards]">
-                    <div className="flex items-center justify-center gap-12 -skew-y-6">
-                      <div className="w-80 h-80 relative bg-white/20 rounded-full border-8 border-white overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.8)]">
-                         <img src="/images/player.png" alt="Victory" className="w-full h-full object-contain transform scale-125 translate-y-4" />
-                      </div>
-                      <div className="text-left">
-                        <h2 className="text-white font-black text-7xl italic drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] tracking-tighter animate-bounce">VICTORY!!</h2>
-                        <div className="h-1 w-32 bg-yellow-400 mt-2 rounded-full" />
-                        <p className="text-green-100 font-bold text-2xl mt-2 drop-shadow-md">QUEST CLEARED</p>
-                      </div>
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/80 via-white/40 to-green-500/80 animate-pulse" />
+              <div className="relative w-full h-[300px] flex items-center justify-center">
+                <div className="absolute left-0 w-full bg-green-600 py-6 transform skew-y-6 shadow-2xl border-y-8 border-white animate-[victory-slide_0.6s_ease-out_forwards]">
+                  <div className="flex items-center justify-center gap-12 -skew-y-6">
+                    <div className="w-80 h-80 relative bg-white/20 rounded-full border-8 border-white overflow-hidden shadow-[0_0_50px_rgba(255,255,255,0.8)]">
+                      <img src="/images/player.png" alt="Victory" className="w-full h-full object-contain transform scale-125 translate-y-4" />
                     </div>
-                 </div>
-               </div>
+                    <div className="text-left">
+                      <h2 className="text-white font-black text-7xl italic drop-shadow-[0_4px_10px_rgba(0,0,0,0.5)] tracking-tighter animate-bounce">VICTORY!!</h2>
+                      <div className="h-1 w-32 bg-yellow-400 mt-2 rounded-full" />
+                      <p className="text-green-100 font-bold text-2xl mt-2 drop-shadow-md">QUEST CLEARED</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
             </div>
           )}
           <div className="md:hidden absolute bottom-2 left-2 right-2 bg-black/70 rounded-lg p-2 backdrop-blur-sm border border-gray-700/50 max-h-16 overflow-hidden">
@@ -716,10 +724,10 @@ export const Battle = () => {
           {/* Commands */}
           <div className="col-span-6 grid grid-cols-2 gap-2">
             {([
-              { label: '攻撃 (Attack)', sub: null,           icon: <Sword size={24} />,   cls: 'from-red-900/70 to-gray-800 hover:from-red-800/80 hover:to-red-900/60 border-red-700/60 hover:border-red-400', textCls: 'text-red-100', subCls: undefined, iconCls: 'text-red-400 group-hover:text-red-300', fn: handleAttack },
-              { label: '青汁スキル',   sub: 'Select Skill', icon: <Zap size={24} />,    cls: 'from-green-900/70 to-gray-800 hover:from-green-800/80 hover:to-green-900/60 border-green-700/60 hover:border-green-400', textCls: 'text-green-100', subCls: 'text-green-400', iconCls: 'text-green-400 group-hover:text-green-300', fn: () => setSkillMenu(true) },
-              { label: '防御 (Guard)', sub: 'AOJIRU +10',   icon: <Shield size={24} />, cls: 'from-blue-900/70 to-gray-800 hover:from-blue-800/80 hover:to-blue-900/60 border-blue-700/60 hover:border-blue-400',   textCls: 'text-blue-100',  subCls: 'text-blue-300',  iconCls: 'text-blue-400 group-hover:text-blue-300',   fn: handleGuard },
-              { label: 'アイテム',     sub: `回復+200 (残${items.aojiruPotion})`,  icon: <Package size={24} />, cls: 'from-yellow-900/70 to-gray-800 hover:from-yellow-800/80 hover:to-yellow-900/60 border-yellow-700/60 hover:border-yellow-400', textCls: 'text-yellow-100', subCls: items.aojiruPotion > 0 ? 'text-yellow-300' : 'text-red-400', iconCls: 'text-yellow-400 group-hover:text-yellow-300', fn: handleItem },
+              { label: '攻撃 (Attack)', sub: null, icon: <Sword size={24} />, cls: 'from-red-900/70 to-gray-800 hover:from-red-800/80 hover:to-red-900/60 border-red-700/60 hover:border-red-400', textCls: 'text-red-100', subCls: undefined, iconCls: 'text-red-400 group-hover:text-red-300', fn: handleAttack },
+              { label: '青汁スキル', sub: 'Select Skill', icon: <Zap size={24} />, cls: 'from-green-900/70 to-gray-800 hover:from-green-800/80 hover:to-green-900/60 border-green-700/60 hover:border-green-400', textCls: 'text-green-100', subCls: 'text-green-400', iconCls: 'text-green-400 group-hover:text-green-300', fn: () => setSkillMenu(true) },
+              { label: '防御 (Guard)', sub: 'AOJIRU +10', icon: <Shield size={24} />, cls: 'from-blue-900/70 to-gray-800 hover:from-blue-800/80 hover:to-blue-900/60 border-blue-700/60 hover:border-blue-400', textCls: 'text-blue-100', subCls: 'text-blue-300', iconCls: 'text-blue-400 group-hover:text-blue-300', fn: handleGuard },
+              { label: 'アイテム', sub: `回復+200 (残${items.aojiruPotion})`, icon: <Package size={24} />, cls: 'from-yellow-900/70 to-gray-800 hover:from-yellow-800/80 hover:to-yellow-900/60 border-yellow-700/60 hover:border-yellow-400', textCls: 'text-yellow-100', subCls: items.aojiruPotion > 0 ? 'text-yellow-300' : 'text-red-400', iconCls: 'text-yellow-400 group-hover:text-yellow-300', fn: handleItem },
             ] as const).map(({ label, sub, icon, cls, textCls, subCls, iconCls, fn }) => (
               <button key={label} onClick={() => fn()} disabled={disabled}
                 className={clsx('bg-gradient-to-br border rounded-lg flex items-center justify-center gap-2 transition-all active:scale-95 group disabled:opacity-40 disabled:cursor-not-allowed', cls)}>
@@ -750,10 +758,10 @@ export const Battle = () => {
         {/* HUD - Mobile */}
         <div className="md:hidden grid grid-cols-2 gap-1.5">
           {([
-            { label: '攻撃',    sub: null,           icon: <Sword size={18} />,   cls: 'from-red-900/70 to-gray-800 border-red-700/60 active:border-red-400', textCls: 'text-red-100',    iconCls: 'text-red-400',    fn: handleAttack },
-            { label: 'スキル',  sub: 'Select',        icon: <Zap size={18} />,    cls: 'from-green-900/70 to-gray-800 border-green-700/60 active:border-green-400', textCls: 'text-green-100',  iconCls: 'text-green-400',  fn: () => setSkillMenu(true) },
-            { label: '防御',    sub: '+10',          icon: <Shield size={18} />,  cls: 'from-blue-900/70 to-gray-800 border-blue-700/60 active:border-blue-400',  textCls: 'text-blue-100',   iconCls: 'text-blue-400',   fn: handleGuard },
-            { label: 'アイテム', sub: `×${items.aojiruPotion}`,       icon: <Package size={18} />, cls: 'from-yellow-900/70 to-gray-800 border-yellow-700/60 active:border-yellow-400', textCls: items.aojiruPotion > 0 ? 'text-yellow-100' : 'text-red-300', iconCls: 'text-yellow-400', fn: handleItem },
+            { label: '攻撃', sub: null, icon: <Sword size={18} />, cls: 'from-red-900/70 to-gray-800 border-red-700/60 active:border-red-400', textCls: 'text-red-100', iconCls: 'text-red-400', fn: handleAttack },
+            { label: 'スキル', sub: 'Select', icon: <Zap size={18} />, cls: 'from-green-900/70 to-gray-800 border-green-700/60 active:border-green-400', textCls: 'text-green-100', iconCls: 'text-green-400', fn: () => setSkillMenu(true) },
+            { label: '防御', sub: '+10', icon: <Shield size={18} />, cls: 'from-blue-900/70 to-gray-800 border-blue-700/60 active:border-blue-400', textCls: 'text-blue-100', iconCls: 'text-blue-400', fn: handleGuard },
+            { label: 'アイテム', sub: `×${items.aojiruPotion}`, icon: <Package size={18} />, cls: 'from-yellow-900/70 to-gray-800 border-yellow-700/60 active:border-yellow-400', textCls: items.aojiruPotion > 0 ? 'text-yellow-100' : 'text-red-300', iconCls: 'text-yellow-400', fn: handleItem },
           ] as const).map(({ label, sub, icon, cls, textCls, iconCls, fn }) => (
             <button key={label} onClick={() => fn()} disabled={disabled}
               className={clsx('bg-gradient-to-br border rounded-lg flex items-center justify-center gap-1.5 py-3 transition-all active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed', cls)}>

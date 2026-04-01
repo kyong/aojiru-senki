@@ -9,10 +9,15 @@ import { ApRecoveryModal } from '../components/ApRecoveryModal';
 import { ALL_QUESTS } from '../store/quests';
 import type { Quest } from '../store/types';
 
-/** every_other_hour ゲリラの残り時間（分）を返す。非アクティブ時は 0 */
-function getGuerrillaRemainingMin(): number {
+/** activeRule に応じた残り時間（分）を返す。非アクティブ時は 0 */
+function getRemainingMin(rule?: 'every_other_hour' | 'every_other_hour_inverse'): number {
+  if (!rule) return 0;
   const now = new Date();
-  if (now.getHours() % 2 !== 0) return 0; // 奇数時間＝非表示
+  const currentHour = now.getHours();
+  const isActive = rule === 'every_other_hour' ? (currentHour % 2 === 0) : (currentHour % 2 !== 0);
+  
+  if (!isActive) return 0;
+  
   const endOfSlot = new Date(now);
   endOfSlot.setHours(now.getHours() + 1, 0, 0, 0);
   return Math.max(0, Math.ceil((endOfSlot.getTime() - now.getTime()) / 60000));
@@ -24,11 +29,10 @@ export const QuestSelect = () => {
   const [selectedQuest, setSelectedQuest] = useState<Quest | null>(null);
   const [apRecoveryQuest, setApRecoveryQuest] = useState<Quest | null>(null);
   const [isApModalOpen, setIsApModalOpen] = useState(false);
-  const [guerrillaMin, setGuerrillaMin] = useState(getGuerrillaRemainingMin);
-
-  // 毎分ゲリラ残り時間を更新
+  // 毎分残り時間を更新（再描画のため）
+  const [, setTick] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setGuerrillaMin(getGuerrillaRemainingMin()), 10000);
+    const id = setInterval(() => setTick(t => t + 1), 10000);
     return () => clearInterval(id);
   }, []);
 
@@ -39,10 +43,11 @@ export const QuestSelect = () => {
         return false;
       }
     }
-    if (quest.timeCondition?.activeRule === 'every_other_hour') {
-      if (currentHour % 2 !== 0) {
-        return false;
-      }
+    const rule = quest.timeCondition?.activeRule;
+    if (rule === 'every_other_hour') {
+      if (currentHour % 2 !== 0) return false;
+    } else if (rule === 'every_other_hour_inverse') {
+      if (currentHour % 2 === 0) return false;
     }
     return true;
   });
@@ -133,7 +138,7 @@ export const QuestSelect = () => {
                           GUERRILLA
                         </span>
                         <span className="flex items-center gap-1 text-orange-300 text-xs font-mono">
-                          <Clock size={12} /> 残り{guerrillaMin}分
+                          <Clock size={12} /> 残り{getRemainingMin(quest.timeCondition?.activeRule)}分
                         </span>
                       </>
                     ) : (

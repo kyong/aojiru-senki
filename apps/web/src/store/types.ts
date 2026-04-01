@@ -41,7 +41,7 @@ export type Quest = {
     requireClearId?: number;
   };
   timeCondition?: {
-    activeRule: 'every_other_hour';
+    activeRule: 'every_other_hour' | 'every_other_hour_inverse';
   };
   chapterLabel?: string;
   guerrilla?: boolean;
