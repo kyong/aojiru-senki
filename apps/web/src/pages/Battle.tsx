@@ -789,6 +789,10 @@ export const Battle = () => {
 // ============================================================
 const style = document.createElement('style');
 style.textContent = `
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+  }
   @keyframes shake {
     0%, 100% { transform: translate(0, 0); }
     25% { transform: translate(-4px, 4px); }
