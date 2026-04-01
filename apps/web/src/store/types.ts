@@ -43,6 +43,7 @@ export type Quest = {
   timeCondition?: {
     activeRule: 'every_other_hour';
   };
+  chapterLabel?: string;
   guerrilla?: boolean;
   gemsReward?: number;
   bgm?: string; // e.g., 'battle.wav'

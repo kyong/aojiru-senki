@@ -12,7 +12,7 @@ export const Privacy = () => {
 
         <div className="bg-gray-800/50 rounded-2xl p-6 md:p-8 border border-gray-700 space-y-6 text-gray-300 leading-relaxed">
           <p className="text-sm">
-            Aojiru Studio（以下「当方」）は、本アプリ「青汁戦記」における利用者情報の扱いについて、以下の通り定めます。
+            スーパーハッピーカンパニー（以下「当方」）は、本アプリ「青汁戦記」における利用者情報の扱いについて、以下の通り定めます。
           </p>
 
           <section>

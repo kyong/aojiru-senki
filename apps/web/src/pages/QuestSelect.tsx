@@ -138,7 +138,7 @@ export const QuestSelect = () => {
                       </>
                     ) : (
                       <span className="bg-green-900/50 text-green-400 text-xs px-2 py-0.5 rounded border border-green-700/50">
-                        Chapter {quest.id}
+                        {quest.chapterLabel}
                       </span>
                     )}
                     <div className="flex gap-0.5">

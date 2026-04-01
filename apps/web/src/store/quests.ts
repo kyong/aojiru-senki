@@ -15,6 +15,7 @@ export const ALL_QUESTS: Quest[] = [
     description: 'ギトギトの朝を浄化せよ！',
     thumbnail: '/images/bacon_general.png',
     bgm: 'battle.mp3',
+    chapterLabel: 'Chapter 1',
   },
   {
     id: 2,
@@ -26,6 +27,7 @@ export const ALL_QUESTS: Quest[] = [
     description: '午後の眠気に打ち勝て！',
     thumbnail: '/images/carb_the_great.png',
     bgm: 'battle.mp3',
+    chapterLabel: 'Chapter 2',
   },
   {
     id: 4,
@@ -37,6 +39,7 @@ export const ALL_QUESTS: Quest[] = [
     description: '甘い誘惑を断ち切れ！',
     thumbnail: '/images/sweets_majin.png',
     bgm: 'battle.mp3',
+    chapterLabel: 'Chapter 3',
     unlockCondition: { requireClearId: 2 },
   },
   {
@@ -49,6 +52,7 @@ export const ALL_QUESTS: Quest[] = [
     description: '世界に健康を取り戻す時だ！',
     thumbnail: '/images/cholesterol_king.png',
     bgm: 'boss_battle.mp3',
+    chapterLabel: 'Chapter 4',
     unlockCondition: { requireClearId: 4 },
   },
   {
@@ -60,6 +64,7 @@ export const ALL_QUESTS: Quest[] = [
     goldReward: 30000,
     description: '深夜の炭水化物は罪深き味……',
     thumbnail: '/images/ramen_kaijin.png',
+    chapterLabel: 'Extra',
     unlockCondition: { requireClearId: 3 },
     bgm: 'battle.mp3',
   },

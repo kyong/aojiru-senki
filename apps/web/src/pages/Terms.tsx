@@ -14,7 +14,7 @@ export const Terms = () => {
           <section>
             <h3 className="text-lg font-bold text-white mb-3">1. はじめに</h3>
             <p className="text-sm">
-              本利用規約は、Aojiru Studio（以下「当方」）が提供するアプリ「青汁戦記」（以下「本アプリ」）の利用条件を定めるものです。
+              本利用規約は、スーパーハッピーカンパニー（以下「当方」）が提供するアプリ「青汁戦記」（以下「本アプリ」）の利用条件を定めるものです。
               利用者の皆様は、本規約に同意した上で本アプリをご利用ください。
             </p>
             <p className="text-xs text-red-400 mt-2 font-bold italic">
