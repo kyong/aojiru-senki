@@ -108,17 +108,26 @@ export const AdRewardModal: React.FC<Props> = ({ open, onClose }) => {
   const [misses, setMisses] = useState<{ id: number; x: number; y: number }[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Pause BGM when ad modal is open
+  // Pause BGM when ad modal is open, play click_game BGM during close-challenge
   useEffect(() => {
     if (open) {
       soundManager.pauseBGM();
     }
     return () => {
       if (open) {
+        soundManager.stopBGM();
         soundManager.resumeBGM();
       }
     };
   }, [open]);
+
+  useEffect(() => {
+    if (phase === 'close-challenge' && hasStarted) {
+      soundManager.playBGM('click_game.mp3');
+    } else if (phase === 'rewarded') {
+      soundManager.playBGM('gem_get.mp3');
+    }
+  }, [phase, hasStarted]);
 
   const reset = useCallback(() => {
     setPhase('confirm');
