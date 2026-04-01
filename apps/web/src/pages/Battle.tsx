@@ -139,6 +139,7 @@ export const Battle = () => {
   const handleStartBattle = () => {
     soundManager.playSortie();
     consumeAp(quest?.stamina ?? 10);
+    setPlayerHp(maxHp); // 戦闘開始時にHPを確実に全回復させる（バフ適用後の上限に合わせる）
     setGameState('BATTLE');
     addLog('戦闘開始！');
   };
@@ -147,6 +148,8 @@ export const Battle = () => {
     soundManager.playPikori();
     if (!useItem('choHadoAojiru')) return;
     setChoHadoBuff(true);
+    // 超波動青汁使用時にHP上限が上がるため、現在のHPもその分引き上げる
+    setPlayerHp(Math.floor(rawBattleStats.maxHp * 1.2));
   };
 
   const doEnemyTurn = (guarding: boolean) => {
