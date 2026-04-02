@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Volume2, VolumeX } from 'lucide-react';
+import { Volume2, VolumeX, MessageSquare } from 'lucide-react';
 import { soundManager } from '../utils/sound';
 import './ServiceEnd.css';
 
@@ -265,13 +265,20 @@ const ServiceEnd: React.FC<ServiceEndProps> = ({ onRestore }) => {
             <p>「青汁戦記」をご利用いただき、誠にありがとうございました。</p>
             <p>本作は2026年4月2日をもちまして、サービスを終了いたしました。</p>
           </div>
-          <div 
+          <div
             className={`service-end-date-wrapper ${isShaking ? 'shake' : ''} ${isFlickering ? 'flicker' : ''}`}
             onClick={handleDateClick}
           >
             <div className="service-end-date">{displayDate}</div>
             <div className="rewind-icon">↺</div>
           </div>
+          <button
+            onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScopIUuQWi_w5xh5--T34y8QtLVQzL9BpHnD5AMF1HI1Fw6eQ/viewform?usp=publish-editor', '_blank')}
+            className="service-end-contact"
+          >
+            <MessageSquare size={16} />
+            お問い合わせ
+          </button>
         </>
       )}
 
