@@ -82,7 +82,8 @@ export const Battle = () => {
   // 新規追加: スキル関連
   const [skillMenu, setSkillMenu] = useState(false);
   const [skillUser, setSkillUser] = useState<Character | null>(null);
-  const [enemyAtkMultiplier, setEnemyAtkMultiplier] = useState(1.0);
+  const [debuffStacks, setDebuffStacks] = useState<{ multiplier: number; remainingTurns: number }[]>([]);
+  const enemyAtkMultiplier = debuffStacks.reduce((acc, s) => acc * s.multiplier, 1.0);
   const [skillFlash, setSkillFlash] = useState<SkillType | null>(null);
   const [isVictoryCutin, setIsVictoryCutin] = useState(false);
 
@@ -188,6 +189,17 @@ export const Battle = () => {
         }
         return nextHp;
       });
+
+      // デバフの残りターン数を減らし、0になったスタックを除去
+      setDebuffStacks(prev => {
+        const next = prev
+          .map(s => ({ ...s, remainingTurns: s.remainingTurns - 1 }))
+          .filter(s => s.remainingTurns > 0);
+        if (next.length < prev.length) {
+          addLog('💨 デバフ効果が一部切れた！');
+        }
+        return next;
+      });
     }, 1000); // 演出に合わせて少し遅らせる
   };
 
@@ -255,9 +267,10 @@ export const Battle = () => {
       }
       else if (skill.type === 'debuff') {
         soundManager.playSkill();
-        setEnemyAtkMultiplier(skill.effectValue || 0.7);
-        setTimeout(() => setEnemyAtkMultiplier(1.0), 5000); // 5秒で戻る
-        logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}の攻撃力を下げた！`;
+        const effectVal = skill.effectValue || 0.7;
+        setDebuffStacks(prev => [...prev, { multiplier: effectVal, remainingTurns: 5 }]);
+        const reductionPct = Math.round((1 - effectVal) * 100);
+        logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}の攻撃力を${reductionPct}%下げた！（5ターン）`;
       }
 
       addLog(logMsg);
