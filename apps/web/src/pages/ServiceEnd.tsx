@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Volume2, VolumeX, MessageSquare } from 'lucide-react';
+import { Volume2, VolumeX, MessageSquare, Music } from 'lucide-react';
 import { soundManager } from '../utils/sound';
+import BgmLibrary from '../components/BgmLibrary';
 import './ServiceEnd.css';
 
 interface ServiceEndProps {
@@ -26,6 +27,7 @@ interface Popup {
 
 const ServiceEnd: React.FC<ServiceEndProps> = ({ onRestore }) => {
   const [phase, setPhase] = useState<Phase>('eol');
+  const [isBgmLibraryOpen, setIsBgmLibraryOpen] = useState(false);
   const [clickCount, setClickCount] = useState(0);
   const [displayDate, setDisplayDate] = useState('2026.04.02');
   const [isShaking, setIsShaking] = useState(false);
@@ -272,13 +274,22 @@ const ServiceEnd: React.FC<ServiceEndProps> = ({ onRestore }) => {
             <div className="service-end-date">{displayDate}</div>
             <div className="rewind-icon">↺</div>
           </div>
-          <button
-            onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScopIUuQWi_w5xh5--T34y8QtLVQzL9BpHnD5AMF1HI1Fw6eQ/viewform?usp=publish-editor', '_blank')}
-            className="service-end-contact"
-          >
-            <MessageSquare size={16} />
-            お問い合わせ
-          </button>
+          <div className="flex gap-4 mt-8">
+            <button
+              onClick={() => setIsBgmLibraryOpen(true)}
+              className="service-end-contact"
+            >
+              <Music size={16} />
+              BGMライブラリ
+            </button>
+            <button
+              onClick={() => window.open('https://docs.google.com/forms/d/e/1FAIpQLScopIUuQWi_w5xh5--T34y8QtLVQzL9BpHnD5AMF1HI1Fw6eQ/viewform?usp=publish-editor', '_blank')}
+              className="service-end-contact"
+            >
+              <MessageSquare size={16} />
+              お問い合わせ
+            </button>
+          </div>
         </>
       )}
 
@@ -345,6 +356,7 @@ const ServiceEnd: React.FC<ServiceEndProps> = ({ onRestore }) => {
       )}
 
       <div className="thank-you-footer">AOJIRU SENKI - MEMORIAL PROJECT</div>
+      <BgmLibrary isOpen={isBgmLibraryOpen} onClose={() => setIsBgmLibraryOpen(false)} />
     </div>
   );
 };

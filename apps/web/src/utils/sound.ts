@@ -1,3 +1,27 @@
+export interface BgmMetadata {
+  id: string;
+  title: string;
+  filename: string;
+  description: string;
+}
+
+export const BGM_METADATA: BgmMetadata[] = [
+  { id: 'home', title: '始まりの苦味', filename: 'home.mp3', description: 'メインテーマ。全ての冒険はここから始まる。' },
+  { id: 'battle', title: '青汁の鼓動', filename: 'battle.mp3', description: '通常戦闘曲。健康への情熱が脈打つ。' },
+  { id: 'boss_battle', title: '濃縮された絶望', filename: 'boss_battle.mp3', description: 'ボス戦。あまりの苦さに意識が遠のく。' },
+  { id: 'click_game', title: 'トクトク・パニック', filename: 'click_game.mp3', description: 'ミニゲーム。溢れ出る青汁を制御せよ。' },
+  { id: 'extra', title: '深淵の緑', filename: 'extra.mp3', description: 'エクストラステージ。更なる高みを目指す者へ。' },
+  { id: 'super_extra', title: '究極の健康', filename: 'super_extra.mp3', description: '最高難易度。青汁の真髄に触れた者の歌。' },
+  { id: 'guerrilla', title: 'ゲリラ収穫祭', filename: 'guerrilla.mp3', description: 'ゲリラクエスト。突如として訪れる恵みの時。' },
+  { id: 'ready', title: '準備の刻', filename: 'ready.mp3', description: 'クエスト準備。覚悟を決める静寂の時間。' },
+  { id: 'story', title: '語り継がれる伝説', filename: 'story.mp3', description: 'ストーリー。青汁を巡る愛と哀しみの物語。' },
+  { id: 'fanfare', title: '勝利の美酒', filename: 'fanfare.mp3', description: '勝利。苦さを乗り越えた先にある歓喜。' },
+  { id: 'gameover', title: '散りゆく葉', filename: 'gameover.mp3', description: '敗北。全てが土に還り、また新たな芽吹きの糧となる。' },
+  { id: 'gem_get', title: '輝く滴', filename: 'gem_get.mp3', description: 'リザルト。努力の結晶が今、手の中に。' },
+  { id: 'gacha', title: '運命の攪拌', filename: 'gacha.mp3', description: 'ガチャ。運命が緑の渦の中で混ざり合う。' },
+  { id: 'gacha_result', title: '覚醒の瞬間', filename: 'gacha_result.mp3', description: 'ガチャ結果。新たなる健康の化身が現臨する。' },
+];
+
 class SoundManager {
   private ctx: AudioContext | null = null;
   private masterGain: GainNode | null = null;

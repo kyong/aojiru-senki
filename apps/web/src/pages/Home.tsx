@@ -1,8 +1,12 @@
 import { Layout } from '../components/layout/Layout';
 import { useGame } from '../context/GameContext';
+import { useState } from 'react';
+import { Music } from 'lucide-react';
+import BgmLibrary from '../components/BgmLibrary';
 
 const Home = () => {
   const { player } = useGame();
+  const [isBgmLibraryOpen, setIsBgmLibraryOpen] = useState(false);
 
   const expPct = Math.floor((player.exp / player.nextExp) * 100);
 
@@ -103,6 +107,31 @@ const Home = () => {
             </div>
           </div>
 
+          {/* Soundtrack / Memorial */}
+          <div 
+            onClick={() => setIsBgmLibraryOpen(true)}
+            className="group relative bg-gradient-to-br from-green-900/40 to-gray-800 rounded-xl p-6 border border-green-500/30 shadow-lg cursor-pointer overflow-hidden transition-all duration-300 hover:border-green-400 hover:shadow-[0_0_20px_rgba(34,197,94,0.2)]"
+          >
+            <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/10 rounded-full blur-xl -mr-8 -mt-8 group-hover:bg-green-500/20 transition-colors" />
+            <div className="flex items-center gap-4">
+              <div className="p-3 bg-green-500/20 rounded-xl text-green-400 group-hover:scale-110 transition-transform">
+                <Music size={24} />
+              </div>
+              <div>
+                <h3 className="font-black text-white tracking-tight">Memorial Soundtrack</h3>
+                <p className="text-xs text-green-400/70 font-bold uppercase tracking-widest">BGM & Downloads</p>
+              </div>
+            </div>
+            <div className="mt-4 flex items-center justify-between">
+              <div className="flex -space-x-2">
+                {[...Array(4)].map((_, i) => (
+                  <div key={i} className="w-6 h-1 bg-green-500/30 rounded-full animate-pulse" style={{ animationDelay: `${i * 0.2}s` }} />
+                ))}
+              </div>
+              <span className="text-[10px] text-gray-500 font-black group-hover:text-white transition-colors">LISTEN NOW →</span>
+            </div>
+          </div>
+
           {/* News / Announcements */}
           <div className="bg-gray-800 rounded-xl p-0 border border-gray-700 flex-1 overflow-hidden flex flex-col">
             <div className="p-4 border-b border-gray-700 bg-gray-800/50">
@@ -150,6 +179,7 @@ const Home = () => {
           </div>
         </div>
       </div>
+      <BgmLibrary isOpen={isBgmLibraryOpen} onClose={() => setIsBgmLibraryOpen(false)} />
     </Layout>
   );
 };
