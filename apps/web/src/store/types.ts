@@ -12,6 +12,7 @@ export type Skill = {
   type: SkillType;
   multiplier?: number;
   effectValue?: number;
+  duration?: number;
   cost: number;
 };
 

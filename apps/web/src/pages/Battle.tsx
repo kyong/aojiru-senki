@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Layout } from '../components/layout/Layout';
 import { Heart, Droplet, Zap, Shield, Sword, ArrowRight, Package, LogOut, Share2 } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -83,7 +83,8 @@ export const Battle = () => {
   const [skillMenu, setSkillMenu] = useState(false);
   const [skillUser, setSkillUser] = useState<Character | null>(null);
   const [debuffStacks, setDebuffStacks] = useState<{ multiplier: number; remainingTurns: number }[]>([]);
-  const enemyAtkMultiplier = debuffStacks.reduce((acc, s) => acc * s.multiplier, 1.0);
+  const debuffStacksRef = useRef(debuffStacks);
+  debuffStacksRef.current = debuffStacks;
   const [skillFlash, setSkillFlash] = useState<SkillType | null>(null);
   const [isVictoryCutin, setIsVictoryCutin] = useState(false);
 
@@ -159,12 +160,14 @@ export const Battle = () => {
     setTimeout(() => setEnemyAttacking(true), 100);
 
     setTimeout(() => {
+      // refから最新のデバフ倍率を算出（クロージャの古い値を回避）
+      const currentMultiplier = debuffStacksRef.current.reduce((acc, s) => acc * s.multiplier, 1.0);
       const baseRaw = enemyData.minAtk + Math.floor(Math.random() * (enemyData.maxAtk - enemyData.minAtk + 1));
       // デバフ適用
-      const base = Math.floor(baseRaw * enemyAtkMultiplier);
+      const base = Math.floor(baseRaw * currentMultiplier);
       const dmg = guarding ? Math.floor(base * 0.5) : base;
       const guardText = guarding ? '（防御！ダメージ半減！）' : '';
-      const debuffText = enemyAtkMultiplier < 1.0 ? '（敵ATK減少中！）' : '';
+      const debuffText = currentMultiplier < 1.0 ? '（敵ATK減少中！）' : '';
       setIsGuarding(false);
       setEnemyAttacking(false); // ランジ終了
 
@@ -191,15 +194,14 @@ export const Battle = () => {
       });
 
       // デバフの残りターン数を減らし、0になったスタックを除去
-      setDebuffStacks(prev => {
-        const next = prev
-          .map(s => ({ ...s, remainingTurns: s.remainingTurns - 1 }))
-          .filter(s => s.remainingTurns > 0);
-        if (next.length < prev.length) {
-          addLog('💨 デバフ効果が一部切れた！');
-        }
-        return next;
-      });
+      const prevStacks = debuffStacksRef.current;
+      const nextStacks = prevStacks
+        .map(s => ({ ...s, remainingTurns: s.remainingTurns - 1 }))
+        .filter(s => s.remainingTurns > 0);
+      setDebuffStacks(nextStacks);
+      if (nextStacks.length < prevStacks.length) {
+        addLog('💨 デバフ効果が一部切れた！');
+      }
     }, 1000); // 演出に合わせて少し遅らせる
   };
 
@@ -268,9 +270,10 @@ export const Battle = () => {
       else if (skill.type === 'debuff') {
         soundManager.playSkill();
         const effectVal = skill.effectValue || 0.7;
-        setDebuffStacks(prev => [...prev, { multiplier: effectVal, remainingTurns: 5 }]);
+        const duration = skill.duration || 5;
+        setDebuffStacks(prev => [...prev, { multiplier: effectVal, remainingTurns: duration }]);
         const reductionPct = Math.round((1 - effectVal) * 100);
-        logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}の攻撃力を${reductionPct}%下げた！（5ターン）`;
+        logMsg = `✨ ${char.name}の${skill.name}！ ${enemyData.name}の攻撃力を${reductionPct}%下げた！（${duration}ターン）`;
       }
 
       addLog(logMsg);
